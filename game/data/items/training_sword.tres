@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://domain/definitions/item_definition.gd" id="1_item"]
+[ext_resource type="Script" path="res://domain/definitions/stat_modifier_definition.gd" id="2_modifier"]
+
+[sub_resource type="Resource" id="Resource_strength"]
+script = ExtResource("2_modifier")
+source_id = "item_definition"
+stat_id = "strength"
+amount = 2
+
+[resource]
+script = ExtResource("1_item")
+id = "training_sword"
+display_name = "Тренировочный меч"
+description = "Простое оружие для первого пути."
+rarity_id = "common"
+type_id = "weapon"
+slot_id = "weapon"
+stack_limit = 1
+modifiers = Array[StatModifierDefinition]([SubResource("Resource_strength")])

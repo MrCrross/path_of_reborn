@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ActorDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://domain/definitions/actor_definition.gd" id="1_actor"]
+
+[resource]
+script = ExtResource("1_actor")
+id = "goblin_scout"
+display_name = "Гоблин-разведчик"
+max_hp = 10
+strength = 4
+defense = 1
+mana = 0
+xp_reward = 8
+xp_thresholds = Array[int]([])
+strength_upgrade_amount = 1
+max_hp_upgrade_amount = 1
+behavior_id = "goblin"
+telegraph_ticks = 36
+startup_ticks = 12
+active_ticks = 6
+recovery_ticks = 18
+vulnerability_ticks = 42
+attacks_per_cycle = 2
+attack_multiplier = 1.0
+vulnerability_multiplier = 2.0

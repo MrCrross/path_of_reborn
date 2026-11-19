@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="LootTableDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://domain/definitions/loot_table_definition.gd" id="1_table"]
+[ext_resource type="Script" path="res://domain/definitions/loot_entry_definition.gd" id="2_entry"]
+
+[sub_resource type="Resource" id="Resource_sword"]
+script = ExtResource("2_entry")
+item_id = "training_sword"
+weight = 1.0
+min_quantity = 1
+max_quantity = 1
+
+[sub_resource type="Resource" id="Resource_charm"]
+script = ExtResource("2_entry")
+item_id = "moss_charm"
+weight = 1.0
+min_quantity = 1
+max_quantity = 1
+
+[sub_resource type="Resource" id="Resource_echo"]
+script = ExtResource("2_entry")
+item_id = "echo_crystal"
+weight = 1.0
+min_quantity = 1
+max_quantity = 2
+aspect_id = "moss"
+
+[resource]
+script = ExtResource("1_table")
+encounter_id = "moss_slime"
+rolls = 1
+entries = Array[LootEntryDefinition]([SubResource("Resource_sword"), SubResource("Resource_charm"), SubResource("Resource_echo")])

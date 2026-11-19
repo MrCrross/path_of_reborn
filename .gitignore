@@ -1,0 +1,27 @@
+# --- MCP / agent tooling ---
+.mcp-downloads/
+.mcp-servers/
+.mcp-local/
+.mcp.json
+.kimi-work/
+.agents/
+
+# --- Working & external material (not project code) ---
+art_working/
+references/agent-skills-src/
+references/path-of-kings/screenshots/
+docs/narrative.zip
+
+# --- Godot ---
+game/.godot/
+game/export/
+game/export*/
+*.pck
+*.apk
+*.aab
+*.tmp
+
+# --- OS junk ---
+.DS_Store
+Thumbs.db
+desktop.ini

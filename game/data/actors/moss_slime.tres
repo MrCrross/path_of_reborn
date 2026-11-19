@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ActorDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://domain/definitions/actor_definition.gd" id="1_actor"]
+
+[resource]
+script = ExtResource("1_actor")
+id = "moss_slime"
+display_name = "Моховая слизь"
+max_hp = 6
+strength = 2
+defense = 0
+mana = 0
+xp_reward = 4
+xp_thresholds = Array[int]([])
+strength_upgrade_amount = 1
+max_hp_upgrade_amount = 1
+behavior_id = "slime"
+telegraph_ticks = 30
+startup_ticks = 18
+active_ticks = 6
+recovery_ticks = 12
+vulnerability_ticks = 36
+attacks_per_cycle = 1
+attack_multiplier = 1.0
+vulnerability_multiplier = 2.0

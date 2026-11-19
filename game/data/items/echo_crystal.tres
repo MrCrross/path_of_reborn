@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://domain/definitions/item_definition.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = "echo_crystal"
+display_name = "Кристалл Эха"
+description = "Кристалл с аспектом побеждённого противника."
+rarity_id = "uncommon"
+type_id = "echo"
+aspect_id = "unspecified"
+stack_limit = 99
+modifiers = Array[StatModifierDefinition]([])
