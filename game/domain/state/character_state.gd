@@ -64,20 +64,54 @@ func heal(amount: int) -> int:
 	return healing_received
 
 func gain_xp(amount: int) -> void:
-	experience += maxi(0, amount)
-	while level <= _xp_thresholds.size():
-		var required_xp: int = maxi(1, _xp_thresholds[level - 1])
-		if experience < required_xp:
-			break
-		experience -= required_xp
-		level += 1
-		pending_upgrade_choices += 1
-		level_changed.emit(level)
+	var allocation: Dictionary = calculate_level_gain(level, experience, _xp_thresholds, amount)
+	experience = int(allocation["experience"])
+	var gained: int = int(allocation["levels_gained"])
+	level = int(allocation["level"])
+	pending_upgrade_choices += gained
+	for gained_level: int in allocation["levels"]:
+		level_changed.emit(gained_level)
 
 func xp_to_next_level() -> int:
 	if level > _xp_thresholds.size():
 		return 0
 	return maxi(1, _xp_thresholds[level - 1])
+
+## Честный прогноз начисления опыта для экрана результата: до claim игрок
+## видит, какой уровень и остаток опыта даст получение награды.
+func preview_level_gain(amount: int) -> Dictionary:
+	return calculate_level_gain(level, experience, _xp_thresholds, amount)
+
+static func calculate_level_gain(start_level: int, start_experience: int, thresholds: Array[int], amount: int) -> Dictionary:
+	var next_level: int = start_level
+	var next_experience: int = start_experience + maxi(0, amount)
+	var levels: Array[int] = []
+	while next_level <= thresholds.size():
+		var required_xp: int = maxi(1, thresholds[next_level - 1])
+		if next_experience < required_xp:
+			break
+		next_experience -= required_xp
+		next_level += 1
+		levels.append(next_level)
+	return {
+		"levels_gained": levels.size(),
+		"levels": levels,
+		"level": next_level,
+		"experience": next_experience,
+		"upgrade_choices": levels.size(),
+	}
+
+## Cap: дальше роста по данным нет; UI показывает понятное состояние, а не 0/0.
+func has_reached_level_cap() -> bool:
+	return _xp_thresholds.is_empty() or level > _xp_thresholds.size()
+
+## Отображаемая оценка комплекта, не участвующая в расчёте боя.
+func power_rating() -> int:
+	return max_hp + strength * 4 + defense * 4 + mana * 2
+
+func upgrade_gains() -> Dictionary[String, int]:
+	var upgraded_hp: int = _calculate_stats(_modifiers.values(), 1)["max_hp"]
+	return {"strength": definition.strength_upgrade_amount, "max_hp": upgraded_hp - max_hp}
 
 func choose_upgrade(upgrade_id: String) -> bool:
 	if pending_upgrade_choices == 0:
@@ -124,9 +158,9 @@ func preview_stats(replaced_sources: Array[String], added_modifiers: Array[StatM
 	modifier_groups.append(added_modifiers)
 	return _calculate_stats(modifier_groups)
 
-func _calculate_stats(modifier_groups: Array) -> Dictionary[String, int]:
+func _calculate_stats(modifier_groups: Array, extra_hp_upgrades: int = 0) -> Dictionary[String, int]:
 	var stats: Dictionary[String, int] = {
-		"max_hp": _base_max_hp + _max_hp_upgrades * definition.max_hp_upgrade_amount,
+		"max_hp": _base_max_hp + (_max_hp_upgrades + extra_hp_upgrades) * definition.max_hp_upgrade_amount,
 		"strength": _base_strength + _strength_upgrades * definition.strength_upgrade_amount,
 		"defense": _base_defense,
 		"mana": _base_mana,
@@ -165,6 +199,16 @@ func apply_dto(dto: Dictionary) -> void:
 	recompute_stats()
 	current_hp = clampi(int(dto.get("current_hp", max_hp)), 0, max_hp)
 	_death_emitted = is_dead()
+
+func unlocked_abilities() -> Array[AbilityDefinition]:
+	var result: Array[AbilityDefinition] = []
+	for ability: AbilityDefinition in definition.abilities:
+		if level >= ability.unlock_level:
+			result.append(ability)
+	return result
+
+func first_ability() -> AbilityDefinition:
+	return null if definition.abilities.is_empty() else definition.abilities[0]
 
 func restore_full_health() -> void:
 	current_hp = max_hp

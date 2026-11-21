@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="ActorDefinition" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ActorDefinition" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://domain/definitions/actor_definition.gd" id="1_actor"]
+[ext_resource type="AbilityDefinition" path="res://data/abilities/haruto_focused_strike.tres" id="2_ability"]
 
 [resource]
 script = ExtResource("1_actor")
@@ -11,9 +12,11 @@ strength = 3
 defense = 2
 mana = 1
 xp_reward = 0
-xp_thresholds = Array[int]([4, 8, 12])
+xp_thresholds = Array[int]([4, 8, 12, 18])
 strength_upgrade_amount = 1
 max_hp_upgrade_amount = 4
-attack_cooldown_ticks = 24
+attack_cooldown_ticks = 60
+attack_startup_ticks = 18
 dodge_duration_ticks = 24
 dodge_cooldown_ticks = 42
+abilities = Array[AbilityDefinition]([ExtResource("2_ability")])

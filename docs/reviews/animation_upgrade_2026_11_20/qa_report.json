@@ -1,0 +1,1011 @@
+{
+  "clips": 15,
+  "frames": 49,
+  "checks": [
+    {
+      "path": "characters/animations/haruto_exiled_idle_sheet.png",
+      "sha256": "37790ac25d54d03ad31af3126b23c5b3742a6aed6d0b0cc9df288ee7e2a1ad49",
+      "frames": 2,
+      "asset_report": {
+        "ok": true,
+        "assets": [
+          {
+            "path": "art_working/animation_upgrade_2026_11_20/candidates/characters/animations/haruto_exiled_idle_sheet.png",
+            "format": "PNG",
+            "mode": "RGBA",
+            "width": 572,
+            "height": 1966,
+            "bytes": 1003758,
+            "color_count": ">65535",
+            "has_alpha": true,
+            "alpha_min": 0,
+            "alpha_max": 255,
+            "transparent_pixels": 524430,
+            "content_bounds": [
+              4,
+              4,
+              568,
+              1962
+            ],
+            "problems": []
+          }
+        ]
+      },
+      "native_rgb_preserved": true,
+      "registration_passed": true,
+      "rgba8_mib": 4.289825439453125
+    },
+    {
+      "path": "characters/animations/haruto_exiled_branch_attack_sheet.png",
+      "sha256": "e64c65acfb619e948dcc917ed82e1a3e69726c68ebe08857a375db71178e0a8a",
+      "frames": 4,
+      "asset_report": {
+        "ok": true,
+        "assets": [
+          {
+            "path": "art_working/animation_upgrade_2026_11_20/candidates/characters/animations/haruto_exiled_branch_attack_sheet.png",
+            "format": "PNG",
+            "mode": "RGBA",
+            "width": 543,
+            "height": 2748,
+            "bytes": 1572733,
+            "color_count": ">65535",
+            "has_alpha": true,
+            "alpha_min": 0,
+            "alpha_max": 254,
+            "transparent_pixels": 903815,
+            "content_bounds": [
+              2,
+              4,
+              539,
+              2744
+            ],
+            "problems": []
+          }
+        ]
+      },
+      "native_rgb_preserved": true,
+      "registration_passed": true,
+      "rgba8_mib": 5.6921539306640625
+    },
+    {
+      "path": "characters/animations/haruto_exiled_dodge_sheet.png",
+      "sha256": "a8d9ec6eb7d8e996a7d0caed1da659b9787ea52ceb67b7ff94d3a91a7400876d",
+      "frames": 4,
+      "asset_report": {
+        "ok": true,
+        "assets": [
+          {
+            "path": "art_working/animation_upgrade_2026_11_20/candidates/characters/animations/haruto_exiled_dodge_sheet.png",
+            "format": "PNG",
+            "mode": "RGBA",
+            "width": 485,
+            "height": 2840,
+            "bytes": 1509704,
+            "color_count": ">65535",
+            "has_alpha": true,
+            "alpha_min": 0,
+            "alpha_max": 254,
+            "transparent_pixels": 730674,
+            "content_bounds": [
+              2,
+              4,
+              481,
+              2830
+            ],
+            "problems": []
+          }
+        ]
+      },
+      "native_rgb_preserved": true,
+      "registration_passed": true,
+      "rgba8_mib": 5.254364013671875
+    },
+    {
+      "path": "characters/animations/haruto_exiled_hit_sheet.png",
+      "sha256": "c53d1695059d2ce385dbe36869181619782fb2670889c18a680842d933b5307f",
+      "frames": 2,
+      "asset_report": {
+        "ok": true,
+        "assets": [
+          {
+            "path": "art_working/animation_upgrade_2026_11_20/candidates/characters/animations/haruto_exiled_hit_sheet.png",
+            "format": "PNG",
+            "mode": "RGBA",
+            "width": 587,
+            "height": 1990,
+            "bytes": 1030602,
+            "color_count": ">65535",
+            "has_alpha": true,
+            "alpha_min": 0,
+            "alpha_max": 255,
+            "transparent_pixels": 531597,
+            "content_bounds": [
+              4,
+              4,
+              583,
+              1986
+            ],
+            "problems": []
+          }
+        ]
+      },
+      "native_rgb_preserved": true,
+      "registration_passed": true,
+      "rgba8_mib": 4.456062316894531
+    },
+    {
+      "path": "enemies/animations/moss_slime_idle_sheet.png",
+      "sha256": "0df99b56aea2d6f9d59f1bd8d237522496d78c5edb3d887421877d09f52c23aa",
+      "frames": 2,
+      "asset_report": {
+        "ok": true,
+        "assets": [
+          {
+            "path": "art_working/animation_upgrade_2026_11_20/candidates/enemies/animations/moss_slime_idle_sheet.png",
+            "format": "PNG",
+            "mode": "RGBA",
+            "width": 724,
+            "height": 1016,
+            "bytes": 526113,
+            "color_count": 47160,
+            "has_alpha": true,
+            "alpha_min": 0,
+            "alpha_max": 255,
+            "transparent_pixels": 218584,
+            "content_bounds": [
+              4,
+              4,
+              720,
+              1012
+            ],
+            "problems": []
+          }
+        ]
+      },
+      "native_rgb_preserved": true,
+      "registration_passed": true,
+      "rgba8_mib": 2.8060302734375
+    },
+    {
+      "path": "enemies/animations/moss_slime_jump_sheet.png",
+      "sha256": "f7413e224f312d3b4ff1e18bb336d58441a60e919b4a47976444328329213e06",
+      "frames": 6,
+      "asset_report": {
+        "ok": true,
+        "assets": [
+          {
+            "path": "art_working/animation_upgrade_2026_11_20/candidates/enemies/animations/moss_slime_jump_sheet.png",
+            "format": "PNG",
+            "mode": "RGBA",
+            "width": 461,
+            "height": 1974,
+            "bytes": 807738,
+            "color_count": ">65535",
+            "has_alpha": true,
+            "alpha_min": 0,
+            "alpha_max": 254,
+            "transparent_pixels": 385034,
+            "content_bounds": [
+              4,
+              4,
+              457,
+              1924
+            ],
+            "problems": []
+          }
+        ]
+      },
+      "native_rgb_preserved": true,
+      "registration_passed": true,
+      "rgba8_mib": 3.4714279174804688
+    },
+    {
+      "path": "enemies/animations/moss_slime_hit_sheet.png",
+      "sha256": "35bdb163f09806c41322273986685f186bd1919a04737a7cd71ab17935f3e21d",
+      "frames": 2,
+      "asset_report": {
+        "ok": true,
+        "assets": [
+          {
+            "path": "art_working/animation_upgrade_2026_11_20/candidates/enemies/animations/moss_slime_hit_sheet.png",
+            "format": "PNG",
+            "mode": "RGBA",
+            "width": 731,
+            "height": 964,
+            "bytes": 518122,
+            "color_count": 45594,
+            "has_alpha": true,
+            "alpha_min": 0,
+            "alpha_max": 255,
+            "transparent_pixels": 222095,
+            "content_bounds": [
+              4,
+              4,
+              727,
+              960
+            ],
+            "problems": []
+          }
+        ]
+      },
+      "native_rgb_preserved": true,
+      "registration_passed": true,
+      "rgba8_mib": 2.6881561279296875
+    },
+    {
+      "path": "enemies/animations/goblin_scout_idle_sheet.png",
+      "sha256": "f7191682a6e1023b2ee51a957bf946f432c5001ede7dcf6329b0ce5e5d9d0e2b",
+      "frames": 2,
+      "asset_report": {
+        "ok": true,
+        "assets": [
+          {
+            "path": "art_working/animation_upgrade_2026_11_20/candidates/enemies/animations/goblin_scout_idle_sheet.png",
+            "format": "PNG",
+            "mode": "RGBA",
+            "width": 748,
+            "height": 1330,
+            "bytes": 828397,
+            "color_count": ">65535",
+            "has_alpha": true,
+            "alpha_min": 0,
+            "alpha_max": 255,
+            "transparent_pixels": 581994,
+            "content_bounds": [
+              4,
+              4,
+              744,
+              1326
+            ],
+            "problems": []
+          }
+        ]
+      },
+      "native_rgb_preserved": true,
+      "registration_passed": true,
+      "rgba8_mib": 3.795013427734375
+    },
+    {
+      "path": "enemies/animations/goblin_scout_double_slash_sheet.png",
+      "sha256": "c826ebcd4d70b0a640227d20838e289137fe8d958260acc34bca942d0da3e678",
+      "frames": 6,
+      "asset_report": {
+        "ok": true,
+        "assets": [
+          {
+            "path": "art_working/animation_upgrade_2026_11_20/candidates/enemies/animations/goblin_scout_double_slash_sheet.png",
+            "format": "PNG",
+            "mode": "RGBA",
+            "width": 446,
+            "height": 2478,
+            "bytes": 1453013,
+            "color_count": ">65535",
+            "has_alpha": true,
+            "alpha_min": 0,
+            "alpha_max": 254,
+            "transparent_pixels": 661085,
+            "content_bounds": [
+              4,
+              4,
+              442,
+              2472
+            ],
+            "problems": []
+          }
+        ]
+      },
+      "native_rgb_preserved": true,
+      "registration_passed": true,
+      "rgba8_mib": 4.2159576416015625
+    },
+    {
+      "path": "enemies/animations/goblin_scout_retreat_sheet.png",
+      "sha256": "8afe89d48b8c8f461f8415bb6bc3580084b03cba34e1341d677ba3d8b45de5ed",
+      "frames": 3,
+      "asset_report": {
+        "ok": true,
+        "assets": [
+          {
+            "path": "art_working/animation_upgrade_2026_11_20/candidates/enemies/animations/goblin_scout_retreat_sheet.png",
+            "format": "PNG",
+            "mode": "RGBA",
+            "width": 605,
+            "height": 1578,
+            "bytes": 826217,
+            "color_count": ">65535",
+            "has_alpha": true,
+            "alpha_min": 0,
+            "alpha_max": 255,
+            "transparent_pixels": 586625,
+            "content_bounds": [
+              4,
+              4,
+              601,
+              1563
+            ],
+            "problems": []
+          }
+        ]
+      },
+      "native_rgb_preserved": true,
+      "registration_passed": true,
+      "rgba8_mib": 3.6418533325195312
+    },
+    {
+      "path": "characters/animations/haruto_modern_push_sheet.png",
+      "sha256": "8fe4be7545e9270fa74dccc8fe6526d743988b956546927c158d3b76de258888",
+      "frames": 4,
+      "asset_report": {
+        "ok": true,
+        "assets": [
+          {
+            "path": "art_working/animation_upgrade_2026_11_20/candidates/characters/animations/haruto_modern_push_sheet.png",
+            "format": "PNG",
+            "mode": "RGBA",
+            "width": 2146,
+            "height": 2330,
+            "bytes": 2323430,
+            "color_count": ">65535",
+            "has_alpha": true,
+            "alpha_min": 0,
+            "alpha_max": 255,
+            "transparent_pixels": 3507314,
+            "content_bounds": [
+              2,
+              2,
+              1962,
+              2328
+            ],
+            "problems": []
+          }
+        ]
+      },
+      "native_rgb_preserved": true,
+      "registration_passed": true,
+      "rgba8_mib": 19.074172973632812
+    },
+    {
+      "path": "characters/animations/yui_crosswalk_wait_sheet.png",
+      "sha256": "50f4a36a8e6d42de38ddb5f4b7f48d5b82f06b695417ca9161c80f15832b57ed",
+      "frames": 2,
+      "asset_report": {
+        "ok": true,
+        "assets": [
+          {
+            "path": "art_working/animation_upgrade_2026_11_20/candidates/characters/animations/yui_crosswalk_wait_sheet.png",
+            "format": "PNG",
+            "mode": "RGBA",
+            "width": 520,
+            "height": 2588,
+            "bytes": 740392,
+            "color_count": ">65535",
+            "has_alpha": true,
+            "alpha_min": 0,
+            "alpha_max": 255,
+            "transparent_pixels": 688312,
+            "content_bounds": [
+              2,
+              2,
+              518,
+              2586
+            ],
+            "problems": []
+          }
+        ]
+      },
+      "native_rgb_preserved": true,
+      "registration_passed": true,
+      "rgba8_mib": 5.1336669921875
+    },
+    {
+      "path": "characters/animations/yui_crosswalk_step_sheet.png",
+      "sha256": "0bf42529fe81d0bc0c093304592a37773dfcf4c07ef100ef4fc35c5803fcbbfc",
+      "frames": 4,
+      "asset_report": {
+        "ok": true,
+        "assets": [
+          {
+            "path": "art_working/animation_upgrade_2026_11_20/candidates/characters/animations/yui_crosswalk_step_sheet.png",
+            "format": "PNG",
+            "mode": "RGBA",
+            "width": 1284,
+            "height": 2558,
+            "bytes": 1632194,
+            "color_count": ">65535",
+            "has_alpha": true,
+            "alpha_min": 0,
+            "alpha_max": 255,
+            "transparent_pixels": 1928099,
+            "content_bounds": [
+              2,
+              2,
+              1253,
+              2556
+            ],
+            "problems": []
+          }
+        ]
+      },
+      "native_rgb_preserved": true,
+      "registration_passed": true,
+      "rgba8_mib": 12.529266357421875
+    },
+    {
+      "path": "characters/animations/mitsuki_offer_sheet.png",
+      "sha256": "e1389fdfc07f9e5734a7cccb8290f83dcd93c785bbe886d464e28863da7b94c4",
+      "frames": 3,
+      "asset_report": {
+        "ok": true,
+        "assets": [
+          {
+            "path": "art_working/animation_upgrade_2026_11_20/candidates/characters/animations/mitsuki_offer_sheet.png",
+            "format": "PNG",
+            "mode": "RGBA",
+            "width": 2835,
+            "height": 1676,
+            "bytes": 5832138,
+            "color_count": ">65535",
+            "has_alpha": true,
+            "alpha_min": 0,
+            "alpha_max": 255,
+            "transparent_pixels": 31404,
+            "content_bounds": [
+              2,
+              2,
+              2833,
+              1674
+            ],
+            "problems": []
+          }
+        ]
+      },
+      "native_rgb_preserved": true,
+      "registration_passed": true,
+      "rgba8_mib": 18.125381469726562
+    },
+    {
+      "path": "characters/animations/mitsuki_wing_glitch_sheet.png",
+      "sha256": "e061e63739888ed3707a9e0031ba29da7d9bd2e79c5a7acc9948d91c761f5c57",
+      "frames": 3,
+      "asset_report": {
+        "ok": true,
+        "assets": [
+          {
+            "path": "art_working/animation_upgrade_2026_11_20/candidates/characters/animations/mitsuki_wing_glitch_sheet.png",
+            "format": "PNG",
+            "mode": "RGBA",
+            "width": 2835,
+            "height": 1676,
+            "bytes": 4080358,
+            "color_count": ">65535",
+            "has_alpha": true,
+            "alpha_min": 0,
+            "alpha_max": 255,
+            "transparent_pixels": 31404,
+            "content_bounds": [
+              2,
+              2,
+              2833,
+              1674
+            ],
+            "problems": []
+          }
+        ]
+      },
+      "native_rgb_preserved": true,
+      "registration_passed": true,
+      "rgba8_mib": 18.125381469726562
+    }
+  ],
+  "gpu_captures": [
+    {
+      "method": "gpu_subviewport",
+      "name": "moss_slime_idle_360x640",
+      "save_error": 0,
+      "size": [
+        360,
+        640
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "moss_slime_idle_720x1280",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "moss_slime_idle_1080x1920",
+      "save_error": 0,
+      "size": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "moss_slime_idle_00",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "moss_slime_idle_01",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "moss_slime_attack_00",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "moss_slime_attack_01",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "moss_slime_attack_02",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "moss_slime_attack_03",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "moss_slime_attack_04",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "moss_slime_attack_05",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "moss_slime_hit_00",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "moss_slime_hit_01",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "haruto_exiled_idle_00",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "haruto_exiled_idle_01",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "haruto_exiled_attack_00",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "haruto_exiled_attack_01",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "haruto_exiled_attack_02",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "haruto_exiled_attack_03",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "haruto_exiled_dodge_00",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "haruto_exiled_dodge_01",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "haruto_exiled_dodge_02",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "haruto_exiled_dodge_03",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "haruto_exiled_hit_00",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "haruto_exiled_hit_01",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "goblin_scout_idle_360x640",
+      "save_error": 0,
+      "size": [
+        360,
+        640
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "goblin_scout_idle_720x1280",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "goblin_scout_idle_1080x1920",
+      "save_error": 0,
+      "size": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "goblin_scout_idle_00",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "goblin_scout_idle_01",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "goblin_scout_attack_00",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "goblin_scout_attack_01",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "goblin_scout_attack_02",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "goblin_scout_attack_03",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "goblin_scout_attack_04",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "goblin_scout_attack_05",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "goblin_scout_retreat_00",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "goblin_scout_retreat_01",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "goblin_scout_retreat_02",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "world_720x1280",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "prologue_push_00",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "prologue_push_01",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "prologue_push_02",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "prologue_push_03",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "prologue_wait_00",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "prologue_wait_01",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "prologue_step_00",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "prologue_step_01",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "prologue_step_02",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "prologue_step_03",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "prologue_offer_00",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "prologue_offer_01",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "prologue_offer_02",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "prologue_wing_glitch_00",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "prologue_wing_glitch_01",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    },
+    {
+      "method": "gpu_subviewport",
+      "name": "prologue_wing_glitch_02",
+      "save_error": 0,
+      "size": [
+        720,
+        1280
+      ]
+    }
+  ],
+  "memory_note": "RGBA8 arithmetic only; excludes driver, scene, other textures and copies; not Android profiling",
+  "combat_slime_atlases_rgba8_mib": 28.65802001953125,
+  "combat_goblin_atlases_rgba8_mib": 31.345230102539062,
+  "prologue_atlases_rgba8_mib": 72.98786926269531
+}

@@ -1,0 +1,13 @@
+{
+	"image_error": 0,
+	"items": 1,
+	"label": "runtime_world_after_victory",
+	"level": 2,
+	"pending_upgrades": 1,
+	"route": {
+		"completed": false,
+		"next_index": 1,
+		"route_id": "forest_edge_slice"
+	},
+	"screen": "World"
+}

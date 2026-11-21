@@ -24,13 +24,13 @@
 
 ## Технические решения MVP
 
-- **Scenes:** persistent `GameRoot` с `Title`, `Prologue`, `World`, `Combat`, `Inventory`, `Reward`, `Checkpoint`; маршрутизация через `SceneRouter`.
+- **Scenes:** persistent `GameRoot` с `Title`, `Prologue`, `World`, `Combat`, `Inventory`, `Checkpoint`; маршрутизация через `SceneRouter`. (Reward-экран удалён в итерации 2026-11-20; результат боя — состояние сцены `Combat`.)
 - **Domains:** `GameSession`, `CharacterState`, `CombatResolver`, `LootGenerator`, `InventoryService`, `CheckpointService`, `SaveService`, `DialogueRunner`.
 - **Data:** `Resource` для authoring в Godot; сериализуемый save DTO для прогресса; item/enemy definitions отдельно от runtime state.
 - **UI:** `Control` scenes с anchors/safe area; UI подписывается на состояние, а не меняет доменные правила напрямую.
 - **Input:** abstract actions (`primary`, `secondary`, `inventory`, `checkpoint`) с touch mapping; keyboard mapping только для desktop smoke test.
 - **Rendering:** nearest filter, integer scaling, portrait base viewport, performance budget на старом Android.
-- **Save:** один локальный профиль в `user://`; versioned JSON DTO, defensive validation, `.tmp`/`.bak` и autosave только на безопасных границах.
+- **Save:** один локальный профиль v4 в `user://`; canonical root `pending_battle_result`, неоткатываемые Echo/trial flag в `meta`, миграции v0–v3, defensive validation, `.tmp`/`.bak`; claim публикуется только после подтверждённой записи, autosave только на безопасных границах.
 - **Networking:** отсутствует в MVP; не добавлять multiplayer SDK или серверный backend.
 
 ## Инструменты графики

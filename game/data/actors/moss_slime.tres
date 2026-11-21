@@ -6,7 +6,7 @@
 script = ExtResource("1_actor")
 id = "moss_slime"
 display_name = "Моховая слизь"
-max_hp = 6
+max_hp = 20
 strength = 2
 defense = 0
 mana = 0

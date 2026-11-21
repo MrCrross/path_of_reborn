@@ -1,0 +1,2093 @@
+{
+  "date": "2026-11-20",
+  "engine_observed": "4.7.2-stable (steam)",
+  "before": 91,
+  "kept": 40,
+  "archived": 51,
+  "added": 3,
+  "after": 43,
+  "backup": ".agents/skill-archives/2026-11-20/before_cleanup.zip",
+  "backup_sha256": "56210a76ef934ffa452b0d240e2db36d55e9e7e9ccd0c8fb1debc4600a12045d",
+  "criteria": "Current scope/code relevance and duplication; no invocation telemetry available.",
+  "skills": [
+    {
+      "name": "2d-essentials",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/2d-essentials/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md",
+              "SKILL.md: project scope"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "cbc35f72a1ace2a356adffc2e74629062919766df269ad6ce893244dc6440992",
+      "current_skill_sha256": "c5c338314d61f44c268d3129539341e6476916524d37775fd174289e2746b53d",
+      "current_provenance": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/2d-essentials/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md",
+              "SKILL.md: project scope"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "ability-system",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/ability-system/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md",
+              "references/ui-binding.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "473468334b90d0d27a802af5c35c33dfc4d107ac55decc84142c66dac13b27b5",
+      "current_skill_sha256": "e31e66fe005f69974822ed60cb116a3d5975ba3b4616946d172da63ed2ddfb57",
+      "current_provenance": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/ability-system/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md",
+              "references/ui-binding.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "addon-development",
+      "action": "archive_reserve",
+      "reason": "Нет задачи editor plugin; MCP уже установлен.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/addon-development/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "3f7c16484c8a43eaa47e4a695c452edc95ee41e4bec33299557d399e04df7f88"
+    },
+    {
+      "name": "ai-behavior-trees-utility-ai",
+      "action": "archive_reserve",
+      "reason": "Текущий бой использует фазы CombatResolver, BT/utility не требуется.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/disciplines/ai-behavior-trees-utility-ai/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "cef89759c9abc932f7c1b058a7620dc7cc838ef01afeb0f3c6f8bd4b38801217"
+    },
+    {
+      "name": "ai-navigation",
+      "action": "archive_reserve",
+      "reason": "В текущем slice нет свободного перемещения и NavigationAgent.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/ai-navigation/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "284a43b4d7a022d7929ec25eab43c99379fc3dc9d46f2b7c0f46dd8c4c9954ba"
+    },
+    {
+      "name": "animation-system",
+      "action": "archive_duplicate",
+      "reason": "Основной маршрут: godot-animation",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/animation-system/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "2283e7fd91b3e21ec82f5bb1d67489e78a129f366fc5a30616fcbc67fae2c7ba"
+    },
+    {
+      "name": "assets-pipeline",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/assets-pipeline/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "dd6d0481141bd2d1adb033a89433fbd9497d550d480f6b68246641d73d3d46d0",
+      "current_skill_sha256": "f785254976ef07eddee0645d6247796e39057c935b46634c6d1d18c1e0630379",
+      "current_provenance": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/assets-pipeline/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "audio-design",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/disciplines/audio-design/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "3526d25dd1b8c4a33d5d0f9682df510ce09322e1dcff55d760a9bdcfeb75810c",
+      "current_skill_sha256": "3526d25dd1b8c4a33d5d0f9682df510ce09322e1dcff55d760a9bdcfeb75810c",
+      "current_provenance": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/disciplines/audio-design/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "audio-system",
+      "action": "archive_duplicate",
+      "reason": "Основной маршрут: godot-audio",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/audio-system/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "2d5eaf6d59dfe69a24bd9519a8bc2d4e99c5ae1255871195f26e2de41584d6a0"
+    },
+    {
+      "name": "camera-system",
+      "action": "archive_reserve",
+      "reason": "В текущем slice постановка сцены, свободная камера не нужна.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/camera-system/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "ccf9ed470a4d05bd1b2c61d12c0210cc6465272febf3e0e76ad91dd8e428c96d"
+    },
+    {
+      "name": "camera-systems",
+      "action": "archive_reserve",
+      "reason": "В текущем slice постановка сцены, свободная камера не нужна.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/disciplines/camera-systems/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "21a86d3e0ae491d5c5a45052047cc87d76ac69c60117bdde8ecee5f9345c6256"
+    },
+    {
+      "name": "card-game",
+      "action": "archive_out_of_scope",
+      "reason": "Другой жанр/стек/платформа или задача вне MVP.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/genres/card-game/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "146bc49e3a59c5a04f8736086d71ce55ae3c045938af9a25c036e472bb2e0163"
+    },
+    {
+      "name": "component-system",
+      "action": "archive_duplicate",
+      "reason": "Основной маршрут: scene-organization",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/component-system/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "cf865e13a7514539031074e6cc039889ff9cf95d20e15fea913eeaa627429562"
+    },
+    {
+      "name": "create-game-assets",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/disciplines/create-game-assets/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "cb26989f0079f50d7b64056f88a997172745e9a234b7320ceea0b2d012bf690d",
+      "current_skill_sha256": "34ee23a524a7dc36879c3d6152f697f9cdddbf2e6e995b008eba627ac64fbffb",
+      "current_provenance": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/disciplines/create-game-assets/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "dialogue-manager",
+      "action": "archive_reserve",
+      "reason": "Аддон Dialogue Manager не установлен; есть собственный DialogueRunner.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/dialogue-manager/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "a4020727dca56107e4245cccc76e101e6da976cd78696022a77c75d7ef856983"
+    },
+    {
+      "name": "dialogue-system",
+      "action": "archive_duplicate",
+      "reason": "Основной маршрут: dialogue-systems",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/dialogue-system/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "efc30a3f1867c1490c2649e32532ea8a377976a70d84e78f1271e091764cbca9"
+    },
+    {
+      "name": "dialogue-systems",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/disciplines/dialogue-systems/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "dc308cf6a7aa9706d99f4f81dc8d3d0840012c0feee8996e3d28c65628522997",
+      "current_skill_sha256": "dc308cf6a7aa9706d99f4f81dc8d3d0840012c0feee8996e3d28c65628522997",
+      "current_provenance": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/disciplines/dialogue-systems/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "event-bus",
+      "action": "archive_duplicate",
+      "reason": "Основной маршрут: godot-signals-groups",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/event-bus/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "59b76910dcc8664d2d5f8b0877ed2acf8c837ee2a66a68b4a136ccdf6e599c93"
+    },
+    {
+      "name": "fps-shooter",
+      "action": "archive_out_of_scope",
+      "reason": "Другой жанр/стек/платформа или задача вне MVP.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/genres/fps-shooter/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "3debc70ff79d6f93f05f0de0df43d495b6102fa066bf95475808586e79f48c60"
+    },
+    {
+      "name": "game-ai",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/disciplines/game-ai/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "c887b81193036b877977b902a6e57d5276d257d6f1dfe54e9d51f66ce6c2cef9",
+      "current_skill_sha256": "c887b81193036b877977b902a6e57d5276d257d6f1dfe54e9d51f66ce6c2cef9",
+      "current_provenance": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/disciplines/game-ai/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "game-docs",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/workflows/game-docs/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "bfde0273042fae1cf14b7e9f19d85e307022438ecbe2b527a283664cdf885a11",
+      "current_skill_sha256": "faba5b9c036dc2aa53915ea37b6726e6cf90ebd8a696524ec50912b001741555",
+      "current_provenance": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/workflows/game-docs/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "reviewed_on": "2026-11-20",
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "reason": "Removed mandatory routing through archived cross-engine router."
+          }
+        ]
+      }
+    },
+    {
+      "name": "game-feel",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/disciplines/game-feel/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md",
+              "references/feedback-recipes.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "4784addf5bd3f02c0ec3fa11a97b5baddd89f5b281bab9d3253439f2b8e7732d",
+      "current_skill_sha256": "7d79662848386c50bf0a94e1ac29b8d433d3013e700a588fde2c8b70bf2053a8",
+      "current_provenance": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/disciplines/game-feel/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md",
+              "references/feedback-recipes.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "game-jam",
+      "action": "archive_out_of_scope",
+      "reason": "Другой жанр/стек/платформа или задача вне MVP.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/workflows/game-jam/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "bfc8470d4eb5e72cf420273411f3ff7cdbdf5c704fe46d42e4eab8de21040987"
+    },
+    {
+      "name": "game-ui-ux",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/disciplines/game-ui-ux/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md",
+              "SKILL.md: project scope"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "a42f6cf20ae82f752c8a96632925ce81d5d144ce9e5dc79b548b071a89e573e5",
+      "current_skill_sha256": "d5b1504cb490bd6476b4245c70055513a155b66565e551f087faa6add8342a9a",
+      "current_provenance": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/disciplines/game-ui-ux/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md",
+              "SKILL.md: project scope"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "gdscript-advanced",
+      "action": "archive_reserve",
+      "reason": "Нет задачи metaprogramming/@tool; базовые API покрыты активными скиллами.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/gdscript-advanced/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "aa3677a5e2b035e0994833333d0718a622dad66126e7db34c2ae866916760a15"
+    },
+    {
+      "name": "gdscript-patterns",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/gdscript-patterns/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "9ad7aaaa7b02c00783741c2475d675896767c1febf77e00774f2f76e760de9ae",
+      "current_skill_sha256": "5984b691d85b4ebe4f21a0b7c67aeb73132c554b0650a942ac56414fea7b6549",
+      "current_provenance": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/gdscript-patterns/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "godot-2d-movement",
+      "action": "archive_reserve",
+      "reason": "В текущем slice нет физического контроллера перемещения.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-2d-movement/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "ec55e2dbd3bb7f235c8e2efe78bc184e4bfffb049c4bdafa61f73e9c7f48ad87"
+    },
+    {
+      "name": "godot-3d-essentials",
+      "action": "archive_out_of_scope",
+      "reason": "Другой жанр/стек/платформа или задача вне MVP.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-3d-essentials/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "265a732b7fed08061681a67d1be641689c96d20f2422cbc6861409b03ee302f9"
+    },
+    {
+      "name": "godot-animation",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-animation/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "d15ce9aa921a83d3c9f0c12c2c702ac208ef5b65e7b2110c0a29c116ee6f3cbc",
+      "current_skill_sha256": "d15ce9aa921a83d3c9f0c12c2c702ac208ef5b65e7b2110c0a29c116ee6f3cbc",
+      "current_provenance": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-animation/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "godot-audio",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-audio/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "fe002b2d60a86d26f8a0cc2cce7d1224f5c5c0906d81dd4100bdae8dccc49773",
+      "current_skill_sha256": "fe002b2d60a86d26f8a0cc2cce7d1224f5c5c0906d81dd4100bdae8dccc49773",
+      "current_provenance": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-audio/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "godot-brainstorming",
+      "action": "archive_duplicate",
+      "reason": "Основной маршрут: por-godot-architecture-api",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/godot-brainstorming/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "76a9416d8d45eb40cde149d78deb08a7662ef690070b0beba753c1dadca921cc"
+    },
+    {
+      "name": "godot-code-review",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/godot-code-review/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "263e2046c8052c8a76a8725fc39dc523319ffc2d42f9f5008cfa94bd6504c6f4",
+      "current_skill_sha256": "772b2ec6edefad8de5b8e062a4a634ff38531ad20278e3a5c292cc68b44acde3",
+      "current_provenance": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/godot-code-review/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          },
+          {
+            "date": "2026-11-20",
+            "reason": "Point review to existing testing approach, without new framework."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "godot-csharp",
+      "action": "archive_out_of_scope",
+      "reason": "Другой жанр/стек/платформа или задача вне MVP.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-csharp/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "ed3e2d6a394289bdc7d486787c130ceaafcb2c98bc2f0012d57062f44e625fcf"
+    },
+    {
+      "name": "godot-debugging",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/godot-debugging/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "37b8e1bd0ccc23815100646242c63ca2a561d1c7d42705604ce74a90484db253",
+      "current_skill_sha256": "847ba0d7ba1172d2cd4b21b46b3651c8282e211d4f236b43207f61d5217a8d61",
+      "current_provenance": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/godot-debugging/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "godot-export",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-export/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "728923bdeb096a7cd5894efb20249cb85281f11837afd509dd577d02a5e0ea72",
+      "current_skill_sha256": "728923bdeb096a7cd5894efb20249cb85281f11837afd509dd577d02a5e0ea72",
+      "current_provenance": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-export/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "godot-gdscript",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-gdscript/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "e9b7871eb920728e6e675267414674a5c5388a291a334fc52e6323562d6117a4",
+      "current_skill_sha256": "e9b7871eb920728e6e675267414674a5c5388a291a334fc52e6323562d6117a4",
+      "current_provenance": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-gdscript/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "godot-gdscript-headless-testing",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-gdscript-headless-testing/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "4106fd292e71b0dca99efe54c5d665b9ba47e3073f7856788963ab32c5f73cf2",
+      "current_skill_sha256": "4106fd292e71b0dca99efe54c5d665b9ba47e3073f7856788963ab32c5f73cf2",
+      "current_provenance": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-gdscript-headless-testing/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "godot-grill",
+      "action": "archive_reserve",
+      "reason": "Отдельный режим интервью сейчас не нужен; уточнения остаются по необходимости.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/godot-grill/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "d281ca25d98eb43d317e20472cd11764ebf7a3802bd4488ca2375288cd76339b"
+    },
+    {
+      "name": "godot-mentor",
+      "action": "archive_reserve",
+      "reason": "Обучающий режим не запрошен.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/godot-mentor/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "1e809ce3c827bc3ddbfa058e6329b2eb1964101fc564dd5e3916cf775c7117ec"
+    },
+    {
+      "name": "godot-multiplayer",
+      "action": "archive_out_of_scope",
+      "reason": "Другой жанр/стек/платформа или задача вне MVP.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-multiplayer/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "bad146ebcc3424e5956b0c079587dba4eb472c69b36bf379558d7e02abbca5a3"
+    },
+    {
+      "name": "godot-nodes-scenes",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-nodes-scenes/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "8717fbec3ab9ac1ac1a69a1a0732fc5b7ce1de06e9a71adf4dc79bb4c42b4621",
+      "current_skill_sha256": "8717fbec3ab9ac1ac1a69a1a0732fc5b7ce1de06e9a71adf4dc79bb4c42b4621",
+      "current_provenance": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-nodes-scenes/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "godot-optimization",
+      "action": "archive_duplicate",
+      "reason": "Основной маршрут: performance-optimization",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/godot-optimization/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "accadbb19d42b62127baad89b97333c125b4cff25df7c28069fb4b5d6d6be063"
+    },
+    {
+      "name": "godot-physics",
+      "action": "archive_reserve",
+      "reason": "Текущий бой на integer ticks, без физической симуляции столкновений.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-physics/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "63e650b15596442d156c1e72d1da636745f3dfe291d227cee758b366557a0bc6"
+    },
+    {
+      "name": "godot-project-setup",
+      "action": "archive_reserve",
+      "reason": "Проект уже создан; повторный scaffold не нужен.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/godot-project-setup/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "25d392a574953c1f4cd863e01942c63710fc830203d09e5fddaf6a42524225f2"
+    },
+    {
+      "name": "godot-resources",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-resources/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "6758e1ed32261f971ac1bf47c02290adff46c57f9f205d0f62ad2da25266f036",
+      "current_skill_sha256": "6758e1ed32261f971ac1bf47c02290adff46c57f9f205d0f62ad2da25266f036",
+      "current_provenance": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-resources/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "godot-shaders",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-shaders/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "04f0ce8d276377025e048f1f7a87c1979c3b4a869cad035a1f13e918797219a0",
+      "current_skill_sha256": "7ec98633aa401cc6e72d5905b8def7911d7f171ab4b0ea6805389dee349248bd",
+      "current_provenance": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-shaders/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "godot-signals-groups",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-signals-groups/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "73eb8cab8deefa6d45c8071460cfbe2c5750d65471a5b759852028e8a84cd342",
+      "current_skill_sha256": "1765fcd6a5e5ea39d0baa2ecfc9939f8161657bd85e5b0015c3d4f3e078f4c5c",
+      "current_provenance": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-signals-groups/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "godot-testing",
+      "action": "archive_reserve",
+      "reason": "Уже есть SceneTree test runner; GUT/gdUnit4 не установлены.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/godot-testing/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "9ee92e4d063177c4fd7b20ee030fab7823d1f56c3c449f9b4465b99fd8e95c38"
+    },
+    {
+      "name": "godot-tilemap",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-tilemap/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "effb6d0d31ba653f0116fbb9bb7a3d1b48f1fb0c136daf3e0cf03e67b498c16a",
+      "current_skill_sha256": "effb6d0d31ba653f0116fbb9bb7a3d1b48f1fb0c136daf3e0cf03e67b498c16a",
+      "current_provenance": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-tilemap/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "godot-ui",
+      "action": "archive_duplicate",
+      "reason": "Основной маршрут: godot-ui-control",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/godot-ui/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "402f33c895663136dfe73d5fd56f93a13a5c1b2ac223ee10b42ae6854ee91d83"
+    },
+    {
+      "name": "godot-ui-control",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-ui-control/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "3cce6960df85e0f8c4181f8937f90cb81d3c46e8b88ceac390d468718464bee8",
+      "current_skill_sha256": "92d68bc45b2e8528dafd91a1ee28fecb3ae7487d471391e4a8b2b587b0f5af1d",
+      "current_provenance": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/godot/godot-ui-control/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "hud-system",
+      "action": "archive_duplicate",
+      "reason": "Основной маршрут: game-ui-ux + godot-ui-control",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/hud-system/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "89040b6096135523ffacd85f0a441835bb58c244c27d749949139ff8acf04073"
+    },
+    {
+      "name": "input-handling",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/input-handling/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "dcd60411898746a9a05d27c55c0c9ef8e87099d61136989867f7476d8b80f4a0",
+      "current_skill_sha256": "15cdbf11f62412cb8d672795a3b9bc0e907e14d6efcd42b92973b1191c0c4e25",
+      "current_provenance": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/input-handling/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "input-systems",
+      "action": "archive_duplicate",
+      "reason": "Основной маршрут: input-handling",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/disciplines/input-systems/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "443d2c575fab06e8e3b90a3d39a0ba8ce24b93693a31a7b5a9dfcfc992f73636"
+    },
+    {
+      "name": "inventory-system",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/inventory-system/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "e4f2908f1feb2a57f41a4433572673c1304b865675379269fa54d773dd0a97d2",
+      "current_skill_sha256": "cbf07adbbd00b7ef25b6dfe43a32482a3750d53a7d07403f8a1efd6b029d9c6b",
+      "current_provenance": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/inventory-system/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "itch-publish",
+      "action": "archive_out_of_scope",
+      "reason": "Другой жанр/стек/платформа или задача вне MVP.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/workflows/itch-publish/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "64cf616ba46fce00fdc232a262610bbfbd657f01bc5d2bad62432d7a481e24d2"
+    },
+    {
+      "name": "level-design",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/disciplines/level-design/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md: project scope"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "c7ee1d53e6aacc528e95bfe82205b094b66078ab00febcc605a197f47284e534",
+      "current_skill_sha256": "f4f42f9e63d9b05383d92d0f220efc26778da97784dbcf72f0a2bb1c2c4ee81d",
+      "current_provenance": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/disciplines/level-design/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md: project scope"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "localization",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/localization/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "8185b9b3caa240f79bc267977f3f52d5f31a12b24d17e354a679190ac95db7d6",
+      "current_skill_sha256": "d622b10dbaa484305bd9fc9b64c4abd5c4c8cf09ee9be9c08a83f25df563c294",
+      "current_provenance": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/localization/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "math-essentials",
+      "action": "archive_reserve",
+      "reason": "Общий математический справочник не закрывает отдельную текущую задачу.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/math-essentials/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "9bb7a3a72f90613a6edab955b1d30815575445640e932c53d60c1716628b17f3"
+    },
+    {
+      "name": "mobile-design",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "https://github.com/RubenGlez/mobile-design",
+        "commit": "9d220f76b21e83ae9a48f0adaf64842d08fac56e",
+        "source_path": "SKILL.md",
+        "installed_on": "2026-11-19",
+        "license": "MIT",
+        "local_modifications": [
+          "Added project scope after the title; preserved upstream recommendations and references."
+        ],
+        "excluded": [
+          "Upstream repository automation and agent/release instructions",
+          "Python tests and caches"
+        ]
+      },
+      "original_skill_sha256": "2c0390faaa902587cfe8b0350c1107a14b10129adcc1a4075d0016791d3baefc",
+      "current_skill_sha256": "62eedce64e0023752789e0948169b2dcf4ddfad0a3c7e9126407e3ec7e2c9645",
+      "current_provenance": {
+        "repository": "https://github.com/RubenGlez/mobile-design",
+        "commit": "9d220f76b21e83ae9a48f0adaf64842d08fac56e",
+        "source_path": "SKILL.md",
+        "installed_on": "2026-11-19",
+        "license": "MIT",
+        "local_modifications": [
+          "Added project scope after the title; preserved upstream recommendations and references.",
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md: focused discovery description"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "excluded": [
+          "Upstream repository automation and agent/release instructions",
+          "Python tests and caches"
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "mobile-development",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/mobile-development/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md",
+              "SKILL.md: project scope"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "59e58d44a5274e9909ef4516b4d317ff98b0c8b262805043e62587a47f20e658",
+      "current_skill_sha256": "ae2d44334d34a7d1ad9ae2660adaae38ece0e86b61a188ea6481f7e3d87c3e3d",
+      "current_provenance": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/mobile-development/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md",
+              "SKILL.md: project scope"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "multithreading",
+      "action": "archive_reserve",
+      "reason": "Нет измеренной потребности выносить работу в потоки.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/multithreading/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "e01b331089b781692aba9c339f565a6f6fb6e9cf53a3b4716d57b3682703cff2"
+    },
+    {
+      "name": "particles-vfx",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/particles-vfx/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md",
+              "SKILL.md: project scope"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "428e50a1a3fccec0ef82453d09c5603744bd1d42cd8e3956a29e6700ad53afca",
+      "current_skill_sha256": "0c93356186996238bae8885057244bc9689db6788e7950986b8ac904d3f545d4",
+      "current_provenance": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/particles-vfx/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md",
+              "SKILL.md: project scope"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "performance-optimization",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/disciplines/performance-optimization/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "a5e0d0fae132ed0ed9b5e1686454e69827d24d27281fe0d0f978b88231eddc46",
+      "current_skill_sha256": "b4499061eb7d92ae4c5eff59146444a36437442735cd44e59be9dc3c7063880e",
+      "current_provenance": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/disciplines/performance-optimization/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "physics-system",
+      "action": "archive_reserve",
+      "reason": "Текущий бой на integer ticks, без физической симуляции столкновений.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/physics-system/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "e29b39fdf9a4ccdc61dc6d06923382312f16cb7d741b0b0678860b2865815a2f"
+    },
+    {
+      "name": "physics-tuning",
+      "action": "archive_reserve",
+      "reason": "Нет физического контроллера, CCD/solver tuning не нужны.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/disciplines/physics-tuning/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "33e2ce7519eed6b34a5654f27a4ade2ad53d7840bc16aef2313d6233d1fc6bbd"
+    },
+    {
+      "name": "platformer",
+      "action": "archive_out_of_scope",
+      "reason": "Другой жанр/стек/платформа или задача вне MVP.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/genres/platformer/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "240fb39924fb02b53d6bbe101d22ee1e690ef1835dccb4e305b270a46bbd03cf"
+    },
+    {
+      "name": "player-controller",
+      "action": "archive_reserve",
+      "reason": "В текущем slice нет физического контроллера перемещения.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/player-controller/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "3d495082d5fd676f32201ea58d04f9e1d55611d83a0a844b846bb204336dd685"
+    },
+    {
+      "name": "procedural-gen",
+      "action": "archive_reserve",
+      "reason": "Seeded loot уже реализован; генерация уровней вне MVP.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/disciplines/procedural-gen/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "52b7420983e401d1fd89f8bc128ee98f676e03f486f8ceada5d4fe34c2a19d56"
+    },
+    {
+      "name": "procedural-generation",
+      "action": "archive_out_of_scope",
+      "reason": "Другой жанр/стек/платформа или задача вне MVP.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/procedural-generation/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "95aa0ea9f2493bc35a34ff7386f251a91215f9fb8a341e39a28212f663560d03"
+    },
+    {
+      "name": "prototype-fast",
+      "action": "archive_reserve",
+      "reason": "Есть рабочий vertical slice; throwaway-прототип не запрошен.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/workflows/prototype-fast/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "7331cf86b78a63c222dde94db3abccc01821faeb663ae541649861c06e371533"
+    },
+    {
+      "name": "puzzle",
+      "action": "archive_out_of_scope",
+      "reason": "Другой жанр/стек/платформа или задача вне MVP.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/genres/puzzle/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "9c70bcec3d5c460bd3111b83b651f90e5229f13b9c33cdfe69935e268261ddfd"
+    },
+    {
+      "name": "rendering-pipeline",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/rendering-pipeline/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "61ff905b4d37cf875444f7922deb37d78c64b2443244120fbb9185b88c01a622",
+      "current_skill_sha256": "26d5b3c4a5774913f96888493a495c3b8974f69024ef70dca7d6c8b36ec93531",
+      "current_provenance": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/rendering-pipeline/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "resource-pattern",
+      "action": "archive_duplicate",
+      "reason": "Основной маршрут: godot-resources",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/resource-pattern/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "1058eba6a3388f698b52c3740d5d98ec8497ab2cce3e585cbda8623a686ec902"
+    },
+    {
+      "name": "responsive-ui",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/responsive-ui/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md",
+              "SKILL.md: project scope",
+              "references/dpi-scaling.md",
+              "references/mobile.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "3576e7c12df58a994b462970f5cb4fba2b8cbfcc71b219a1d4e518d7ccb99778",
+      "current_skill_sha256": "cc89ce76018119af5ecb2319893b83127657fd439c57fd3f97b28ed14a2071b0",
+      "current_provenance": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/responsive-ui/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md",
+              "SKILL.md: project scope",
+              "references/dpi-scaling.md",
+              "references/mobile.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          },
+          {
+            "date": "2026-11-20",
+            "reason": "Use project portrait matrix and preserve the existing aspect policy."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "roguelike",
+      "action": "archive_out_of_scope",
+      "reason": "Другой жанр/стек/платформа или задача вне MVP.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/genres/roguelike/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "dc01796208e5bd0cf34881fcadd830de2568815fef8e8ed591b65254c0f74597"
+    },
+    {
+      "name": "router",
+      "action": "archive_duplicate",
+      "reason": "Основной маршрут: docs/architecture/AGENT_SKILLS.md",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/router/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "31f0c9cfe8e01d4633e8f7d94db56b1c059c4cb7e9661aa82e7f5ebab532c849"
+    },
+    {
+      "name": "rpg",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/genres/rpg/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md: project scope"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "1f10b714e96abefde03c5ab3c54a9b68c736f23431b4a0be6639f7038607d471",
+      "current_skill_sha256": "74fdec639d1a5f5629276e1232c8375c3349fe3f6c7704f627c92de14f17df64",
+      "current_provenance": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/genres/rpg/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md: project scope"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "save-load",
+      "action": "archive_duplicate",
+      "reason": "Основной маршрут: save-systems",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/save-load/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "0c81d8ae252f633c29c68cd8533255b395aef9580804176d6f3815a04cbc320b"
+    },
+    {
+      "name": "save-systems",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/disciplines/save-systems/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "6457b8b28e0a9cbbe6191d40f4553903fe8590a54e0c1a7c7470b79ad0842e08",
+      "current_skill_sha256": "bf3ce69befcd923e9578c19fa76fb17bca8a68311ed74de7cd3aad6b685277c4",
+      "current_provenance": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/disciplines/save-systems/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "scene-organization",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/scene-organization/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md",
+              "SKILL.md: project scope"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "74d417c0c376f31f57c7155388496e4c250a93dd284c32d3ec0a31aa3178c0be",
+      "current_skill_sha256": "22df4605bff9f503c8d17cc5295c97472dbfc1943a3240a7dcdd4c994149833f",
+      "current_provenance": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/scene-organization/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md",
+              "SKILL.md: project scope"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          },
+          {
+            "date": "2026-11-20",
+            "reason": "Removed arbitrary scene-size/name constraints and automatic global EventBus requirement."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "shader-basics",
+      "action": "archive_duplicate",
+      "reason": "Основной маршрут: godot-shaders",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/shader-basics/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "9b435375bae233708e92a398831d0409ef0900b4491f26bf66478270c33296a1"
+    },
+    {
+      "name": "shader-programming",
+      "action": "archive_duplicate",
+      "reason": "Основной маршрут: godot-shaders",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/disciplines/shader-programming/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "f18e7ef13b3e6babff1a2138a0a1edb0d665a70d833541b68f3e6d5a1165e3a1"
+    },
+    {
+      "name": "state-machine",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/state-machine/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "dcb384628528640a900f258d9757c290b1f572d72907f0b61c41425859510d7c",
+      "current_skill_sha256": "38be2967dcada3628bee866c8812beb4dc08f690bd489019e695da5c3e1515e9",
+      "current_provenance": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/state-machine/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "steam-publish",
+      "action": "archive_out_of_scope",
+      "reason": "Другой жанр/стек/платформа или задача вне MVP.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/workflows/steam-publish/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "ba6ed1e423bfbf859e2c9da80bc0b1e9227ab443f561811206a06c9d7fd30fc3"
+    },
+    {
+      "name": "survival-crafting",
+      "action": "archive_out_of_scope",
+      "reason": "Другой жанр/стек/платформа или задача вне MVP.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/genres/survival-crafting/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "e1922912b9c032c89f0d16059935fbb916dc155f4f8adfbf67919499e9bef3ea"
+    },
+    {
+      "name": "tower-defense",
+      "action": "archive_out_of_scope",
+      "reason": "Другой жанр/стек/платформа или задача вне MVP.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/genres/tower-defense/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "306e4c6d1cac94e42d5e57cb5c8953aa7d714a90db7010fc46d5fb730bbf9deb"
+    },
+    {
+      "name": "tween-animation",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/tween-animation/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      },
+      "original_skill_sha256": "8f8d0bf8d468faf024119e6ccf82aff827fca3d94cdc96acbf4ea249497f758b",
+      "current_skill_sha256": "434448ac0368471c1e7ed643494a1a903e35ff14e3bdbd2c497a59ee51886ae3",
+      "current_provenance": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/tween-animation/SKILL.md",
+        "matches_source_before_cleanup": true,
+        "local_modifications": [
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "ui-ux-pro-max",
+      "action": "keep",
+      "reason": "Соответствует стеку и задачам 2D portrait RPG; загружать только по задаче.",
+      "source": {
+        "repository": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+        "commit": "2de1134dc4d1cfe112934611ae5803ae17a1bd7e",
+        "source_path": ".claude/skills/ui-ux-pro-max/SKILL.md",
+        "installed_on": "2026-11-19",
+        "license": "MIT",
+        "local_modifications": [
+          "Added project scope after the title; preserved upstream recommendations and references.",
+          "Replaced Claude plugin paths with the portable <skill-dir> placeholder and documented Godot/Python usage."
+        ],
+        "excluded": [
+          "Upstream repository automation and agent/release instructions",
+          "Python tests and caches"
+        ]
+      },
+      "original_skill_sha256": "2ebd356e31818329f23d72482399246dee64990eb5ddc3b2282117cdd829a942",
+      "current_skill_sha256": "f32a025d90c848618c2030c6d714d0838395d726a5aa8447f148e842ae517469",
+      "current_provenance": {
+        "repository": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+        "commit": "2de1134dc4d1cfe112934611ae5803ae17a1bd7e",
+        "source_path": ".claude/skills/ui-ux-pro-max/SKILL.md",
+        "installed_on": "2026-11-19",
+        "license": "MIT",
+        "local_modifications": [
+          "Added project scope after the title; preserved upstream recommendations and references.",
+          "Replaced Claude plugin paths with the portable <skill-dir> placeholder and documented Godot/Python usage.",
+          {
+            "date": "2026-11-20",
+            "files": [
+              "SKILL.md: focused discovery description"
+            ],
+            "reason": "Project scope, selected skill routing, or coordinate correction; original in before_cleanup.zip."
+          }
+        ],
+        "excluded": [
+          "Upstream repository automation and agent/release instructions",
+          "Python tests and caches"
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "using-godot-prompter",
+      "action": "archive_duplicate",
+      "reason": "Основной маршрут: docs/architecture/AGENT_SKILLS.md",
+      "source": {
+        "repository": "GodotPrompter",
+        "commit": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39",
+        "path": "references/agent-skills-src/GodotPrompter/skills/using-godot-prompter/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "5e10a6b904f018d7841f70a1659ccaf5f70fb04a6f265c4c5d5cd7f969de1f36"
+    },
+    {
+      "name": "visual-novel",
+      "action": "archive_reserve",
+      "reason": "Есть линейный пролог и DialogueRunner; отдельный VN framework не нужен.",
+      "source": {
+        "repository": "awesome-gamedev-agent-skills",
+        "commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+        "path": "references/agent-skills-src/awesome-gamedev-agent-skills/skills/genres/visual-novel/SKILL.md",
+        "matches_source_before_cleanup": true
+      },
+      "original_skill_sha256": "e11c4970ba08f808b65fc7beecfb0c5472cd77842a470930b9a71bba421102d7"
+    },
+    {
+      "name": "headless-game-balance",
+      "action": "install",
+      "reason": "Seeded balance of actual domain code.",
+      "current_skill_sha256": "1409e43d725e5ef6407d7a56dc65dffaa8abb71c374770408aabe54a85a2c81a",
+      "current_provenance": {
+        "repository": "https://github.com/nitzangames/headless-game-balance",
+        "commit": "0b0a759c5ad446d5d677da52721d2ce6203b503d",
+        "license": "MIT",
+        "installed_on": "2026-11-20",
+        "local_modifications": [
+          "Added project simulation boundary after title."
+        ],
+        "reviewed_on": "2026-11-20"
+      }
+    },
+    {
+      "name": "por-mobile-combat-ux",
+      "action": "create_project_skill",
+      "reason": "Narrow project-specific gap.",
+      "current_skill_sha256": "216e8694c0df52487c9f02f67f4cfd8901f52fcf82f351add0208e29b7995fab",
+      "source": {
+        "kind": "project-authored",
+        "date": "2026-11-20"
+      }
+    },
+    {
+      "name": "por-godot-architecture-api",
+      "action": "create_project_skill",
+      "reason": "Narrow project-specific gap.",
+      "current_skill_sha256": "427d843e7c700fda6d61a4ad49dd3ebde821155a1d29df0fa9272d5136573045",
+      "source": {
+        "kind": "project-authored",
+        "date": "2026-11-20"
+      }
+    }
+  ],
+  "verification": {
+    "active_skills": 43,
+    "archive_files_verified": 400,
+    "broken_navigation_links": [],
+    "summarizer_valid_fixture": "PASS: 3 runs, 2 wins",
+    "summarizer_invalid_fixture": "PASS: exit 2",
+    "entrypoint_bytes_before": 1028180,
+    "entrypoint_bytes_after": 462812,
+    "entrypoint_reduction_percent": 55.0,
+    "frontmatter": "43/43 passed official quick_validate.py using preinstalled PyYAML",
+    "ui_reference_search": "PASS: ux touch target spacing, 3 results"
+  },
+  "source_heads_verified": [
+    {
+      "repository": "gamedev-skills/awesome-gamedev-agent-skills",
+      "branch": "main",
+      "sha": "c6ca6c41c839b68319ffc08430b99ab768debc32"
+    },
+    {
+      "repository": "jame581/GodotPrompter",
+      "branch": "master",
+      "sha": "426e8ab597473d1c71a11a04f6f0f2e1182a8e39"
+    },
+    {
+      "repository": "RubenGlez/mobile-design",
+      "branch": "main",
+      "sha": "9d220f76b21e83ae9a48f0adaf64842d08fac56e"
+    },
+    {
+      "repository": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "branch": "main",
+      "sha": "2de1134dc4d1cfe112934611ae5803ae17a1bd7e"
+    },
+    {
+      "repository": "nitzangames/headless-game-balance",
+      "branch": "main",
+      "sha": "0b0a759c5ad446d5d677da52721d2ce6203b503d"
+    }
+  ]
+}

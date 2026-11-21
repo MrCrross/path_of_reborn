@@ -1,0 +1,6 @@
+[
+  {"id":"DIA_MERCHANT_009","speaker":"Дайдзиро","text":"Живой. Телега почти целая. Вы, судя по трясущимся рукам, тоже пока живой.","shot":"daijiro_cart","once":true},
+  {"id":"DIA_MERCHANT_010","speaker":"Харуто","text":"Пока — мой любимый сегодня статус.","shot":"daijiro_cart","once":true},
+  {"id":"DIA_MERCHANT_016","speaker":"Дайдзиро","text":"Дайдзиро Мори. Медный Дайдзиро для тех, кто любит прозвища. Гильдия Медного Компаса, собственный магазин в Лиорене.","shot":"daijiro_cart","once":true},
+  {"id":"DIA_MERCHANT_017","speaker":"Харуто","text":"Харуто Куросава. Профессия… в данный момент не имеет значения.","shot":"daijiro_cart","once":true,"destination":"world","commands":[{"type":"set_world_flag","key":"daijiro_introduction_completed","value":true}]}
+]

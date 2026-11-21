@@ -1,0 +1,28 @@
+{
+	"captures": [],
+	"checks": [
+		{
+			"message": "Continue fixture completes at least one cue",
+			"ok": true
+		},
+		{
+			"message": "Continue returns to unfinished prologue",
+			"ok": true
+		},
+		{
+			"message": "Continue starts at the first unseen cue",
+			"ok": true
+		},
+		{
+			"message": "Skip still reaches World and records its outcome",
+			"ok": true
+		},
+		{
+			"message": "Continue after completion returns to World",
+			"ok": true
+		}
+	],
+	"checks_count": 5,
+	"failed": 0,
+	"windows": []
+}

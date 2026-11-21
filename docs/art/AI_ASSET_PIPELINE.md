@@ -35,3 +35,7 @@
 ## Ограничения среды
 
 Наличие ChatGPT Image Generation в конкретной сессии не предполагается. Если инструмент недоступен, сохранять готовые prompts и выполнять generation/export вручную, не подменяя отсутствующий результат выдуманным файлом.
+
+## Записи интеграции
+
+**2026-11-20, source-resolution still'ы ENV-05/CHR-03/MON-01.** Кандидаты из `art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/` (прошли тест оригинального разрешения, см. SOURCE_RESOLUTION_REVIEW_2026_11_20.md) заменили прежние уменьшенные экспорты в `assets/`; старые версии перенесены в `art_working/visual_upgrade_2026_11_20/previous_exports/`. `assets/manifest.json` обновлён: size, sha256, rgba_sha256, pivot и provenance. Пайплайн обычный: byte-идентичность с мастером → импорт lossless без mipmaps и size_limit → кадры 360×640 / 720×1280 / максимальное портретное окно вживую → замер texture memory ≈23.2 MiB (экран мира). Отступление от checklist: единая строгая сетка 2 logical px для этого семейства не заявляется (явное исключение, см. ART_DIRECTION.md «Переходный профиль»).

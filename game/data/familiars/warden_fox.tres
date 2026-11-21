@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FamiliarDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://domain/definitions/familiar_definition.gd" id="1"]
+[ext_resource type="Script" path="res://domain/definitions/stat_modifier_definition.gd" id="2"]
+
+[sub_resource type="Resource" id="StatModifierDefinition_base"]
+script = ExtResource("2")
+stat_id = "defense"
+amount = 1
+
+[sub_resource type="Resource" id="StatModifierDefinition_level"]
+script = ExtResource("2")
+stat_id = "defense"
+amount = 1
+
+[resource]
+script = ExtResource("1")
+id = "warden_fox"
+display_name = "Лис-хранитель"
+description = "Рабочий привязанный фамильяр для проверки развития спутника."
+bound_character_id = "road_companion"
+max_level = 3
+modifiers = Array[StatModifierDefinition]([SubResource("StatModifierDefinition_base")])
+per_level_modifiers = Array[StatModifierDefinition]([SubResource("StatModifierDefinition_level")])

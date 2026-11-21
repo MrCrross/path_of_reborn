@@ -1,0 +1,953 @@
+{
+	"failed_claim_save": {
+		"blocker_created": true,
+		"disk_items": 0,
+		"disk_loaded": true,
+		"disk_pending": true,
+		"memory_items": 1,
+		"memory_pending": false,
+		"notice": "Не удалось открыть временный файл: Can't open file",
+		"screen_after_claim": "World"
+	},
+	"goblin_contacts": [
+		{
+			"attacker_in_attack_clip": true,
+			"frame": 3,
+			"frame_progress": 0.0,
+			"strike_index": 0,
+			"target": "goblin_scout",
+			"tick": 19
+		},
+		{
+			"attacker_in_attack_clip": true,
+			"frame": 2,
+			"frame_progress": 0.0,
+			"strike_index": 0,
+			"target": "hero",
+			"tick": 48
+		},
+		{
+			"attacker_in_attack_clip": true,
+			"frame": 5,
+			"frame_progress": 0.0,
+			"strike_index": 1,
+			"target": "hero",
+			"tick": 66
+		},
+		{
+			"attacker_in_attack_clip": false,
+			"frame": 0,
+			"frame_progress": 0.17,
+			"strike_index": 1,
+			"target": "goblin_scout",
+			"tick": 79
+		}
+	],
+	"legacy_snapshot": {
+		"migrated_version": 3,
+		"snapshot_has_pending_field": false,
+		"validates": false
+	},
+	"reentrant_claim": {
+		"expected_units": 1,
+		"inner_accepted": true,
+		"level": 2,
+		"outer_accepted": true,
+		"units": 2,
+		"xp": 0
+	},
+	"route_balance": [
+		{
+			"build": "no_growth",
+			"seed": "path_of_reborn_blockout",
+			"stages": [
+				{
+					"echo_delta": 1,
+					"enemy": "moss_slime",
+					"hp": 11,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "",
+							"item_id": "moss_charm",
+							"quantity": 1,
+							"slot_id": "charm"
+						}
+					],
+					"strength": 3,
+					"ticks": 259,
+					"won": true
+				},
+				{
+					"echo_delta": 1,
+					"enemy": "goblin_scout",
+					"hp": 8,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "goblin",
+							"item_id": "echo_crystal",
+							"quantity": 1,
+							"slot_id": ""
+						}
+					],
+					"strength": 3,
+					"ticks": 379,
+					"won": true
+				},
+				{
+					"enemy": "goblin_trial",
+					"hp": 0,
+					"hp_max": 12,
+					"strength": 3,
+					"ticks": 462,
+					"won": false
+				}
+			]
+		},
+		{
+			"build": "strength",
+			"seed": "path_of_reborn_blockout",
+			"stages": [
+				{
+					"echo_delta": 1,
+					"enemy": "moss_slime",
+					"hp": 11,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "",
+							"item_id": "moss_charm",
+							"quantity": 1,
+							"slot_id": "charm"
+						}
+					],
+					"strength": 3,
+					"ticks": 259,
+					"won": true
+				},
+				{
+					"echo_delta": 1,
+					"enemy": "goblin_scout",
+					"hp": 9,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "goblin",
+							"item_id": "echo_crystal",
+							"quantity": 1,
+							"slot_id": ""
+						}
+					],
+					"strength": 4,
+					"ticks": 259,
+					"won": true
+				},
+				{
+					"echo_delta": 2,
+					"enemy": "goblin_trial",
+					"hp": 6,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "goblin",
+							"item_id": "echo_crystal",
+							"quantity": 1,
+							"slot_id": ""
+						}
+					],
+					"strength": 5,
+					"ticks": 259,
+					"won": true
+				}
+			]
+		},
+		{
+			"build": "max_hp",
+			"seed": "path_of_reborn_blockout",
+			"stages": [
+				{
+					"echo_delta": 1,
+					"enemy": "moss_slime",
+					"hp": 11,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "",
+							"item_id": "moss_charm",
+							"quantity": 1,
+							"slot_id": "charm"
+						}
+					],
+					"strength": 3,
+					"ticks": 259,
+					"won": true
+				},
+				{
+					"echo_delta": 1,
+					"enemy": "goblin_scout",
+					"hp": 12,
+					"hp_max": 16,
+					"loot": [
+						{
+							"aspect_id": "goblin",
+							"item_id": "echo_crystal",
+							"quantity": 1,
+							"slot_id": ""
+						}
+					],
+					"strength": 3,
+					"ticks": 379,
+					"won": true
+				},
+				{
+					"echo_delta": 2,
+					"enemy": "goblin_trial",
+					"hp": 8,
+					"hp_max": 20,
+					"loot": [
+						{
+							"aspect_id": "goblin",
+							"item_id": "echo_crystal",
+							"quantity": 1,
+							"slot_id": ""
+						}
+					],
+					"strength": 3,
+					"ticks": 499,
+					"won": true
+				}
+			]
+		},
+		{
+			"build": "equip_drops",
+			"seed": "path_of_reborn_blockout",
+			"stages": [
+				{
+					"echo_delta": 1,
+					"enemy": "moss_slime",
+					"hp": 11,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "",
+							"item_id": "moss_charm",
+							"quantity": 1,
+							"slot_id": "charm"
+						}
+					],
+					"strength": 3,
+					"ticks": 259,
+					"won": true
+				},
+				{
+					"echo_delta": 1,
+					"enemy": "goblin_scout",
+					"hp": 12,
+					"hp_max": 16,
+					"loot": [
+						{
+							"aspect_id": "goblin",
+							"item_id": "echo_crystal",
+							"quantity": 1,
+							"slot_id": ""
+						}
+					],
+					"strength": 3,
+					"ticks": 379,
+					"won": true
+				},
+				{
+					"echo_delta": 2,
+					"enemy": "goblin_trial",
+					"hp": 4,
+					"hp_max": 16,
+					"loot": [
+						{
+							"aspect_id": "goblin",
+							"item_id": "echo_crystal",
+							"quantity": 1,
+							"slot_id": ""
+						}
+					],
+					"strength": 3,
+					"ticks": 499,
+					"won": true
+				}
+			]
+		},
+		{
+			"build": "no_growth",
+			"seed": "11",
+			"stages": [
+				{
+					"echo_delta": 1,
+					"enemy": "moss_slime",
+					"hp": 11,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "moss",
+							"item_id": "echo_crystal",
+							"quantity": 1,
+							"slot_id": ""
+						}
+					],
+					"strength": 3,
+					"ticks": 259,
+					"won": true
+				},
+				{
+					"echo_delta": 1,
+					"enemy": "goblin_scout",
+					"hp": 8,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "",
+							"item_id": "moss_charm",
+							"quantity": 1,
+							"slot_id": "charm"
+						}
+					],
+					"strength": 3,
+					"ticks": 379,
+					"won": true
+				},
+				{
+					"enemy": "goblin_trial",
+					"hp": 0,
+					"hp_max": 12,
+					"strength": 3,
+					"ticks": 462,
+					"won": false
+				}
+			]
+		},
+		{
+			"build": "strength",
+			"seed": "11",
+			"stages": [
+				{
+					"echo_delta": 1,
+					"enemy": "moss_slime",
+					"hp": 11,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "moss",
+							"item_id": "echo_crystal",
+							"quantity": 1,
+							"slot_id": ""
+						}
+					],
+					"strength": 3,
+					"ticks": 259,
+					"won": true
+				},
+				{
+					"echo_delta": 1,
+					"enemy": "goblin_scout",
+					"hp": 9,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "",
+							"item_id": "moss_charm",
+							"quantity": 1,
+							"slot_id": "charm"
+						}
+					],
+					"strength": 4,
+					"ticks": 259,
+					"won": true
+				},
+				{
+					"echo_delta": 2,
+					"enemy": "goblin_trial",
+					"hp": 6,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "",
+							"item_id": "training_sword",
+							"quantity": 1,
+							"slot_id": "weapon"
+						}
+					],
+					"strength": 5,
+					"ticks": 259,
+					"won": true
+				}
+			]
+		},
+		{
+			"build": "max_hp",
+			"seed": "11",
+			"stages": [
+				{
+					"echo_delta": 1,
+					"enemy": "moss_slime",
+					"hp": 11,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "moss",
+							"item_id": "echo_crystal",
+							"quantity": 1,
+							"slot_id": ""
+						}
+					],
+					"strength": 3,
+					"ticks": 259,
+					"won": true
+				},
+				{
+					"echo_delta": 1,
+					"enemy": "goblin_scout",
+					"hp": 12,
+					"hp_max": 16,
+					"loot": [
+						{
+							"aspect_id": "",
+							"item_id": "moss_charm",
+							"quantity": 1,
+							"slot_id": "charm"
+						}
+					],
+					"strength": 3,
+					"ticks": 379,
+					"won": true
+				},
+				{
+					"echo_delta": 2,
+					"enemy": "goblin_trial",
+					"hp": 8,
+					"hp_max": 20,
+					"loot": [
+						{
+							"aspect_id": "",
+							"item_id": "training_sword",
+							"quantity": 1,
+							"slot_id": "weapon"
+						}
+					],
+					"strength": 3,
+					"ticks": 499,
+					"won": true
+				}
+			]
+		},
+		{
+			"build": "equip_drops",
+			"seed": "11",
+			"stages": [
+				{
+					"echo_delta": 1,
+					"enemy": "moss_slime",
+					"hp": 11,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "moss",
+							"item_id": "echo_crystal",
+							"quantity": 1,
+							"slot_id": ""
+						}
+					],
+					"strength": 3,
+					"ticks": 259,
+					"won": true
+				},
+				{
+					"echo_delta": 1,
+					"enemy": "goblin_scout",
+					"hp": 8,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "",
+							"item_id": "moss_charm",
+							"quantity": 1,
+							"slot_id": "charm"
+						}
+					],
+					"strength": 3,
+					"ticks": 379,
+					"won": true
+				},
+				{
+					"echo_delta": 2,
+					"enemy": "goblin_trial",
+					"hp": 4,
+					"hp_max": 16,
+					"loot": [
+						{
+							"aspect_id": "",
+							"item_id": "training_sword",
+							"quantity": 1,
+							"slot_id": "weapon"
+						}
+					],
+					"strength": 3,
+					"ticks": 499,
+					"won": true
+				}
+			]
+		},
+		{
+			"build": "no_growth",
+			"seed": "22",
+			"stages": [
+				{
+					"echo_delta": 1,
+					"enemy": "moss_slime",
+					"hp": 11,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "moss",
+							"item_id": "echo_crystal",
+							"quantity": 2,
+							"slot_id": ""
+						}
+					],
+					"strength": 3,
+					"ticks": 259,
+					"won": true
+				},
+				{
+					"echo_delta": 1,
+					"enemy": "goblin_scout",
+					"hp": 8,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "",
+							"item_id": "training_sword",
+							"quantity": 1,
+							"slot_id": "weapon"
+						}
+					],
+					"strength": 3,
+					"ticks": 379,
+					"won": true
+				},
+				{
+					"enemy": "goblin_trial",
+					"hp": 0,
+					"hp_max": 12,
+					"strength": 3,
+					"ticks": 462,
+					"won": false
+				}
+			]
+		},
+		{
+			"build": "strength",
+			"seed": "22",
+			"stages": [
+				{
+					"echo_delta": 1,
+					"enemy": "moss_slime",
+					"hp": 11,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "moss",
+							"item_id": "echo_crystal",
+							"quantity": 2,
+							"slot_id": ""
+						}
+					],
+					"strength": 3,
+					"ticks": 259,
+					"won": true
+				},
+				{
+					"echo_delta": 1,
+					"enemy": "goblin_scout",
+					"hp": 9,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "",
+							"item_id": "training_sword",
+							"quantity": 1,
+							"slot_id": "weapon"
+						}
+					],
+					"strength": 4,
+					"ticks": 259,
+					"won": true
+				},
+				{
+					"echo_delta": 2,
+					"enemy": "goblin_trial",
+					"hp": 6,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "goblin",
+							"item_id": "echo_crystal",
+							"quantity": 2,
+							"slot_id": ""
+						}
+					],
+					"strength": 5,
+					"ticks": 259,
+					"won": true
+				}
+			]
+		},
+		{
+			"build": "max_hp",
+			"seed": "22",
+			"stages": [
+				{
+					"echo_delta": 1,
+					"enemy": "moss_slime",
+					"hp": 11,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "moss",
+							"item_id": "echo_crystal",
+							"quantity": 2,
+							"slot_id": ""
+						}
+					],
+					"strength": 3,
+					"ticks": 259,
+					"won": true
+				},
+				{
+					"echo_delta": 1,
+					"enemy": "goblin_scout",
+					"hp": 12,
+					"hp_max": 16,
+					"loot": [
+						{
+							"aspect_id": "",
+							"item_id": "training_sword",
+							"quantity": 1,
+							"slot_id": "weapon"
+						}
+					],
+					"strength": 3,
+					"ticks": 379,
+					"won": true
+				},
+				{
+					"echo_delta": 2,
+					"enemy": "goblin_trial",
+					"hp": 8,
+					"hp_max": 20,
+					"loot": [
+						{
+							"aspect_id": "goblin",
+							"item_id": "echo_crystal",
+							"quantity": 2,
+							"slot_id": ""
+						}
+					],
+					"strength": 3,
+					"ticks": 499,
+					"won": true
+				}
+			]
+		},
+		{
+			"build": "equip_drops",
+			"seed": "22",
+			"stages": [
+				{
+					"echo_delta": 1,
+					"enemy": "moss_slime",
+					"hp": 11,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "moss",
+							"item_id": "echo_crystal",
+							"quantity": 2,
+							"slot_id": ""
+						}
+					],
+					"strength": 3,
+					"ticks": 259,
+					"won": true
+				},
+				{
+					"echo_delta": 1,
+					"enemy": "goblin_scout",
+					"hp": 8,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "",
+							"item_id": "training_sword",
+							"quantity": 1,
+							"slot_id": "weapon"
+						}
+					],
+					"strength": 3,
+					"ticks": 379,
+					"won": true
+				},
+				{
+					"echo_delta": 2,
+					"enemy": "goblin_trial",
+					"hp": 6,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "goblin",
+							"item_id": "echo_crystal",
+							"quantity": 2,
+							"slot_id": ""
+						}
+					],
+					"strength": 5,
+					"ticks": 259,
+					"won": true
+				}
+			]
+		},
+		{
+			"build": "no_growth",
+			"seed": "33",
+			"stages": [
+				{
+					"echo_delta": 1,
+					"enemy": "moss_slime",
+					"hp": 11,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "moss",
+							"item_id": "echo_crystal",
+							"quantity": 1,
+							"slot_id": ""
+						}
+					],
+					"strength": 3,
+					"ticks": 259,
+					"won": true
+				},
+				{
+					"echo_delta": 1,
+					"enemy": "goblin_scout",
+					"hp": 8,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "",
+							"item_id": "training_sword",
+							"quantity": 1,
+							"slot_id": "weapon"
+						}
+					],
+					"strength": 3,
+					"ticks": 379,
+					"won": true
+				},
+				{
+					"enemy": "goblin_trial",
+					"hp": 0,
+					"hp_max": 12,
+					"strength": 3,
+					"ticks": 462,
+					"won": false
+				}
+			]
+		},
+		{
+			"build": "strength",
+			"seed": "33",
+			"stages": [
+				{
+					"echo_delta": 1,
+					"enemy": "moss_slime",
+					"hp": 11,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "moss",
+							"item_id": "echo_crystal",
+							"quantity": 1,
+							"slot_id": ""
+						}
+					],
+					"strength": 3,
+					"ticks": 259,
+					"won": true
+				},
+				{
+					"echo_delta": 1,
+					"enemy": "goblin_scout",
+					"hp": 9,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "",
+							"item_id": "training_sword",
+							"quantity": 1,
+							"slot_id": "weapon"
+						}
+					],
+					"strength": 4,
+					"ticks": 259,
+					"won": true
+				},
+				{
+					"echo_delta": 2,
+					"enemy": "goblin_trial",
+					"hp": 6,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "",
+							"item_id": "moss_charm",
+							"quantity": 1,
+							"slot_id": "charm"
+						}
+					],
+					"strength": 5,
+					"ticks": 259,
+					"won": true
+				}
+			]
+		},
+		{
+			"build": "max_hp",
+			"seed": "33",
+			"stages": [
+				{
+					"echo_delta": 1,
+					"enemy": "moss_slime",
+					"hp": 11,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "moss",
+							"item_id": "echo_crystal",
+							"quantity": 1,
+							"slot_id": ""
+						}
+					],
+					"strength": 3,
+					"ticks": 259,
+					"won": true
+				},
+				{
+					"echo_delta": 1,
+					"enemy": "goblin_scout",
+					"hp": 12,
+					"hp_max": 16,
+					"loot": [
+						{
+							"aspect_id": "",
+							"item_id": "training_sword",
+							"quantity": 1,
+							"slot_id": "weapon"
+						}
+					],
+					"strength": 3,
+					"ticks": 379,
+					"won": true
+				},
+				{
+					"echo_delta": 2,
+					"enemy": "goblin_trial",
+					"hp": 8,
+					"hp_max": 20,
+					"loot": [
+						{
+							"aspect_id": "",
+							"item_id": "moss_charm",
+							"quantity": 1,
+							"slot_id": "charm"
+						}
+					],
+					"strength": 3,
+					"ticks": 499,
+					"won": true
+				}
+			]
+		},
+		{
+			"build": "equip_drops",
+			"seed": "33",
+			"stages": [
+				{
+					"echo_delta": 1,
+					"enemy": "moss_slime",
+					"hp": 11,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "moss",
+							"item_id": "echo_crystal",
+							"quantity": 1,
+							"slot_id": ""
+						}
+					],
+					"strength": 3,
+					"ticks": 259,
+					"won": true
+				},
+				{
+					"echo_delta": 1,
+					"enemy": "goblin_scout",
+					"hp": 8,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "",
+							"item_id": "training_sword",
+							"quantity": 1,
+							"slot_id": "weapon"
+						}
+					],
+					"strength": 3,
+					"ticks": 379,
+					"won": true
+				},
+				{
+					"echo_delta": 2,
+					"enemy": "goblin_trial",
+					"hp": 6,
+					"hp_max": 12,
+					"loot": [
+						{
+							"aspect_id": "",
+							"item_id": "moss_charm",
+							"quantity": 1,
+							"slot_id": "charm"
+						}
+					],
+					"strength": 5,
+					"ticks": 259,
+					"won": true
+				}
+			]
+		}
+	],
+	"stale_run": {
+		"new_run": "run_000002",
+		"new_run_finished": false,
+		"old_run": "run_000001",
+		"pending_run": "run_000001",
+		"session_in_combat_after_old_finish": false
+	},
+	"trial_echo_after_rollback": {
+		"checkpoint_began": true,
+		"echoes_preserved": true,
+		"first_claim": true,
+		"first_delta": 2,
+		"restored": true,
+		"second_claim": true,
+		"second_delta": 1
+	}
+}

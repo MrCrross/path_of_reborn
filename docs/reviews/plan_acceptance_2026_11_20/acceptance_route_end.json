@@ -1,0 +1,23 @@
+{
+	"beaten_in_memory": {
+		"goblin_scout": true,
+		"moss_slime": true
+	},
+	"beaten_on_disk": {
+		"goblin_scout": true,
+		"moss_slime": true
+	},
+	"hero_foot_y": 224.0,
+	"image_error": 0,
+	"items": 2,
+	"label": "acceptance_route_end",
+	"level": 3,
+	"main_action_rect": "[P: (12.0, 240.0), S: (156.0, 30.0)]",
+	"pending_upgrades": 2,
+	"route": {
+		"completed": true,
+		"next_index": 2,
+		"route_id": "forest_edge_slice"
+	},
+	"screen": "World"
+}

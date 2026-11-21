@@ -1,5 +1,9 @@
 # Журнал генерации ассетов
 
+## 20 ноября 2026 — native-resolution анимации текущей игры
+
+По поручению реализации подготовлены и подключены 15 клипов / 49 кадров: 10 новых листов (Харуто после изгнания, слизь, гоблин) через встроенный image_gen и 5 восстановленных из больших AI-исходников клипов пролога. Промпты, masters, вырезки, backup и manifest: `art_working/animation_upgrade_2026_11_20/`. В production продвинуты выбранные агентом после технической и native-scale проверки PNG; manifests содержат происхождение каждого кадра. [Отчёт с GPU-кадрами, GIF и ограничениями](ANIMATION_UPGRADE_REVIEW_2026_11_20.md), [план остальных ассетов для ChatGPT](CHATGPT_ANIMATION_PRODUCTION_PLAN.md).
+
 ## 18 ноября 2026 — P0, этап 1: идентичность
 
 По порядку из [ASSET_PROMPT_TEMPLATES.md](ASSET_PROMPT_TEMPLATES.md#малое-семейство-для-первого-review), v2.0 выполнены четыре отдельных запроса встроенным `image_gen.imagegen`: CHR-01, CHR-02, CHR-08, CHR-09. Полные промпты, briefs, исходники, нормализованные пробы, provenance и review сохранены в [рабочей партии](../../art_working/identity_p0_2026_11_18/README.md).

@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/game_root.gd" id="1_root"]
+[ext_resource type="Texture2D" path="res://art/effects/void_return_overlay_01.png" id="2_fx"]
+[ext_resource type="Script" path="res://scripts/ui/safe_area.gd" id="3_safe"]
 
 [node name="GameRoot" type="Control"]
 layout_mode = 3
@@ -9,10 +11,49 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("1_root")
 
-[node name="ScreenHost" type="Control" parent="."]
+[node name="SafeArea" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_safe")
+
+[node name="ScreenHost" type="Control" parent="SafeArea"]
 unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+
+[node name="NoticeBar" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = -8.0
+offset_bottom = 34.0
+grow_horizontal = 2
+
+[node name="NoticeText" type="Label" parent="NoticeBar"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.976, 0.729, 0.627, 1)
+theme_override_font_sizes/font_size = 9
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="FxOverlay" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="VoidReturn" type="TextureRect" parent="FxOverlay"]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -20,23 +61,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-
-[node name="SaveStatus" type="Label" parent="."]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 8.0
-offset_top = -42.0
-offset_right = -8.0
-offset_bottom = -6.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_colors/font_color = Color(1, 0.55, 0.45, 1)
-theme_override_font_sizes/font_size = 9
-horizontal_alignment = 1
-autowrap_mode = 2
-mouse_filter = 2
+texture = ExtResource("2_fx")
+expand_mode = 1
+stretch_mode = 5
 visible = false

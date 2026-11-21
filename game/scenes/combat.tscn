@@ -1,6 +1,12 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/combat_screen.gd" id="1_combat"]
+[ext_resource type="Texture2D" path="res://art/environments/first_breath_trail_background.png" id="2_bg"]
+[ext_resource type="Texture2D" path="res://art/effects/attack_zone_telegraph_01.png" id="3_telegraph"]
+[ext_resource type="Script" path="res://scripts/ui/combat_result_view.gd" id="4_result"]
+[ext_resource type="Script" path="res://scripts/ui/item_details_view.gd" id="5_details"]
+[ext_resource type="Script" path="res://scripts/ui/safe_area.gd" id="6_safe"]
+[ext_resource type="Script" path="res://scripts/ui/equipment_strip.gd" id="7_equipment"]
 
 [node name="Combat" type="Control"]
 layout_mode = 3
@@ -9,154 +15,345 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("1_combat")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Arena" type="Control" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.055, 0.075, 0.105, 1)
+theme_type_variation = &"ArenaPanel"
 mouse_filter = 2
 
-[node name="Margin" type="MarginContainer" parent="."]
+[node name="ArenaBackground" type="TextureRect" parent="Arena"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Telegraph" type="Sprite2D" parent="Arena"]
+unique_name_in_owner = true
+visible = false
+texture = ExtResource("3_telegraph")
+
+[node name="HeroSprite" type="AnimatedSprite2D" parent="Arena"]
+unique_name_in_owner = true
+
+[node name="EnemySprite" type="AnimatedSprite2D" parent="Arena"]
+unique_name_in_owner = true
+
+[node name="PhaseCue" type="Label" parent="Arena"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 24.0
+offset_bottom = 20.0
+mouse_filter = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 13
+
+[node name="HudSafeArea" type="MarginContainer" parent="."]
+layout_mode = 1
+mouse_filter = 2
+script = ExtResource("6_safe")
+
+[node name="Hud" type="Control" parent="HudSafeArea"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="EquipmentStrip" type="PanelContainer" parent="HudSafeArea/Hud"]
+unique_name_in_owner = true
+layout_mode = 1
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -74.0
+offset_right = 74.0
+offset_top = -64.0
+offset_bottom = -8.0
+script = ExtResource("7_equipment")
+
+[node name="FormatLabel" type="Label" parent="HudSafeArea/Hud"]
+unique_name_in_owner = true
+layout_mode = 1
+mouse_filter = 2
 offset_left = 8.0
 offset_top = 8.0
+theme_override_font_sizes/font_size = 7
+
+[node name="HintLabel" type="Label" parent="HudSafeArea/Hud"]
+unique_name_in_owner = true
+layout_mode = 1
+mouse_filter = 2
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = -111.0
+offset_right = -12.0
+offset_bottom = -95.0
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_outline_color = Color(0.06, 0.1, 0.07, 1)
+theme_override_constants/outline_size = 3
+visible = false
+
+[node name="VictoryLabel" type="Label" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+mouse_filter = 2
+anchor_right = 1.0
+offset_top = 78.0
+offset_bottom = 112.0
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.949, 0.761, 0.306, 1)
+theme_override_colors/font_outline_color = Color(0.145, 0.086, 0.031, 1)
+theme_override_constants/outline_size = 5
+
+[node name="ResultPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+offset_left = 12.0
+offset_top = 98.0
+offset_right = -12.0
+offset_bottom = -2.0
+script = ExtResource("4_result")
+
+[node name="Actions" type="HBoxContainer" parent="HudSafeArea/Hud"]
+unique_name_in_owner = true
+layout_mode = 1
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -88.0
+offset_top = -32.0
 offset_right = -8.0
 offset_bottom = -8.0
+alignment = 2
+theme_override_constants/separation = 4
+
+[node name="AttackButton" type="Button" parent="HudSafeArea/Hud/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+accessibility_name = "Атака"
+
+[node name="AttackCooldown" type="ProgressBar" parent="HudSafeArea/Hud/Actions/AttackButton"]
+unique_name_in_owner = true
+layout_mode = 1
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = -5.0
+offset_right = -4.0
+offset_bottom = -2.0
+mouse_filter = 2
+show_percentage = false
+max_value = 1.0
+step = 0.001
+
+[node name="AbilityButton" type="Button" parent="HudSafeArea/Hud/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+accessibility_name = "Точный удар"
+
+[node name="AbilityCooldown" type="ProgressBar" parent="HudSafeArea/Hud/Actions/AbilityButton"]
+unique_name_in_owner = true
+layout_mode = 1
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = -5.0
+offset_right = -4.0
+offset_bottom = -2.0
+mouse_filter = 2
+show_percentage = false
+max_value = 1.0
+step = 0.001
+
+[node name="DodgeButton" type="Button" parent="HudSafeArea/Hud/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="DodgeCooldown" type="ProgressBar" parent="HudSafeArea/Hud/Actions/DodgeButton"]
+unique_name_in_owner = true
+layout_mode = 1
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = -5.0
+offset_right = -4.0
+offset_bottom = -2.0
+mouse_filter = 2
+show_percentage = false
+max_value = 1.0
+step = 0.001
+
+[node name="PauseButton" type="Button" parent="HudSafeArea/Hud"]
+unique_name_in_owner = true
+layout_mode = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -32.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = 32.0
+theme_type_variation = &"IconButton"
+theme_override_font_sizes/font_size = 12
+text = "II"
+accessibility_name = "Пауза"
+
+[node name="DetailsLayer" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Column" type="VBoxContainer" parent="Margin"]
-layout_mode = 2
-theme_override_constants/separation = 4
+[node name="Dim" type="ColorRect" parent="DetailsLayer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03, 0.04, 0.05, 0.55)
 
-[node name="EnemyName" type="Label" parent="Margin/Column"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 12
-horizontal_alignment = 1
-
-[node name="HeroHpText" type="Label" parent="Margin/Column"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 10
-
-[node name="HeroHpBar" type="ProgressBar" parent="Margin/Column"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 6)
-layout_mode = 2
-show_percentage = false
-
-[node name="EnemyHpText" type="Label" parent="Margin/Column"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 10
-
-[node name="EnemyHpBar" type="ProgressBar" parent="Margin/Column"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 6)
-layout_mode = 2
-show_percentage = false
-
-[node name="Arena" type="Panel" parent="Margin/Column"]
-custom_minimum_size = Vector2(0, 58)
-layout_mode = 2
-
-[node name="HeroMarker" type="Label" parent="Margin/Column/Arena"]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 10.0
-offset_top = 12.0
-offset_right = 70.0
-offset_bottom = 46.0
-theme_override_font_sizes/font_size = 10
-text = "ГЕРОЙ"
-horizontal_alignment = 1
-
-[node name="EnemyMarker" type="Label" parent="Margin/Column/Arena"]
+[node name="DetailsView" type="PanelContainer" parent="DetailsLayer"]
 unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
 offset_left = -76.0
-offset_top = 12.0
-offset_right = -6.0
-offset_bottom = 46.0
-grow_horizontal = 0
-theme_override_font_sizes/font_size = 9
-horizontal_alignment = 1
-autowrap_mode = 2
+offset_top = -100.0
+offset_right = 76.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("5_details")
 
-[node name="PhaseLabel" type="Label" parent="Margin/Column"]
+[node name="PauseLayer" type="Control" parent="."]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 36)
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dim" type="ColorRect" parent="PauseLayer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03, 0.04, 0.05, 0.62)
+
+[node name="SafeArea" type="MarginContainer" parent="PauseLayer"]
+layout_mode = 1
+mouse_filter = 2
+script = ExtResource("6_safe")
+
+[node name="Center" type="CenterContainer" parent="PauseLayer/SafeArea"]
 layout_mode = 2
+mouse_filter = 2
+
+[node name="Panel" type="PanelContainer" parent="PauseLayer/SafeArea/Center"]
+custom_minimum_size = Vector2(124, 0)
+layout_mode = 2
+theme_type_variation = &"HudPanel"
+
+[node name="Inset" type="MarginContainer" parent="PauseLayer/SafeArea/Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 5
+
+[node name="Column" type="VBoxContainer" parent="PauseLayer/SafeArea/Center/Panel/Inset"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="PauseCaption" type="Label" parent="PauseLayer/SafeArea/Center/Panel/Inset/Column"]
+layout_mode = 2
+horizontal_alignment = 1
 theme_override_font_sizes/font_size = 11
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 2
+text = "Пауза"
 
-[node name="HintLabel" type="Label" parent="Margin/Column"]
+[node name="ResumeButton" type="Button" parent="PauseLayer/SafeArea/Center/Panel/Inset/Column"]
 unique_name_in_owner = true
+layout_mode = 2
 custom_minimum_size = Vector2(0, 24)
+text = "Продолжить"
+theme_type_variation = &"PrimaryButton"
+
+[node name="FormatSwitch" type="Button" parent="PauseLayer/SafeArea/Center/Panel/Inset/Column"]
+unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 10
-horizontal_alignment = 1
+custom_minimum_size = Vector2(0, 24)
+theme_type_variation = &"CompactMultilineButton"
+theme_override_font_sizes/font_size = 8
+text = "Формат: ручной бой"
+
+[node name="SpeedSwitch" type="Button" parent="PauseLayer/SafeArea/Center/Panel/Inset/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 24)
+theme_type_variation = &"CompactMultilineButton"
+theme_override_font_sizes/font_size = 8
+text = "Скорость автобоя: ×1"
+
+[node name="ForfeitButton" type="Button" parent="PauseLayer/SafeArea/Center/Panel/Inset/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 24)
+theme_type_variation = &"DangerButton"
+theme_override_colors/font_color = Color(0.949, 0.902, 0.808, 1)
+text = "Сдаться"
+
+[node name="ForfeitNote" type="Label" parent="PauseLayer/SafeArea/Center/Panel/Inset/Column"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.596, 0.631, 0.702, 1)
 autowrap_mode = 2
-
-[node name="ResultLabel" type="Label" parent="Margin/Column"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 28)
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_font_sizes/font_size = 10
+text = "Поражение и возврат через Печать."
 horizontal_alignment = 1
-autowrap_mode = 2
 
-[node name="Actions" type="HBoxContainer" parent="Margin/Column"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="AttackButton" type="Button" parent="Margin/Column/Actions"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 10
-text = "Атака\nSpace"
-
-[node name="DodgeButton" type="Button" parent="Margin/Column/Actions"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 10
-text = "Уклонение\nE"
-
-[node name="RetryButton" type="Button" parent="Margin/Column"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 28)
-layout_mode = 2
-text = "Повторить бой"
-visible = false
-
-[node name="ContinueButton" type="Button" parent="Margin/Column"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 28)
-layout_mode = 2
-text = "Вернуться к пути"
-visible = false
-
-[connection signal="pressed" from="Margin/Column/Actions/AttackButton" to="." method="_on_attack_pressed"]
-[connection signal="pressed" from="Margin/Column/Actions/DodgeButton" to="." method="_on_dodge_pressed"]
-[connection signal="pressed" from="Margin/Column/RetryButton" to="." method="_on_retry_pressed"]
-[connection signal="pressed" from="Margin/Column/ContinueButton" to="." method="_on_continue_pressed"]
+[connection signal="pressed" from="HudSafeArea/Hud/Actions/AttackButton" to="." method="_on_attack_pressed"]
+[connection signal="pressed" from="HudSafeArea/Hud/Actions/AbilityButton" to="." method="_on_ability_pressed"]
+[connection signal="pressed" from="HudSafeArea/Hud/Actions/DodgeButton" to="." method="_on_dodge_pressed"]
+[connection signal="pressed" from="HudSafeArea/Hud/PauseButton" to="." method="_on_pause_pressed"]
+[connection signal="gui_input" from="DetailsLayer/Dim" to="." method="_on_details_dismiss"]
+[connection signal="pressed" from="PauseLayer/SafeArea/Center/Panel/Inset/Column/ResumeButton" to="." method="_on_resume_pressed"]
+[connection signal="pressed" from="PauseLayer/SafeArea/Center/Panel/Inset/Column/FormatSwitch" to="." method="_on_format_switch_pressed"]
+[connection signal="pressed" from="PauseLayer/SafeArea/Center/Panel/Inset/Column/SpeedSwitch" to="." method="_on_speed_switch_pressed"]
+[connection signal="pressed" from="PauseLayer/SafeArea/Center/Panel/Inset/Column/ForfeitButton" to="." method="_on_forfeit_pressed"]

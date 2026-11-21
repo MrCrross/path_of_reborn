@@ -1,16 +1,21 @@
 # --- MCP / agent tooling ---
-.mcp-downloads/
-.mcp-servers/
-.mcp-local/
-.mcp.json
-.kimi-work/
-.agents/
+/.mcp-*/
+/.mcp.json
+/.codex/
+/.kimi-work/
+/.agents/
 
 # --- Working & external material (not project code) ---
 art_working/
 references/agent-skills-src/
 references/path-of-kings/screenshots/
+/references/path-of-kings/feedback_*/
 docs/narrative.zip
+
+# --- Local QA captures and logs ---
+/docs/reviews/*/baseline/
+/docs/reviews/**/*.log
+/docs/reviews/**/*.avi
 
 # --- Godot ---
 game/.godot/
@@ -20,6 +25,10 @@ game/export*/
 *.apk
 *.aab
 *.tmp
+
+# --- Python bytecode ---
+__pycache__/
+*.pyc
 
 # --- OS junk ---
 .DS_Store

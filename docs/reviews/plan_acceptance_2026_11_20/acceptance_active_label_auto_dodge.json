@@ -1,0 +1,28 @@
+{
+	"beaten_in_memory": {
+		"moss_slime": true
+	},
+	"beaten_on_disk": {
+		"moss_slime": true
+	},
+	"enemy_frame": 4,
+	"enemy_hp": 14,
+	"finished": false,
+	"hero_begin_connections": 1,
+	"hero_clip_is_idle": true,
+	"hero_frame": 0,
+	"hero_hp": 12,
+	"image_error": 0,
+	"items": 1,
+	"label": "acceptance_active_label_auto_dodge",
+	"level": 2,
+	"pending_upgrades": 1,
+	"phase": 1,
+	"route": {
+		"completed": false,
+		"next_index": 1,
+		"route_id": "forest_edge_slice"
+	},
+	"screen": "Combat",
+	"tick": 59
+}

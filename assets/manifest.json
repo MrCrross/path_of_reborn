@@ -64,11 +64,11 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        96,
-        128
+        974,
+        1360
       ],
-      "sha256": "990b1cbc11bfa1824669a80f77d21e5b8af1d61fdcf6b8b23b70efe9d590f311",
-      "rgba_sha256": "0855402afc3fb65c48601bdf5ab65acad14262f97101e5312d778d57b96b595d",
+      "sha256": "67fc94a1da895efa9c77a4e8262c7af60c91e70a799159f85e3eb4025c7f7d67",
+      "rgba_sha256": "7b780ff3bbd398cdfba99dc92c044ceda926347c75af3900324a7fad7ae75bba",
       "priority": "P1",
       "source": {
         "export": "art_working/exile_and_road_p0_p1_2026_11_18/chr_03/normalized/haruto_exiled_idle_v01.png",
@@ -77,12 +77,17 @@
         "original": "art_working/exile_and_road_p0_p1_2026_11_18/chr_03/source/haruto_exiled_idle_v01.png",
         "original_sha256": "d8a9bc86ec3fdd0428bca6a8930cdcfa196eda9896564db0d8c5ebaf237d5002",
         "prompt": "art_working/exile_and_road_p0_p1_2026_11_18/chr_03/prompt_v01.txt",
-        "prompt_sha256": "2fbd8118592849f7ba39c3e4f8d62bdafbf954526393feea0a7c1123bd171a2f"
+        "prompt_sha256": "2fbd8118592849f7ba39c3e4f8d62bdafbf954526393feea0a7c1123bd171a2f",
+        "candidate": "art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/haruto_exiled_idle.png",
+        "candidate_sha256": "67fc94a1da895efa9c77a4e8262c7af60c91e70a799159f85e3eb4025c7f7d67",
+        "integration_manifest": "art_working/visual_upgrade_2026_11_20/source_resolution_test/manifest.json",
+        "integration_audit": "art_working/visual_upgrade_2026_11_20/source_resolution_test/qa/source_audit.json"
       },
       "pivot": [
-        48,
-        112
-      ]
+        389,
+        1352
+      ],
+      "integration_note": "source-resolution still: alpha-bbox crop only, pixels preserved; solid height 1275 -> 82 logical px"
     },
     {
       "id": "CHR-04",
@@ -450,11 +455,11 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        64,
-        64
+        1248,
+        1106
       ],
-      "sha256": "2e0271e278ed715983f5c6c6635d3cf420fd2d147b09b298d8dbb73d5e61c3ef",
-      "rgba_sha256": "38a1e6766c719d39ee8b0647a4126055b7a0654f13edb1da2cd5217ea91e1fe3",
+      "sha256": "18187b14019baf1b28d4f8ef94713350219049de2e002bf7cdf0f226f26233aa",
+      "rgba_sha256": "b3acc2befb259fa0a877a225e0a866dbba21fc9af68b97f5ef1bd9dca3a2073a",
       "priority": "P0",
       "source": {
         "export": "art_working/gameplay_scale_p0_2026_11_18/mon_01/normalized/moss_slime_idle_v01.png",
@@ -463,12 +468,17 @@
         "original": "art_working/gameplay_scale_p0_2026_11_18/mon_01/source/moss_slime_idle_v01.png",
         "original_sha256": "75b996260b3c3c556727086a2bcc202bec5e18ee3d9b728bdaad3db2ba34f957",
         "prompt": "art_working/gameplay_scale_p0_2026_11_18/mon_01/prompt_v01.txt",
-        "prompt_sha256": "6a0b9cdddfb5825617561c9e3376140d462df1d3420e92d19115630603ac886c"
+        "prompt_sha256": "6a0b9cdddfb5825617561c9e3376140d462df1d3420e92d19115630603ac886c",
+        "candidate": "art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/moss_slime_idle.png",
+        "candidate_sha256": "18187b14019baf1b28d4f8ef94713350219049de2e002bf7cdf0f226f26233aa",
+        "integration_manifest": "art_working/visual_upgrade_2026_11_20/source_resolution_test/manifest.json",
+        "integration_audit": "art_working/visual_upgrade_2026_11_20/source_resolution_test/qa/source_audit.json"
       },
       "pivot": [
-        32,
-        56
-      ]
+        628.5,
+        952
+      ],
+      "integration_note": "source-resolution still: alpha-bbox crop only, pixels preserved; solid height 608 -> 32 logical px"
     },
     {
       "id": "MON-02",
@@ -710,14 +720,14 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        180,
-        320
+        540,
+        960
       ],
-      "sha256": "c9261b5e46d50e48fe41e389e90c37083ef60c31fde897da25e54a9967a70d6e",
-      "rgba_sha256": "a28586a63a6824fead62fcf1f34be884c0664c9e96d3f25f5d781fadd5b3ffde",
+      "sha256": "d4308fdd1d3f4f072ff693b411adaed8369e53207d4cf4b0ad792fc6ff737896",
+      "rgba_sha256": "0ee30683cb814384ac833bba39ceabc49d0c03a026a8d6a885148fef09992ba9",
       "priority": "P0",
       "source": {
-        "export": "art_working/tokyo_crosswalk_p0_p1_2026_11_18/env_01/normalized/tokyo_crosswalk_background_v01.png",
+        "export": "art_working/prologue_resolution_p2_2026_11_20/exports/540/tokyo_crosswalk_background_540x960.png",
         "export_sha256": "c9261b5e46d50e48fe41e389e90c37083ef60c31fde897da25e54a9967a70d6e",
         "manifest": "art_working/tokyo_crosswalk_p0_p1_2026_11_18/manifest.json",
         "original": "art_working/tokyo_crosswalk_p0_p1_2026_11_18/env_01/source/tokyo_crosswalk_background_v01.png",
@@ -798,11 +808,11 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        180,
-        320
+        941,
+        1672
       ],
-      "sha256": "a46f6d8fe881e621a89b52825b2897c9ef5c0f8302ced4d6ab06b338164db4b5",
-      "rgba_sha256": "a4f91cd85049a425f93da8a5ecdb757e2652cc6231e05bd17efeb7276bf99d8d",
+      "sha256": "cfb90e37c35b06683b84247920958f4ec6972521969ad752820631d17fc65a0c",
+      "rgba_sha256": "41811c831bc35767a0e6730342d218b5de1b01eff684065db7f35dcaf9be8bdc",
       "priority": "P0",
       "source": {
         "export": "art_working/gameplay_scale_p0_2026_11_18/env_05/normalized/first_breath_trail_background_v01.png",
@@ -811,8 +821,13 @@
         "original": "art_working/gameplay_scale_p0_2026_11_18/env_05/source/first_breath_trail_background_v01.png",
         "original_sha256": "cfb90e37c35b06683b84247920958f4ec6972521969ad752820631d17fc65a0c",
         "prompt": "art_working/gameplay_scale_p0_2026_11_18/env_05/prompt_v01.txt",
-        "prompt_sha256": "5c42ba64ccf361278d2a2e82ce1fdec8508615d01f909e8b2991b61adb56318f"
-      }
+        "prompt_sha256": "5c42ba64ccf361278d2a2e82ce1fdec8508615d01f909e8b2991b61adb56318f",
+        "candidate": "art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/first_breath_trail_background.png",
+        "candidate_sha256": "cfb90e37c35b06683b84247920958f4ec6972521969ad752820631d17fc65a0c",
+        "integration_manifest": "art_working/visual_upgrade_2026_11_20/source_resolution_test/manifest.json",
+        "integration_audit": "art_working/visual_upgrade_2026_11_20/source_resolution_test/qa/source_audit.json"
+      },
+      "integration_note": "source-resolution master, byte-identical copy; RGB background"
     },
     {
       "id": "ENV-06",
@@ -2650,14 +2665,14 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        180,
-        320
+        540,
+        960
       ],
-      "sha256": "39f8a679e3bc0284c5368341dc79e3fa4163e65e73818259ee3f22e7181c9e69",
-      "rgba_sha256": "5e88074db578e37cf29a699d3ce4f0734d0929fb3129bf67fd54620d88b38833",
+      "sha256": "c70a32ad6f6aa1fdd323e17d6f4f6b0c8f1c404c6df8e22d8cf6736619841b9c",
+      "rgba_sha256": "68ee867a26bb29033b253e7cfbf17bcc721711d735a9050e0d33375baccc11fa",
       "priority": "P1",
       "source": {
-        "export": "art_working/nar_tokyo_prologue_p1_2026_11_18/nar_01_v02/normalized/haruto_tokyo_evening_story_v02.png",
+        "export": "art_working/prologue_resolution_p2_2026_11_20/exports/540/haruto_tokyo_evening_story_540x960.png",
         "export_sha256": "39f8a679e3bc0284c5368341dc79e3fa4163e65e73818259ee3f22e7181c9e69",
         "manifest": "art_working/nar_tokyo_prologue_p1_2026_11_18/manifest.json",
         "original": "art_working/nar_tokyo_prologue_p1_2026_11_18/nar_01_v02/source/haruto_tokyo_evening_story_v02.png",
@@ -2672,14 +2687,14 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        180,
-        320
+        540,
+        960
       ],
-      "sha256": "3946d72d982604f7b4d9c3487a7b833c8089835e296f96dd8fdeb819c826dae5",
-      "rgba_sha256": "3fbaf4900bff157d655105c51124fe41d6490df7fd076359a1ab0f38a04652cf",
+      "sha256": "4421ead0b8ddc82184d4e9db8f85cfccce36faf6814fd0d10c3f2355cfd6b2cc",
+      "rgba_sha256": "153ada2c61ae0fd2eaa751d1df4b76aa01b37a017b9ba1e6a80cd807279fb2a8",
       "priority": "P1",
       "source": {
-        "export": "art_working/nar_tokyo_prologue_p1_2026_11_18/nar_02/normalized/haruto_crosswalk_alarm_story_v01.png",
+        "export": "art_working/prologue_resolution_p2_2026_11_20/exports/540/haruto_crosswalk_alarm_story_540x960.png",
         "export_sha256": "3946d72d982604f7b4d9c3487a7b833c8089835e296f96dd8fdeb819c826dae5",
         "manifest": "art_working/nar_tokyo_prologue_p1_2026_11_18/manifest.json",
         "original": "art_working/nar_tokyo_prologue_p1_2026_11_18/nar_02/source/haruto_crosswalk_alarm_story_v01.png",
@@ -2694,14 +2709,14 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        180,
-        320
+        540,
+        960
       ],
-      "sha256": "49c6af7adf094e54c757bc5fbddda9f3458d3ca26b60128b0307080ef602e860",
-      "rgba_sha256": "5cd4edef8fdaaa1601d8bb7f67b9f2e8659049fccef41ce66b409bc755f1f5d0",
+      "sha256": "913e278420450efaf47c9d8c1c0e5523bf548fbb5cb892aa6a6f3abd4e469351",
+      "rgba_sha256": "2d4780fbbe965e97057c073fe9209ce000188c71e5f8d0b4eea9719c8f56d1b8",
       "priority": "P1",
       "source": {
-        "export": "art_working/nar_tokyo_prologue_p1_2026_11_18/nar_03/normalized/haruto_pushes_yui_story_v01.png",
+        "export": "art_working/prologue_resolution_p2_2026_11_20/exports/540/haruto_pushes_yui_story_540x960.png",
         "export_sha256": "49c6af7adf094e54c757bc5fbddda9f3458d3ca26b60128b0307080ef602e860",
         "manifest": "art_working/nar_tokyo_prologue_p1_2026_11_18/manifest.json",
         "original": "art_working/nar_tokyo_prologue_p1_2026_11_18/nar_03/source/haruto_pushes_yui_story_v01.png",
@@ -2716,14 +2731,14 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        180,
-        320
+        540,
+        960
       ],
-      "sha256": "2a9652702a8947048d8295a19310f83365905b40cc270376220c8a3b68fc52c4",
-      "rgba_sha256": "32eb373efa6e2d18386e84a7aeda0134ef9ad84b6275764d6d70afb5b8a5ba14",
+      "sha256": "7fc0e8ff91a206e9ae65bd69792f0b058d2636f6f28136379f6a5610a21c8ab1",
+      "rgba_sha256": "c9e6c965f6e5c2f07c8d45e310450df2e255f4df1bdbd6a3b3eff978cd2308b9",
       "priority": "P1",
       "source": {
-        "export": "art_working/nar_tokyo_prologue_p1_2026_11_18/nar_04/normalized/briefcase_after_flash_story_v01.png",
+        "export": "art_working/prologue_resolution_p2_2026_11_20/exports/540/briefcase_after_flash_story_540x960.png",
         "export_sha256": "2a9652702a8947048d8295a19310f83365905b40cc270376220c8a3b68fc52c4",
         "manifest": "art_working/nar_tokyo_prologue_p1_2026_11_18/manifest.json",
         "original": "art_working/nar_tokyo_prologue_p1_2026_11_18/nar_04/source/briefcase_after_flash_story_v01.png",
@@ -2738,14 +2753,14 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        180,
-        320
+        540,
+        960
       ],
-      "sha256": "478e70b5e195474c82cc5f6305c2ada08fae1225a691857f77084dc3d99c1e92",
-      "rgba_sha256": "52d5a13dcd812a85b0115d7c7c6b4f531b88b8f07b9b4cf9c2fd1e62e67bc81c",
+      "sha256": "257150d4c16769b103cb7f2c680a9ebfe7e4b59ebecfa4029eae95f6b0141087",
+      "rgba_sha256": "0e82d0d3e6e7cb4c6113a9700885e7f877ad0babe27e8cf72ff88d72a4ac0ba6",
       "priority": "P1",
       "source": {
-        "export": "art_working/nar_threshold_to_shop_p1_2026_11_18/nar_05/normalized/mitsuki_first_meeting_story_v01.png",
+        "export": "art_working/prologue_resolution_p2_2026_11_20/exports/540/mitsuki_first_meeting_story_540x960.png",
         "export_sha256": "478e70b5e195474c82cc5f6305c2ada08fae1225a691857f77084dc3d99c1e92",
         "manifest": "art_working/nar_threshold_to_shop_p1_2026_11_18/manifest.json",
         "original": "art_working/nar_threshold_to_shop_p1_2026_11_18/nar_05/source/mitsuki_first_meeting_story_v01.png",
@@ -2760,14 +2775,14 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        180,
-        320
+        540,
+        960
       ],
-      "sha256": "8990759053600ecf44e90bbd2b06420601793dff1c218e92c28b3323eee3adb6",
-      "rgba_sha256": "637a2221e3680357bb31f3df88b126d8add5dfcf9dcc625da68ad0aef719da8e",
+      "sha256": "687e062c6f5c218b7696ad79e717f9db3c326d851f679ae61e7511f6cce9f4be",
+      "rgba_sha256": "39fb76b683aec4c3687e463ad6c5cad6317031d594a126d8ab0246322d01b9b5",
       "priority": "P1",
       "source": {
-        "export": "art_working/nar_threshold_to_shop_p1_2026_11_18/nar_06_v02/normalized/haruto_receives_path_seal_story_v02.png",
+        "export": "art_working/prologue_resolution_p2_2026_11_20/exports/540/haruto_receives_path_seal_story_540x960.png",
         "export_sha256": "8990759053600ecf44e90bbd2b06420601793dff1c218e92c28b3323eee3adb6",
         "manifest": "art_working/nar_threshold_to_shop_p1_2026_11_18/manifest.json",
         "original": "art_working/nar_threshold_to_shop_p1_2026_11_18/nar_06_v02/source/haruto_receives_path_seal_story_v02.png",
@@ -3670,20 +3685,26 @@
       "kind": "animation",
       "status": "approved",
       "size": [
-        384,
-        128
+        2146,
+        2330
       ],
-      "sha256": "d646ed9c054f29d06e59e1ee9a6f4c4263849ed0179767c5c531882819015131",
-      "rgba_sha256": "89f286ed46e8ca79f1fc60454057cdf2b70f97d37318fe5c64f5f4a63dd890ca",
+      "sha256": "8fe4be7545e9270fa74dccc8fe6526d743988b956546927c158d3b76de258888",
+      "rgba_sha256": "3f892f5f5eaaf2e7812d25fefd651d97d74fcd31cb9dc2453ca580083310c1ef",
       "frames": [
         {
           "region": [
-            0,
-            0,
-            96,
-            128
+            2,
+            2,
+            594,
+            1031
           ],
-          "rgba_sha256": "2ba688889434cb50af313de37bd9fd275185af47c1d894c4a1c874b03faeab7f",
+          "margin": [
+            384,
+            551,
+            789,
+            776
+          ],
+          "rgba_sha256": "a145edfeefa8f38259c2f1d29af7b1b5561fedb1dcfaa42843f07e526836335a",
           "source": {
             "export": "art_working/tokyo_rescue_motion_p1_2026_11_19/chr_01_push_01/normalized/haruto_modern_push_01_v01.png",
             "export_sha256": "63234c092f7f7bbf3c0d808d5a83a905882a648b1b0cb387215524d1c71ccdfb",
@@ -3691,17 +3712,45 @@
             "original": "art_working/tokyo_rescue_motion_p1_2026_11_19/chr_01_push_01/source/haruto_modern_push_01_v01.png",
             "original_sha256": "7be4619b7eac15a4625717ccbd03af34e43f227b4babc03381a9487189d8b8f8",
             "prompt": "art_working/tokyo_rescue_motion_p1_2026_11_19/chr_01_push_01/prompt_v01.txt",
-            "prompt_sha256": "02112454b86f1ffb51643fc7e97d9c902c4b4753cc6e7e88c7b1b9f08e53b80a"
+            "prompt_sha256": "02112454b86f1ffb51643fc7e97d9c902c4b4753cc6e7e88c7b1b9f08e53b80a",
+            "kind": "ai_generated_reused_original",
+            "archived_original": "art_working/animation_upgrade_2026_11_20/source/haruto_modern_push_01_original.png",
+            "rights": "Existing project AI-generated source; platform terms apply",
+            "processing": "original RGBA retained inside alpha>=128 bounds plus 2px; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              1122,
+              1402
+            ],
+            "source_crop": [
+              159,
+              242,
+              753,
+              1273
+            ],
+            "source_anchor": [
+              451.5,
+              1271.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 72.78651685393258
           }
         },
         {
           "region": [
-            96,
-            0,
-            96,
-            128
+            1075,
+            2,
+            887,
+            958
           ],
-          "rgba_sha256": "266a41b49a8f731d635387792d8ba823ada66f13e460b211f3f05bd055266591",
+          "margin": [
+            250,
+            624,
+            496,
+            849
+          ],
+          "rgba_sha256": "815b89e06e45ca75863be67e9228356f3381d00f304c257c8fe7ef49b99a086c",
           "source": {
             "export": "art_working/tokyo_rescue_motion_p1_2026_11_19/chr_01_push_02/normalized/haruto_modern_push_02_v02.png",
             "export_sha256": "d27f6e3411e2785bc292a397fb895dd85073c70fd12d7479c1fedbead2a19732",
@@ -3709,17 +3758,45 @@
             "original": "art_working/tokyo_rescue_motion_p1_2026_11_19/chr_01_push_02/source/haruto_modern_push_02_v02.png",
             "original_sha256": "c867e776d9762fcd8c2b1c2513e15e795eb48a3b72a529bc2a34418e41fa3a7d",
             "prompt": "art_working/tokyo_rescue_motion_p1_2026_11_19/chr_01_push_02/prompt_v02.txt",
-            "prompt_sha256": "b062748c9b0cadfc8d87a4f795d9ce015d2db7d2adb0dcf2b733badf003dc146"
+            "prompt_sha256": "b062748c9b0cadfc8d87a4f795d9ce015d2db7d2adb0dcf2b733badf003dc146",
+            "kind": "ai_generated_reused_original",
+            "archived_original": "art_working/animation_upgrade_2026_11_20/source/haruto_modern_push_02_original.png",
+            "rights": "Existing project AI-generated source; platform terms apply",
+            "processing": "original RGBA retained inside alpha>=128 bounds plus 2px; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              1536,
+              1024
+            ],
+            "source_crop": [
+              165,
+              36,
+              1052,
+              994
+            ],
+            "source_anchor": [
+              592.5,
+              992.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 67.61279170267935
           }
         },
         {
           "region": [
-            192,
-            0,
-            96,
-            128
+            2,
+            1167,
+            1069,
+            1055
           ],
-          "rgba_sha256": "0806b2c1020cb31209ae34f15dd031c3b52d36cf55065cb8b93c30bd5eaeae71",
+          "margin": [
+            314,
+            527,
+            314,
+            752
+          ],
+          "rgba_sha256": "057ddd88b9a1e9504fff06cfd12d88418774b23d6c9eb0e89cf70e530a3643fc",
           "source": {
             "export": "art_working/tokyo_rescue_motion_p1_2026_11_19/chr_01_push_03/normalized/haruto_modern_push_03_v01.png",
             "export_sha256": "c84fca85033be5db0f742de5554c414877a9311282c4ebd0789294490765cc13",
@@ -3727,17 +3804,45 @@
             "original": "art_working/tokyo_rescue_motion_p1_2026_11_19/chr_01_push_03/source/haruto_modern_push_03_v01.png",
             "original_sha256": "105090de4af18d8b0676bd0d6cdf3c1f78c48940a53b6aa9737d3f11eeebc385",
             "prompt": "art_working/tokyo_rescue_motion_p1_2026_11_19/chr_01_push_03/prompt_v01.txt",
-            "prompt_sha256": "d862a8c82b893db571f9b87ef52c3c6565e7d7d0baaad51fadb3f1e50bd8e9c3"
+            "prompt_sha256": "d862a8c82b893db571f9b87ef52c3c6565e7d7d0baaad51fadb3f1e50bd8e9c3",
+            "kind": "ai_generated_reused_original",
+            "archived_original": "art_working/animation_upgrade_2026_11_20/source/haruto_modern_push_03_original.png",
+            "rights": "Existing project AI-generated source; platform terms apply",
+            "processing": "original RGBA retained inside alpha>=128 bounds plus 2px; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              1199,
+              1312
+            ],
+            "source_crop": [
+              92,
+              146,
+              1161,
+              1201
+            ],
+            "source_anchor": [
+              455.0,
+              1199.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 74.48746758859119
           }
         },
         {
           "region": [
-            288,
-            0,
-            96,
-            128
+            1075,
+            1167,
+            803,
+            1161
           ],
-          "rgba_sha256": "412d9ef95b0eca75347292ac0f0f1ef66424f92b72b7ebf4bc96db8f408f6413",
+          "margin": [
+            394,
+            421,
+            580,
+            646
+          ],
+          "rgba_sha256": "582b7bce5d1ff5d9c7329d38fd5681054cf1b3a6246fb312c585aa0d7f7536ba",
           "source": {
             "export": "art_working/tokyo_rescue_motion_p1_2026_11_19/chr_01_push_04/normalized/haruto_modern_push_04_v01.png",
             "export_sha256": "751473e3407a13992d68d4a04c41ec07092fc1a8c7ac184443a51be741fba26e",
@@ -3745,14 +3850,123 @@
             "original": "art_working/tokyo_rescue_motion_p1_2026_11_19/chr_01_push_04/source/haruto_modern_push_04_v01.png",
             "original_sha256": "07c505b38764707855075a02fc674781522b8ea38ceb4047d6c20d0a92bb2637",
             "prompt": "art_working/tokyo_rescue_motion_p1_2026_11_19/chr_01_push_04/prompt_v01.txt",
-            "prompt_sha256": "b44d5d17a11bb800f0732b287f502c0e7030205f3a869c85eef6793b9b2f5423"
+            "prompt_sha256": "b44d5d17a11bb800f0732b287f502c0e7030205f3a869c85eef6793b9b2f5423",
+            "kind": "ai_generated_reused_original",
+            "archived_original": "art_working/animation_upgrade_2026_11_20/source/haruto_modern_push_04_original.png",
+            "rights": "Existing project AI-generated source; platform terms apply",
+            "processing": "original RGBA retained inside alpha>=128 bounds plus 2px; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              1122,
+              1402
+            ],
+            "source_crop": [
+              161,
+              146,
+              964,
+              1307
+            ],
+            "source_anchor": [
+              444.5,
+              1305.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 82.0
           }
         }
       ],
       "pivot": [
-        48,
-        112
-      ]
+        677,
+        1580
+      ],
+      "runtime": {
+        "frame": [
+          1383,
+          1807
+        ],
+        "count": 4,
+        "scale": 0.07087294727744166,
+        "offset": [
+          14.5,
+          -676.5
+        ],
+        "regions": [
+          {
+            "region": [
+              2,
+              2,
+              594,
+              1031
+            ],
+            "margin": [
+              384,
+              551,
+              789,
+              776
+            ]
+          },
+          {
+            "region": [
+              1075,
+              2,
+              887,
+              958
+            ],
+            "margin": [
+              250,
+              624,
+              496,
+              849
+            ]
+          },
+          {
+            "region": [
+              2,
+              1167,
+              1069,
+              1055
+            ],
+            "margin": [
+              314,
+              527,
+              314,
+              752
+            ]
+          },
+          {
+            "region": [
+              1075,
+              1167,
+              803,
+              1161
+            ],
+            "margin": [
+              394,
+              421,
+              580,
+              646
+            ]
+          }
+        ]
+      },
+      "technical_checks_passed": true,
+      "source_resolution_upgrade": true,
+      "source": {
+        "kind": "ai_generated_reused_original",
+        "export": "art_working/animation_upgrade_2026_11_20/candidates/characters/animations/haruto_modern_push_sheet.png",
+        "tool": "existing project AI originals",
+        "rights": "Project AI-generated content; platform terms apply"
+      },
+      "review": {
+        "date": "2026-11-20",
+        "by": "Codex",
+        "status": "approved for integration after technical and native-scale review",
+        "strict_shared_pixel_grid": false,
+        "per_frame_resampling": false,
+        "authorization": "User requested implementation of currently used animation sprites on 2026-11-20; selection delegated to implementing agent"
+      },
+      "rgba8_mib": 19.074172973632812
     },
     {
       "id": "CHR-02",
@@ -4054,46 +4268,176 @@
       "kind": "animation",
       "status": "approved",
       "size": [
-        192,
-        128
+        572,
+        1966
       ],
-      "sha256": "2854b6eaddf7076379e712e7029429158f91634aaf81b6061611301c02600944",
-      "rgba_sha256": "ff00b6175f2df9061662d3d66136834f9c409cb556005e701a1171ec8f29593d",
+      "sha256": "37790ac25d54d03ad31af3126b23c5b3742a6aed6d0b0cc9df288ee7e2a1ad49",
+      "rgba_sha256": "d5296b4a2b9762bb20798d536d0be4ad12ca96d857507625fb28fd2cc6ba6572",
       "frames": [
         {
           "region": [
-            0,
-            0,
-            96,
-            128
+            2,
+            2,
+            548,
+            976
           ],
-          "rgba_sha256": "8b95eb56275914222648e46ce8950885f62d4e59c7b83341a19d690c6dc23b7b",
-          "phase": "guard"
+          "margin": [
+            254,
+            354,
+            590,
+            542
+          ],
+          "rgba_sha256": "de3bb56927a9d57db1582e53b5ceaec8e9786a2cbdd8686049d6ca3fbf9f3a3b",
+          "source": {
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/haruto_exiled_idle_v01.png",
+            "original_sha256": "ca5c79c7775421a7cd585e4426ceef59e1cffd46538b874c127ef1e28d251f8f",
+            "source_region": [
+              0,
+              0,
+              724,
+              1086
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/haruto_exiled_idle_v01.txt",
+            "prompt_sha256": "9045d6f2c27fec56e0a13d9f566c7c3fc33c395de1afc09da4a5c957b973a6e9",
+            "reference": "art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/haruto_exiled_idle.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              724,
+              1086
+            ],
+            "source_crop": [
+              52,
+              61,
+              600,
+              1037
+            ],
+            "source_anchor": [
+              367.0,
+              1035.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 82.0
+          }
         },
         {
           "region": [
-            96,
-            0,
-            96,
-            128
+            2,
+            985,
+            568,
+            979
           ],
-          "rgba_sha256": "d39c1b6ebdae187453d531e37e004c0edc8f38ba9f1e49fab385d355d6409898",
-          "phase": "breathe"
+          "margin": [
+            229,
+            351,
+            570,
+            539
+          ],
+          "rgba_sha256": "7e2b63dc1b4051c66c7a562f74b79a72bd448dc98886b0b3866069837b15cca1",
+          "source": {
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/haruto_exiled_idle_v01.png",
+            "original_sha256": "ca5c79c7775421a7cd585e4426ceef59e1cffd46538b874c127ef1e28d251f8f",
+            "source_region": [
+              724,
+              0,
+              1448,
+              1086
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/haruto_exiled_idle_v01.txt",
+            "prompt_sha256": "9045d6f2c27fec56e0a13d9f566c7c3fc33c395de1afc09da4a5c957b973a6e9",
+            "reference": "art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/haruto_exiled_idle.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              724,
+              1086
+            ],
+            "source_crop": [
+              20,
+              58,
+              588,
+              1037
+            ],
+            "source_anchor": [
+              360.0,
+              1035.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 82.25308641975309
+          }
         }
       ],
       "pivot": [
-        48,
-        112
+        569,
+        1328
       ],
       "source": {
-        "export": "art_working/haruto_and_raven_motion_p0_p1_2026_11_19/exiled_idle/normalized/haruto_exiled_idle_sheet_v01.png",
-        "export_sha256": "2854b6eaddf7076379e712e7029429158f91634aaf81b6061611301c02600944",
-        "manifest": "art_working/haruto_and_raven_motion_p0_p1_2026_11_19/manifest.json",
-        "original": "art_working/haruto_and_raven_motion_p0_p1_2026_11_19/exiled_idle/source/original_v01.png",
-        "original_sha256": "9108372d468cfc3d5cc3fc1a1da38afbfb34587f6cc5badebfb90b48bdad5476",
-        "prompt": "art_working/haruto_and_raven_motion_p0_p1_2026_11_19/exiled_idle/prompt_v01.txt",
-        "prompt_sha256": "7a95563d70c6046cf20e2408ad45b9613cf8fb0143f8745fa4e47506e7705014"
-      }
+        "kind": "ai_generated",
+        "export": "art_working/animation_upgrade_2026_11_20/candidates/characters/animations/haruto_exiled_idle_sheet.png",
+        "tool": "image_gen built-in",
+        "rights": "Project AI-generated content; platform terms apply"
+      },
+      "runtime": {
+        "frame": [
+          1138,
+          1518
+        ],
+        "count": 2,
+        "scale": 0.08436213991769548,
+        "offset": [
+          0.0,
+          -569.0
+        ],
+        "regions": [
+          {
+            "region": [
+              2,
+              2,
+              548,
+              976
+            ],
+            "margin": [
+              254,
+              354,
+              590,
+              542
+            ]
+          },
+          {
+            "region": [
+              2,
+              985,
+              568,
+              979
+            ],
+            "margin": [
+              229,
+              351,
+              570,
+              539
+            ]
+          }
+        ]
+      },
+      "technical_checks_passed": true,
+      "source_resolution_upgrade": true,
+      "review": {
+        "date": "2026-11-20",
+        "by": "Codex",
+        "status": "approved for integration after technical and native-scale review",
+        "strict_shared_pixel_grid": false,
+        "per_frame_resampling": false,
+        "authorization": "User requested implementation of currently used animation sprites on 2026-11-20; selection delegated to implementing agent"
+      },
+      "rgba8_mib": 4.289825439453125
     },
     {
       "id": "CHR-03",
@@ -4101,91 +4445,304 @@
       "kind": "animation",
       "status": "approved",
       "size": [
-        448,
-        128
+        543,
+        2748
       ],
-      "sha256": "957a4958b417e289a2c4dc1df4e3ad9a1981b7cf69aa0cad88d1cad96ce35e88",
-      "rgba_sha256": "266e12c818773be891804431ca55c232e7061d3194919b7d2a6f026601724094",
+      "sha256": "e64c65acfb619e948dcc917ed82e1a3e69726c68ebe08857a375db71178e0a8a",
+      "rgba_sha256": "6650ab490f9db6b845bd268d4592feb62061866bd141926cdf31de51d13394bd",
       "frames": [
         {
           "region": [
-            0,
-            0,
-            112,
-            128
+            2,
+            2,
+            390,
+            682
           ],
-          "rgba_sha256": "1c191a04ecd16a0661e7c03f91cbfa6441d1023646ac81e57fe951c2bbaae4a5",
+          "margin": [
+            250,
+            246,
+            537,
+            377
+          ],
+          "rgba_sha256": "ada414da8edcd0fc4af23527cccd6642108a4041702f742cc06a77497585e199",
           "source": {
-            "export": "art_working/first_slime_combat_p0_p1_2026_11_19/chr_03_branch_attack_01/normalized/haruto_exiled_branch_attack_01_v01.png",
-            "export_sha256": "4fcb6474b33d2364986576c28a4795b170d14654cb59e17856b81583707d6e70",
-            "manifest": "art_working/first_slime_combat_p0_p1_2026_11_19/manifest.json",
-            "original": "art_working/first_slime_combat_p0_p1_2026_11_19/chr_03_branch_attack_01/source/haruto_exiled_branch_attack_01_v01.png",
-            "original_sha256": "df521d4b2e6f2579c242e48d7bef587c738f48c576de0916829d8175b5693597",
-            "prompt": "art_working/first_slime_combat_p0_p1_2026_11_19/chr_03_branch_attack_01/prompt_v01.txt",
-            "prompt_sha256": "63dd58ae66f5d56b5b05dc21e4f538682a9ec622eee1364594ea20d0c9a621b5"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/haruto_exiled_branch_attack_v01.png",
+            "original_sha256": "4b3a3a18753bdeedc0ebd2f7271b28c7368a9786b4eb67ffc5ea020fa8e9def2",
+            "source_region": [
+              0,
+              0,
+              512,
+              768
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/haruto_exiled_branch_attack_v01.txt",
+            "prompt_sha256": "01ec6f1aa6ad527aa35287460c4e969da2cfeffbff13b92d27b99ad64267e9e4",
+            "reference": "art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/haruto_exiled_idle.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              512,
+              768
+            ],
+            "source_crop": [
+              10,
+              28,
+              400,
+              710
+            ],
+            "source_anchor": [
+              223.0,
+              708.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 82.0
           }
         },
         {
           "region": [
-            112,
-            0,
-            112,
-            128
+            2,
+            689,
+            487,
+            651
           ],
-          "rgba_sha256": "dcb607c2ac6ce36dbb2b5bc1a8ad4d6c9ea57bb958d4378e5d902c1bcf416130",
+          "margin": [
+            255,
+            277,
+            440,
+            408
+          ],
+          "rgba_sha256": "57ab97c30250e9bad3c3f3ba60efcf36dc5e57c42078952d288f21c4987dfe7f",
           "source": {
-            "export": "art_working/first_slime_combat_p0_p1_2026_11_19/chr_03_branch_attack_02/normalized/haruto_exiled_branch_attack_02_v01.png",
-            "export_sha256": "053a7561e3dda75118ffec2462ee1280a06d1188ee20d4fe860a9d60b3281023",
-            "manifest": "art_working/first_slime_combat_p0_p1_2026_11_19/manifest.json",
-            "original": "art_working/first_slime_combat_p0_p1_2026_11_19/chr_03_branch_attack_02/source/haruto_exiled_branch_attack_02_v01.png",
-            "original_sha256": "6e96988ae53108bf70c09b824d1a2cc151c298ecfaf69e1c0cfbbacb80d52c73",
-            "prompt": "art_working/first_slime_combat_p0_p1_2026_11_19/chr_03_branch_attack_02/prompt_v01.txt",
-            "prompt_sha256": "156f782af1f3486bfe5ec2ed3c5d87892b863a33d7957d706a2d62c80b43e037"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/haruto_exiled_branch_attack_v01.png",
+            "original_sha256": "4b3a3a18753bdeedc0ebd2f7271b28c7368a9786b4eb67ffc5ea020fa8e9def2",
+            "source_region": [
+              512,
+              0,
+              1024,
+              768
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/haruto_exiled_branch_attack_v01.txt",
+            "prompt_sha256": "01ec6f1aa6ad527aa35287460c4e969da2cfeffbff13b92d27b99ad64267e9e4",
+            "reference": "art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/haruto_exiled_idle.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              512,
+              768
+            ],
+            "source_crop": [
+              3,
+              59,
+              490,
+              710
+            ],
+            "source_anchor": [
+              211.0,
+              708.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 78.25073746312685
           }
         },
         {
           "region": [
-            224,
-            0,
-            112,
-            128
+            2,
+            1376,
+            539,
+            648
           ],
-          "rgba_sha256": "d3610f1011281650a6bd00ede47c696371263bd8480224acd9930cb777d8bb0b",
+          "margin": [
+            252,
+            280,
+            388,
+            411
+          ],
+          "rgba_sha256": "23b654e7aca026fefc92a7cf2863b58d461faf8c4cf43f0c4b908d81561c5666",
           "source": {
-            "export": "art_working/first_slime_combat_p0_p1_2026_11_19/chr_03_branch_attack_03/normalized/haruto_exiled_branch_attack_03_v01.png",
-            "export_sha256": "7d8fd91b2b2060b0a541e0b4e5a8378391382614b82cd31967ff121b66b773fb",
-            "manifest": "art_working/first_slime_combat_p0_p1_2026_11_19/manifest.json",
-            "original": "art_working/first_slime_combat_p0_p1_2026_11_19/chr_03_branch_attack_03/source/haruto_exiled_branch_attack_03_v01.png",
-            "original_sha256": "e75dce5df57c67924b3632e3e5ff0cefd94c487981e948aa01b0195dae771f24",
-            "prompt": "art_working/first_slime_combat_p0_p1_2026_11_19/chr_03_branch_attack_03/prompt_v01.txt",
-            "prompt_sha256": "6912ddf3cbf92301216557c021ba927491813b9a5fffd03ca655e036b67d6363"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/haruto_exiled_branch_attack_v01.png",
+            "original_sha256": "4b3a3a18753bdeedc0ebd2f7271b28c7368a9786b4eb67ffc5ea020fa8e9def2",
+            "source_region": [
+              0,
+              768,
+              552,
+              1536
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/haruto_exiled_branch_attack_v01.txt",
+            "prompt_sha256": "01ec6f1aa6ad527aa35287460c4e969da2cfeffbff13b92d27b99ad64267e9e4",
+            "reference": "art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/haruto_exiled_idle.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              552,
+              768
+            ],
+            "source_crop": [
+              12,
+              68,
+              551,
+              716
+            ],
+            "source_anchor": [
+              223.5,
+              714.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 77.88790560471978
           }
         },
         {
           "region": [
-            336,
-            0,
-            112,
-            128
+            2,
+            2063,
+            402,
+            683
           ],
-          "rgba_sha256": "642211a55716cf7b2c104673219d6fc2defbe151b162a0c652f13030c60ebaa2",
+          "margin": [
+            238,
+            245,
+            525,
+            376
+          ],
+          "rgba_sha256": "d58d0731c318932f80f162616c8b6c35b05245df6d8e163bf254ea4dc4f58cd7",
           "source": {
-            "export": "art_working/weapon_props_p0_p1_2026_11_19/chr_03_body/normalized/haruto_exiled_idle_body_v01.png",
-            "export_sha256": "a6f7b9d216263c4775967a9957e2fbd314dd18528293bb94ab095a7a81fddf5d",
-            "manifest": "art_working/weapon_props_p0_p1_2026_11_19/manifest.json",
-            "original": "art_working/weapon_props_p0_p1_2026_11_19/chr_03_body/source/haruto_exiled_idle_body_v01.png",
-            "original_sha256": "399b316cce0543d2a688c72aed101306e08af9efaa623f69d9254bc64d1dced6",
-            "prompt": "art_working/weapon_props_p0_p1_2026_11_19/chr_03_body/prompt_v01.txt",
-            "prompt_sha256": "da4c70c22032d3d4778d271178c0a424bb6450cfc969d70c5e62dd8d3dd91002",
-            "reviewed_canvas": "art_working/first_slime_combat_p0_p1_2026_11_19/godot_preview/textures/haruto_exiled_idle_attack_canvas.png",
-            "reviewed_canvas_sha256": "77cc5d02fbad302827634f152876d1c52333045309ee04621a8d6fb181bbb9f5"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/haruto_exiled_branch_attack_v01.png",
+            "original_sha256": "4b3a3a18753bdeedc0ebd2f7271b28c7368a9786b4eb67ffc5ea020fa8e9def2",
+            "source_region": [
+              552,
+              768,
+              1024,
+              1536
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/haruto_exiled_branch_attack_v01.txt",
+            "prompt_sha256": "01ec6f1aa6ad527aa35287460c4e969da2cfeffbff13b92d27b99ad64267e9e4",
+            "reference": "art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/haruto_exiled_idle.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              472,
+              768
+            ],
+            "source_crop": [
+              0,
+              33,
+              402,
+              716
+            ],
+            "source_anchor": [
+              224.5,
+              714.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 82.12094395280236
           }
         }
       ],
       "pivot": [
-        56,
-        112
-      ]
+        463,
+        926
+      ],
+      "runtime": {
+        "frame": [
+          927,
+          1059
+        ],
+        "count": 4,
+        "scale": 0.1209439528023599,
+        "offset": [
+          0.5,
+          -396.5
+        ],
+        "regions": [
+          {
+            "region": [
+              2,
+              2,
+              390,
+              682
+            ],
+            "margin": [
+              250,
+              246,
+              537,
+              377
+            ]
+          },
+          {
+            "region": [
+              2,
+              689,
+              487,
+              651
+            ],
+            "margin": [
+              255,
+              277,
+              440,
+              408
+            ]
+          },
+          {
+            "region": [
+              2,
+              1376,
+              539,
+              648
+            ],
+            "margin": [
+              252,
+              280,
+              388,
+              411
+            ]
+          },
+          {
+            "region": [
+              2,
+              2063,
+              402,
+              683
+            ],
+            "margin": [
+              238,
+              245,
+              525,
+              376
+            ]
+          }
+        ]
+      },
+      "technical_checks_passed": true,
+      "source_resolution_upgrade": true,
+      "source": {
+        "kind": "ai_generated",
+        "export": "art_working/animation_upgrade_2026_11_20/candidates/characters/animations/haruto_exiled_branch_attack_sheet.png",
+        "tool": "image_gen built-in",
+        "rights": "Project AI-generated content; platform terms apply"
+      },
+      "review": {
+        "date": "2026-11-20",
+        "by": "Codex",
+        "status": "approved for integration after technical and native-scale review",
+        "strict_shared_pixel_grid": false,
+        "per_frame_resampling": false,
+        "authorization": "User requested implementation of currently used animation sprites on 2026-11-20; selection delegated to implementing agent"
+      },
+      "rgba8_mib": 5.6921539306640625
     },
     {
       "id": "CHR-03",
@@ -4193,89 +4750,304 @@
       "kind": "animation",
       "status": "approved",
       "size": [
-        384,
-        128
+        485,
+        2840
       ],
-      "sha256": "6f404572931846b44fb2ce603dc1102f591167214b459d136747aa425f5e09d4",
-      "rgba_sha256": "d4023549cc7ecde06d929012dd4c43aed5b39b29726ff21f87968b079e66e294",
+      "sha256": "a8d9ec6eb7d8e996a7d0caed1da659b9787ea52ceb67b7ff94d3a91a7400876d",
+      "rgba_sha256": "e9cf18dd51a08ab2ef94141cfae924b78de14c7d99cb3005251bc02082b476b3",
       "frames": [
         {
           "region": [
-            0,
-            0,
-            96,
-            128
+            2,
+            2,
+            418,
+            706
           ],
-          "rgba_sha256": "a81e1c3bfa04061d6dbe8677d33c68a077cfc49ba637793e279345f20e760e23",
+          "margin": [
+            176,
+            255,
+            404,
+            390
+          ],
+          "rgba_sha256": "ab83422524b85f621ca41eae2c64d035dcf27a0c627101d9bdbd761634417d86",
           "source": {
-            "export": "art_working/first_slime_combat_p0_p1_2026_11_19/chr_03_dodge_01/normalized/haruto_exiled_dodge_01_v01.png",
-            "export_sha256": "a58d250e174ff397427ecccdf0d53e4637496c389d07a72395cae3a9f11c5f2a",
-            "manifest": "art_working/first_slime_combat_p0_p1_2026_11_19/manifest.json",
-            "original": "art_working/first_slime_combat_p0_p1_2026_11_19/chr_03_dodge_01/source/haruto_exiled_dodge_01_v01.png",
-            "original_sha256": "7f002b46a165d1e6ae124a4b39692e3768c881caad1802e38e4e2070b2cea5f9",
-            "prompt": "art_working/first_slime_combat_p0_p1_2026_11_19/chr_03_dodge_01/prompt_v01.txt",
-            "prompt_sha256": "1c5ef661782a41a9c3876572201a51fb4d7e5f6dcc5bf05d5cda855c7f88b210"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/haruto_exiled_dodge_v01.png",
+            "original_sha256": "d63e8583018b50684dd1c7dfc60ceaf2caf970a8fa2fff0111eb49c38896c1bc",
+            "source_region": [
+              0,
+              0,
+              512,
+              768
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/haruto_exiled_dodge_v01.txt",
+            "prompt_sha256": "2c3e2223a7dbe16685b534378c53ab7d9a669ee0494b752a7fb871f5f4e440dc",
+            "reference": "art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/haruto_exiled_idle.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              512,
+              768
+            ],
+            "source_crop": [
+              25,
+              28,
+              443,
+              734
+            ],
+            "source_anchor": [
+              259.5,
+              732.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 82.0
           }
         },
         {
           "region": [
-            96,
-            0,
-            96,
-            128
+            2,
+            712,
+            415,
+            676
           ],
-          "rgba_sha256": "fab5aae0b3bdf6995e1dd753b96114504709807983336d2e02b301068ba0b2d9",
+          "margin": [
+            164,
+            285,
+            407,
+            420
+          ],
+          "rgba_sha256": "372bbdc6eeb4397b5b0128ff606095b39c7b821b274a0a4187a543eaa4e2a737",
           "source": {
-            "export": "art_working/first_slime_combat_p0_p1_2026_11_19/chr_03_dodge_02/normalized/haruto_exiled_dodge_02_v01.png",
-            "export_sha256": "c6b049f5fbca7f1bde6f6dad4ced650f7ee5b42d832aea0e0f9728fae9fb9573",
-            "manifest": "art_working/first_slime_combat_p0_p1_2026_11_19/manifest.json",
-            "original": "art_working/first_slime_combat_p0_p1_2026_11_19/chr_03_dodge_02/source/haruto_exiled_dodge_02_v01.png",
-            "original_sha256": "3d8575d7d46cf96f21b05536bd3c03bbfffa988897e757523a31568874d73cdb",
-            "prompt": "art_working/first_slime_combat_p0_p1_2026_11_19/chr_03_dodge_02/prompt_v01.txt",
-            "prompt_sha256": "d7a618fa4d817f10d4ddc03bf75b6098a170e5685abfb8ca1f978eff2dfa9480"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/haruto_exiled_dodge_v01.png",
+            "original_sha256": "d63e8583018b50684dd1c7dfc60ceaf2caf970a8fa2fff0111eb49c38896c1bc",
+            "source_region": [
+              512,
+              0,
+              1024,
+              768
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/haruto_exiled_dodge_v01.txt",
+            "prompt_sha256": "2c3e2223a7dbe16685b534378c53ab7d9a669ee0494b752a7fb871f5f4e440dc",
+            "reference": "art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/haruto_exiled_idle.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              512,
+              768
+            ],
+            "source_crop": [
+              0,
+              58,
+              415,
+              734
+            ],
+            "source_anchor": [
+              246.5,
+              732.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 78.4957264957265
           }
         },
         {
           "region": [
-            192,
-            0,
-            96,
-            128
+            2,
+            1422,
+            481,
+            626
           ],
-          "rgba_sha256": "4c69bc26919a08a5930f9839b8b4fd56efa448137286ee8fa09a951ecf73b439",
+          "margin": [
+            113,
+            335,
+            341,
+            470
+          ],
+          "rgba_sha256": "df7d0aa65f0f1e20a07a95a1490bc691dfaf59afb5bebbec8885891c3937c9ff",
           "source": {
-            "export": "art_working/first_slime_combat_p0_p1_2026_11_19/chr_03_dodge_03/normalized/haruto_exiled_dodge_03_v01.png",
-            "export_sha256": "0f4b24d6c9b7248f39d0742be382f668f28ecd08d6bf0ba5c48c5354b9b489c1",
-            "manifest": "art_working/first_slime_combat_p0_p1_2026_11_19/manifest.json",
-            "original": "art_working/first_slime_combat_p0_p1_2026_11_19/chr_03_dodge_03/source/haruto_exiled_dodge_03_v01.png",
-            "original_sha256": "668ea4abaa8a4138e75b9b83daf967d5e143df4c3cc3696e8aca23d17d52ebb3",
-            "prompt": "art_working/first_slime_combat_p0_p1_2026_11_19/chr_03_dodge_03/prompt_v01.txt",
-            "prompt_sha256": "99f7597be12b42f5969206ca773c1bc24f248cf65b5c9cbf87b2a8211e92dca5"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/haruto_exiled_dodge_v01.png",
+            "original_sha256": "d63e8583018b50684dd1c7dfc60ceaf2caf970a8fa2fff0111eb49c38896c1bc",
+            "source_region": [
+              0,
+              768,
+              512,
+              1536
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/haruto_exiled_dodge_v01.txt",
+            "prompt_sha256": "2c3e2223a7dbe16685b534378c53ab7d9a669ee0494b752a7fb871f5f4e440dc",
+            "reference": "art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/haruto_exiled_idle.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              512,
+              768
+            ],
+            "source_crop": [
+              7,
+              108,
+              488,
+              734
+            ],
+            "source_anchor": [
+              305.0,
+              732.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 72.65527065527066
           }
         },
         {
           "region": [
-            288,
-            0,
-            96,
-            128
+            2,
+            2132,
+            424,
+            700
           ],
-          "rgba_sha256": "515740367b0819c2afb35dc7278ad007956bd91d33aed24c13d334c92f5740e6",
+          "margin": [
+            160,
+            261,
+            398,
+            396
+          ],
+          "rgba_sha256": "cc568b8ec9c6773635f8f8291e3ac70f4a9c2637cc15de41652577af6d260edd",
           "source": {
-            "export": "art_working/weapon_props_p0_p1_2026_11_19/chr_03_body/normalized/haruto_exiled_idle_body_v01.png",
-            "export_sha256": "a6f7b9d216263c4775967a9957e2fbd314dd18528293bb94ab095a7a81fddf5d",
-            "manifest": "art_working/weapon_props_p0_p1_2026_11_19/manifest.json",
-            "original": "art_working/weapon_props_p0_p1_2026_11_19/chr_03_body/source/haruto_exiled_idle_body_v01.png",
-            "original_sha256": "399b316cce0543d2a688c72aed101306e08af9efaa623f69d9254bc64d1dced6",
-            "prompt": "art_working/weapon_props_p0_p1_2026_11_19/chr_03_body/prompt_v01.txt",
-            "prompt_sha256": "da4c70c22032d3d4778d271178c0a424bb6450cfc969d70c5e62dd8d3dd91002"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/haruto_exiled_dodge_v01.png",
+            "original_sha256": "d63e8583018b50684dd1c7dfc60ceaf2caf970a8fa2fff0111eb49c38896c1bc",
+            "source_region": [
+              512,
+              768,
+              1024,
+              1536
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/haruto_exiled_dodge_v01.txt",
+            "prompt_sha256": "2c3e2223a7dbe16685b534378c53ab7d9a669ee0494b752a7fb871f5f4e440dc",
+            "reference": "art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/haruto_exiled_idle.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              512,
+              768
+            ],
+            "source_crop": [
+              18,
+              34,
+              442,
+              734
+            ],
+            "source_anchor": [
+              269.0,
+              732.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 81.29914529914531
           }
         }
       ],
       "pivot": [
-        48,
-        112
-      ]
+        411,
+        959
+      ],
+      "runtime": {
+        "frame": [
+          822,
+          1096
+        ],
+        "count": 4,
+        "scale": 0.11680911680911682,
+        "offset": [
+          0.0,
+          -411.0
+        ],
+        "regions": [
+          {
+            "region": [
+              2,
+              2,
+              418,
+              706
+            ],
+            "margin": [
+              176,
+              255,
+              404,
+              390
+            ]
+          },
+          {
+            "region": [
+              2,
+              712,
+              415,
+              676
+            ],
+            "margin": [
+              164,
+              285,
+              407,
+              420
+            ]
+          },
+          {
+            "region": [
+              2,
+              1422,
+              481,
+              626
+            ],
+            "margin": [
+              113,
+              335,
+              341,
+              470
+            ]
+          },
+          {
+            "region": [
+              2,
+              2132,
+              424,
+              700
+            ],
+            "margin": [
+              160,
+              261,
+              398,
+              396
+            ]
+          }
+        ]
+      },
+      "technical_checks_passed": true,
+      "source_resolution_upgrade": true,
+      "source": {
+        "kind": "ai_generated",
+        "export": "art_working/animation_upgrade_2026_11_20/candidates/characters/animations/haruto_exiled_dodge_sheet.png",
+        "tool": "image_gen built-in",
+        "rights": "Project AI-generated content; platform terms apply"
+      },
+      "review": {
+        "date": "2026-11-20",
+        "by": "Codex",
+        "status": "approved for integration after technical and native-scale review",
+        "strict_shared_pixel_grid": false,
+        "per_frame_resampling": false,
+        "authorization": "User requested implementation of currently used animation sprites on 2026-11-20; selection delegated to implementing agent"
+      },
+      "rgba8_mib": 5.254364013671875
     },
     {
       "id": "CHR-03",
@@ -4283,46 +5055,176 @@
       "kind": "animation",
       "status": "approved",
       "size": [
-        192,
-        128
+        587,
+        1990
       ],
-      "sha256": "2e574b3ccb77c4a549d23e603c2b6b158002ba6506a5826709056bfaa875ff29",
-      "rgba_sha256": "33df612aed04b743a63f85c5e4638520837187d53fcbef7a7de984f273be49c9",
+      "sha256": "c53d1695059d2ce385dbe36869181619782fb2670889c18a680842d933b5307f",
+      "rgba_sha256": "85fb000e646c74c7e34ecd85156e511e07d12e6fb8b064bb67d506abbd85f646",
       "frames": [
         {
           "region": [
-            0,
-            0,
-            96,
-            128
+            2,
+            2,
+            583,
+            984
           ],
-          "rgba_sha256": "df49f7f9bfe9bbf378804acf80b8d7f4c9262a821b77e5ed5a94c5fe448ed910",
-          "phase": "recoil"
+          "margin": [
+            248,
+            366,
+            573,
+            557
+          ],
+          "rgba_sha256": "0c5e64a13132d73a500e8ed7aee6541c69edd049274ff99c98a525bcb2ee6915",
+          "source": {
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/haruto_exiled_hit_v01.png",
+            "original_sha256": "f96e42303b29524d069aee9182c502f47eb333420ebd14fd870cb2ba71ec7783",
+            "source_region": [
+              0,
+              0,
+              724,
+              1086
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/haruto_exiled_hit_v01.txt",
+            "prompt_sha256": "400ef77297689b10200d364e34794e133051307055f4ec9224304f277cc72fe1",
+            "reference": "art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/haruto_exiled_idle.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              724,
+              1086
+            ],
+            "source_crop": [
+              30,
+              49,
+              613,
+              1033
+            ],
+            "source_anchor": [
+              359.5,
+              1031.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 81.41843971631205
+          }
         },
         {
           "region": [
-            96,
-            0,
-            96,
-            128
+            2,
+            997,
+            561,
+            991
           ],
-          "rgba_sha256": "7528400dbde87fb46c87f86b151c295c8cac7bd6fe654c3b317df069e4b4ca78",
-          "phase": "recover"
+          "margin": [
+            246,
+            359,
+            595,
+            550
+          ],
+          "rgba_sha256": "4adde6bb5dd0eaf3ded9777ed488ddf907f55addc0a19d142055f3c675c458f0",
+          "source": {
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/haruto_exiled_hit_v01.png",
+            "original_sha256": "f96e42303b29524d069aee9182c502f47eb333420ebd14fd870cb2ba71ec7783",
+            "source_region": [
+              724,
+              0,
+              1448,
+              1086
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/haruto_exiled_hit_v01.txt",
+            "prompt_sha256": "400ef77297689b10200d364e34794e133051307055f4ec9224304f277cc72fe1",
+            "reference": "art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/haruto_exiled_idle.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              724,
+              1086
+            ],
+            "source_crop": [
+              30,
+              42,
+              591,
+              1033
+            ],
+            "source_anchor": [
+              362.5,
+              1031.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 82.0
+          }
         }
       ],
       "pivot": [
-        48,
-        112
+        578,
+        1348
       ],
       "source": {
-        "export": "art_working/haruto_and_raven_motion_p0_p1_2026_11_19/exiled_hit/normalized/haruto_exiled_hit_sheet_v01.png",
-        "export_sha256": "2e574b3ccb77c4a549d23e603c2b6b158002ba6506a5826709056bfaa875ff29",
-        "manifest": "art_working/haruto_and_raven_motion_p0_p1_2026_11_19/manifest.json",
-        "original": "art_working/haruto_and_raven_motion_p0_p1_2026_11_19/exiled_hit/source/original_v01.png",
-        "original_sha256": "ebe33d4706bad97af3bda4da0f47face832f0114346c28a28ad2fe2da42dfbcd",
-        "prompt": "art_working/haruto_and_raven_motion_p0_p1_2026_11_19/exiled_hit/prompt_v01.txt",
-        "prompt_sha256": "49a1b03a880a082440ed43e484cf69cec8895712fe684031dfe109d2d2b4e8c0"
-      }
+        "kind": "ai_generated",
+        "export": "art_working/animation_upgrade_2026_11_20/candidates/characters/animations/haruto_exiled_hit_sheet.png",
+        "tool": "image_gen built-in",
+        "rights": "Project AI-generated content; platform terms apply"
+      },
+      "runtime": {
+        "frame": [
+          1156,
+          1541
+        ],
+        "count": 2,
+        "scale": 0.08308004052684903,
+        "offset": [
+          0.0,
+          -577.5
+        ],
+        "regions": [
+          {
+            "region": [
+              2,
+              2,
+              583,
+              984
+            ],
+            "margin": [
+              248,
+              366,
+              573,
+              557
+            ]
+          },
+          {
+            "region": [
+              2,
+              997,
+              561,
+              991
+            ],
+            "margin": [
+              246,
+              359,
+              595,
+              550
+            ]
+          }
+        ]
+      },
+      "technical_checks_passed": true,
+      "source_resolution_upgrade": true,
+      "review": {
+        "date": "2026-11-20",
+        "by": "Codex",
+        "status": "approved for integration after technical and native-scale review",
+        "strict_shared_pixel_grid": false,
+        "per_frame_resampling": false,
+        "authorization": "User requested implementation of currently used animation sprites on 2026-11-20; selection delegated to implementing agent"
+      },
+      "rgba8_mib": 4.456062316894531
     },
     {
       "id": "CHR-04",
@@ -4330,20 +5232,26 @@
       "kind": "animation",
       "status": "approved",
       "size": [
-        540,
-        320
+        2835,
+        1676
       ],
-      "sha256": "7501ac0da18fcb0b22f7d9347b9d84dcf9215467b69ca2c78ac8f26042f3a188",
-      "rgba_sha256": "73e4af80ee52e957cb26db995a2ff7a3c0b0abdc517adfedc9a4576319cab425",
+      "sha256": "e1389fdfc07f9e5734a7cccb8290f83dcd93c785bbe886d464e28863da7b94c4",
+      "rgba_sha256": "8f13b7984830093252119388273e350d9a81c697b1cdd1e265c33d3be79e6284",
       "frames": [
         {
           "region": [
-            0,
-            0,
-            180,
-            320
+            2,
+            2,
+            941,
+            1672
           ],
-          "rgba_sha256": "7d4399bf4052b106085c56f42e1bcf4e179346e688dfd73cbce104c9299e0044",
+          "margin": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "rgba_sha256": "a2384a7d6bf6c37d551d24f621c253db745d6b9e32ef1dcdc5182cff3b415233",
           "source": {
             "export": "art_working/white_threshold_motion_p0_2026_11_19/chr_04_offer_01/normalized/mitsuki_offer_01_v01.png",
             "export_sha256": "6bf3b14163aa5acf497e175b41d5c8d0c8e8349bae675e580054ac1cd707a656",
@@ -4351,17 +5259,45 @@
             "original": "art_working/white_threshold_motion_p0_2026_11_19/chr_04_offer_01/source/mitsuki_offer_01_v01.png",
             "original_sha256": "7298fbab50b33331ba6950fe4efd404b8bc97d8f27ae6c68fcffaab918ed4360",
             "prompt": "art_working/white_threshold_motion_p0_2026_11_19/chr_04_offer_01/prompt_v01.txt",
-            "prompt_sha256": "5c3c8486aec214290605d68e3d37749c91103d6d7b70e045980eb8ea0689431c"
+            "prompt_sha256": "5c3c8486aec214290605d68e3d37749c91103d6d7b70e045980eb8ea0689431c",
+            "kind": "ai_generated_reused_original",
+            "archived_original": "art_working/animation_upgrade_2026_11_20/source/mitsuki_offer_01_original.png",
+            "rights": "Existing project AI-generated source; platform terms apply",
+            "processing": "original RGBA retained inside alpha>=128 bounds plus 2px; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              941,
+              1672
+            ],
+            "source_crop": [
+              0,
+              0,
+              941,
+              1672
+            ],
+            "source_anchor": [
+              470.5,
+              836.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 320.0
           }
         },
         {
           "region": [
-            180,
-            0,
-            180,
-            320
+            947,
+            2,
+            941,
+            1672
           ],
-          "rgba_sha256": "bc842ce75e151a0a7d261013478aeeb07747499a603d2b35c52e5e13cd5ba4f8",
+          "margin": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "rgba_sha256": "aacc7851d4f556b0c44cba7bc9dc0fd228708dcb22ffed096feb08a43aefa703",
           "source": {
             "export": "art_working/white_threshold_motion_p0_2026_11_19/chr_04_offer_02/normalized/mitsuki_offer_02_v01.png",
             "export_sha256": "3054154c92e4a22e34852df1189ef1436561611b1dab8aef15d3643005e57e92",
@@ -4369,17 +5305,45 @@
             "original": "art_working/white_threshold_motion_p0_2026_11_19/chr_04_offer_02/source/mitsuki_offer_02_v01.png",
             "original_sha256": "69b06a13f329dcf6b2eaab9404c14fe61cb72fc0e58c8d8ea5019ce0bf3c0f20",
             "prompt": "art_working/white_threshold_motion_p0_2026_11_19/chr_04_offer_02/prompt_v01.txt",
-            "prompt_sha256": "b844d11718fcf70c5aac128fe720c3eb01b088b927ff86ee11401527dbb8fc73"
+            "prompt_sha256": "b844d11718fcf70c5aac128fe720c3eb01b088b927ff86ee11401527dbb8fc73",
+            "kind": "ai_generated_reused_original",
+            "archived_original": "art_working/animation_upgrade_2026_11_20/source/mitsuki_offer_02_original.png",
+            "rights": "Existing project AI-generated source; platform terms apply",
+            "processing": "original RGBA retained inside alpha>=128 bounds plus 2px; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              941,
+              1672
+            ],
+            "source_crop": [
+              0,
+              0,
+              941,
+              1672
+            ],
+            "source_anchor": [
+              470.5,
+              836.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 320.0
           }
         },
         {
           "region": [
-            360,
-            0,
-            180,
-            320
+            1892,
+            2,
+            941,
+            1672
           ],
-          "rgba_sha256": "0593bd389556693b174e392289d7ba235a2b472cb253ee931b2333c9001c0b15",
+          "margin": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "rgba_sha256": "06113899e87be0db3f2b34ecf18f2154ce6f35ac7a2455e111cf60a478720267",
           "source": {
             "export": "art_working/white_threshold_motion_p0_2026_11_19/chr_04_offer_03/normalized/mitsuki_offer_03_v01.png",
             "export_sha256": "c6d43bae2770ba8a58a47dd5529650bc49b301d06e9ee1cdc088774b053f7c26",
@@ -4387,11 +5351,109 @@
             "original": "art_working/white_threshold_motion_p0_2026_11_19/chr_04_offer_03/source/mitsuki_offer_03_v01.png",
             "original_sha256": "c63cadb331458bba8e78f7ae38f8e818bae68fd83f42a6f73e420797d385a2f6",
             "prompt": "art_working/white_threshold_motion_p0_2026_11_19/chr_04_offer_03/prompt_v01.txt",
-            "prompt_sha256": "ac0c861679b868bcd5b0970aa538e4144919a1bdcee1d554bc59b6a0ee9d7e77"
+            "prompt_sha256": "ac0c861679b868bcd5b0970aa538e4144919a1bdcee1d554bc59b6a0ee9d7e77",
+            "kind": "ai_generated_reused_original",
+            "archived_original": "art_working/animation_upgrade_2026_11_20/source/mitsuki_offer_03_original.png",
+            "rights": "Existing project AI-generated source; platform terms apply",
+            "processing": "original RGBA retained inside alpha>=128 bounds plus 2px; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              941,
+              1672
+            ],
+            "source_crop": [
+              0,
+              0,
+              941,
+              1672
+            ],
+            "source_anchor": [
+              470.5,
+              836.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 320.0
           }
         }
       ],
-      "pivot": null
+      "pivot": [
+        470,
+        836
+      ],
+      "runtime": {
+        "frame": [
+          941,
+          1672
+        ],
+        "count": 3,
+        "scale": 0.19138755980861244,
+        "offset": [
+          0.5,
+          0.0
+        ],
+        "regions": [
+          {
+            "region": [
+              2,
+              2,
+              941,
+              1672
+            ],
+            "margin": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "region": [
+              947,
+              2,
+              941,
+              1672
+            ],
+            "margin": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "region": [
+              1892,
+              2,
+              941,
+              1672
+            ],
+            "margin": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "technical_checks_passed": true,
+      "source_resolution_upgrade": true,
+      "source": {
+        "kind": "ai_generated_reused_original",
+        "export": "art_working/animation_upgrade_2026_11_20/candidates/characters/animations/mitsuki_offer_sheet.png",
+        "tool": "existing project AI originals",
+        "rights": "Project AI-generated content; platform terms apply"
+      },
+      "review": {
+        "date": "2026-11-20",
+        "by": "Codex",
+        "status": "approved for integration after technical and native-scale review",
+        "strict_shared_pixel_grid": false,
+        "per_frame_resampling": false,
+        "authorization": "User requested implementation of currently used animation sprites on 2026-11-20; selection delegated to implementing agent"
+      },
+      "rgba8_mib": 18.125381469726562
     },
     {
       "id": "CHR-04",
@@ -4399,20 +5461,26 @@
       "kind": "animation",
       "status": "approved",
       "size": [
-        540,
-        320
+        2835,
+        1676
       ],
-      "sha256": "71e6933ec51570ce5b32bb9405760b7968227e16fc8621f7355c8c9ea83a85bc",
-      "rgba_sha256": "945044e1a3007e85c2723f8892a98e2576b1c3a86faab285a6dec86f19ffcd23",
+      "sha256": "e061e63739888ed3707a9e0031ba29da7d9bd2e79c5a7acc9948d91c761f5c57",
+      "rgba_sha256": "ae2f23d5398d43660025860066596cf2b22558d67548240dd4619721b1066744",
       "frames": [
         {
           "region": [
-            0,
-            0,
-            180,
-            320
+            2,
+            2,
+            941,
+            1672
           ],
-          "rgba_sha256": "52d5a13dcd812a85b0115d7c7c6b4f531b88b8f07b9b4cf9c2fd1e62e67bc81c",
+          "margin": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "rgba_sha256": "3e0361282a66669c200a8b72ce9128bff8dc0bdbf381eab089386ff760931b2d",
           "source": {
             "export": "art_working/nar_threshold_to_shop_p1_2026_11_18/nar_05/normalized/mitsuki_first_meeting_story_v01.png",
             "export_sha256": "478e70b5e195474c82cc5f6305c2ada08fae1225a691857f77084dc3d99c1e92",
@@ -4420,17 +5488,45 @@
             "original": "art_working/nar_threshold_to_shop_p1_2026_11_18/nar_05/source/mitsuki_first_meeting_story_v01.png",
             "original_sha256": "41036f3a3e188df4b183b0226888757043bc44430be1e33f7df0340226fb44dc",
             "prompt": "art_working/nar_threshold_to_shop_p1_2026_11_18/nar_05/prompt_v01.txt",
-            "prompt_sha256": "032ac872271fa715c11dcd04c2b80d69bc1343c1e7a5bf6580e9a5331ef83ed7"
+            "prompt_sha256": "032ac872271fa715c11dcd04c2b80d69bc1343c1e7a5bf6580e9a5331ef83ed7",
+            "kind": "ai_generated_reused_original",
+            "archived_original": "art_working/animation_upgrade_2026_11_20/source/mitsuki_wing_glitch_01_original.png",
+            "rights": "Existing project AI-generated source; platform terms apply",
+            "processing": "original RGBA retained inside alpha>=128 bounds plus 2px; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              941,
+              1672
+            ],
+            "source_crop": [
+              0,
+              0,
+              941,
+              1672
+            ],
+            "source_anchor": [
+              470.5,
+              836.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 320.0
           }
         },
         {
           "region": [
-            180,
-            0,
-            180,
-            320
+            947,
+            2,
+            941,
+            1672
           ],
-          "rgba_sha256": "5c72208cf6ccf05c9b4eb8fa8b6279f7383d8337a599ee611cbfe7d1639df085",
+          "margin": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "rgba_sha256": "5e2f673b8566f2d7344b6128cd6732d892d28574ddd24177e3c56514ebf40066",
           "source": {
             "export": "art_working/white_threshold_motion_p0_2026_11_19/chr_04_wing_glitch_02/normalized/mitsuki_wing_glitch_02_v01.png",
             "export_sha256": "a5734dc149982005028655e07dbce80c57c1ffb029bb7377784c8c3304ccc7e5",
@@ -4438,17 +5534,45 @@
             "original": "art_working/white_threshold_motion_p0_2026_11_19/chr_04_wing_glitch_02/source/mitsuki_wing_glitch_02_v01.png",
             "original_sha256": "08396f2bda7cece72cf950c699292ba9f06018dddcfa6c46050c16787dfaa27c",
             "prompt": "art_working/white_threshold_motion_p0_2026_11_19/chr_04_wing_glitch_02/prompt_v01.txt",
-            "prompt_sha256": "cc98228ed987692d843ff98609f3cd6d8bff33bf355f3a59a25ba0ef828c513f"
+            "prompt_sha256": "cc98228ed987692d843ff98609f3cd6d8bff33bf355f3a59a25ba0ef828c513f",
+            "kind": "ai_generated_reused_original",
+            "archived_original": "art_working/animation_upgrade_2026_11_20/source/mitsuki_wing_glitch_02_original.png",
+            "rights": "Existing project AI-generated source; platform terms apply",
+            "processing": "original RGBA retained inside alpha>=128 bounds plus 2px; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              941,
+              1672
+            ],
+            "source_crop": [
+              0,
+              0,
+              941,
+              1672
+            ],
+            "source_anchor": [
+              470.5,
+              836.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 320.0
           }
         },
         {
           "region": [
-            360,
-            0,
-            180,
-            320
+            1892,
+            2,
+            941,
+            1672
           ],
-          "rgba_sha256": "52d5a13dcd812a85b0115d7c7c6b4f531b88b8f07b9b4cf9c2fd1e62e67bc81c",
+          "margin": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "rgba_sha256": "3e0361282a66669c200a8b72ce9128bff8dc0bdbf381eab089386ff760931b2d",
           "source": {
             "export": "art_working/nar_threshold_to_shop_p1_2026_11_18/nar_05/normalized/mitsuki_first_meeting_story_v01.png",
             "export_sha256": "478e70b5e195474c82cc5f6305c2ada08fae1225a691857f77084dc3d99c1e92",
@@ -4456,11 +5580,109 @@
             "original": "art_working/nar_threshold_to_shop_p1_2026_11_18/nar_05/source/mitsuki_first_meeting_story_v01.png",
             "original_sha256": "41036f3a3e188df4b183b0226888757043bc44430be1e33f7df0340226fb44dc",
             "prompt": "art_working/nar_threshold_to_shop_p1_2026_11_18/nar_05/prompt_v01.txt",
-            "prompt_sha256": "032ac872271fa715c11dcd04c2b80d69bc1343c1e7a5bf6580e9a5331ef83ed7"
+            "prompt_sha256": "032ac872271fa715c11dcd04c2b80d69bc1343c1e7a5bf6580e9a5331ef83ed7",
+            "kind": "ai_generated_reused_original",
+            "archived_original": "art_working/animation_upgrade_2026_11_20/source/mitsuki_wing_glitch_03_original.png",
+            "rights": "Existing project AI-generated source; platform terms apply",
+            "processing": "original RGBA retained inside alpha>=128 bounds plus 2px; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              941,
+              1672
+            ],
+            "source_crop": [
+              0,
+              0,
+              941,
+              1672
+            ],
+            "source_anchor": [
+              470.5,
+              836.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 320.0
           }
         }
       ],
-      "pivot": null
+      "pivot": [
+        470,
+        836
+      ],
+      "runtime": {
+        "frame": [
+          941,
+          1672
+        ],
+        "count": 3,
+        "scale": 0.19138755980861244,
+        "offset": [
+          0.5,
+          0.0
+        ],
+        "regions": [
+          {
+            "region": [
+              2,
+              2,
+              941,
+              1672
+            ],
+            "margin": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "region": [
+              947,
+              2,
+              941,
+              1672
+            ],
+            "margin": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "region": [
+              1892,
+              2,
+              941,
+              1672
+            ],
+            "margin": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "technical_checks_passed": true,
+      "source_resolution_upgrade": true,
+      "source": {
+        "kind": "ai_generated_reused_original",
+        "export": "art_working/animation_upgrade_2026_11_20/candidates/characters/animations/mitsuki_wing_glitch_sheet.png",
+        "tool": "existing project AI originals",
+        "rights": "Project AI-generated content; platform terms apply"
+      },
+      "review": {
+        "date": "2026-11-20",
+        "by": "Codex",
+        "status": "approved for integration after technical and native-scale review",
+        "strict_shared_pixel_grid": false,
+        "per_frame_resampling": false,
+        "authorization": "User requested implementation of currently used animation sprites on 2026-11-20; selection delegated to implementing agent"
+      },
+      "rgba8_mib": 18.125381469726562
     },
     {
       "id": "CHR-07",
@@ -4990,20 +6212,26 @@
       "kind": "animation",
       "status": "approved",
       "size": [
-        192,
-        128
+        520,
+        2588
       ],
-      "sha256": "848ae707c68a0016384627e79580f00b2e421666c680f3fe7bf6475a0d1f3155",
-      "rgba_sha256": "436afde48e80f95ee4c92990b92dcfcd2a535611703c130f838832955e28371b",
+      "sha256": "50f4a36a8e6d42de38ddb5f4b7f48d5b82f06b695417ca9161c80f15832b57ed",
+      "rgba_sha256": "ab2129d14c3f2bb8838a055b6629d50c22882ebe6915b014e8ed2a1a90f51fd6",
       "frames": [
         {
           "region": [
-            0,
-            0,
-            96,
-            128
+            2,
+            2,
+            516,
+            1290
           ],
-          "rgba_sha256": "b93b970db1933ab66684c4a0438ac9f9fd951f84896da409429b15ecdd5748bb",
+          "margin": [
+            564,
+            468,
+            990,
+            718
+          ],
+          "rgba_sha256": "a63f1d1ebacba8d81f3d246a7e15835d9841548448f65c895e44774e75d9b13d",
           "source": {
             "export": "art_working/tokyo_crosswalk_p0_p1_2026_11_18/chr_15/normalized/yui_crosswalk_idle_v01.png",
             "export_sha256": "29fb51d605bfc21564b44877d2f4198bbb4f02c3456fc5dc06f6f2686b6b2825",
@@ -5011,17 +6239,45 @@
             "original": "art_working/tokyo_crosswalk_p0_p1_2026_11_18/chr_15/source/yui_crosswalk_idle_v01.png",
             "original_sha256": "dcafcab06f2b109bb5e0608e5dfa68d68a5ad73924291301527314bb844dcb01",
             "prompt": "art_working/tokyo_crosswalk_p0_p1_2026_11_18/chr_15/prompt_v01.txt",
-            "prompt_sha256": "48eecbce759122adf32e0c688e8de468c35332b035a64c8678c081c9cda0179b"
+            "prompt_sha256": "48eecbce759122adf32e0c688e8de468c35332b035a64c8678c081c9cda0179b",
+            "kind": "ai_generated_reused_original",
+            "archived_original": "art_working/animation_upgrade_2026_11_20/source/yui_crosswalk_wait_01_original.png",
+            "rights": "Existing project AI-generated source; platform terms apply",
+            "processing": "original RGBA retained inside alpha>=128 bounds plus 2px; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              1122,
+              1402
+            ],
+            "source_crop": [
+              331,
+              67,
+              847,
+              1357
+            ],
+            "source_anchor": [
+              520.5,
+              1355.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 82.0
           }
         },
         {
           "region": [
-            96,
-            0,
-            96,
-            128
+            2,
+            1296,
+            516,
+            1290
           ],
-          "rgba_sha256": "6925ae2f64775d87759e8afbcab9de63ec991d3e57a2ca187dc070fce64a02d5",
+          "margin": [
+            564,
+            468,
+            990,
+            718
+          ],
+          "rgba_sha256": "72ee6e80ad7bc7d5caef90a4e54d283b9276b5955ac2ff321a11e9ee62bd8a7c",
           "source": {
             "export": "art_working/tokyo_crosswalk_motion_p0_p1_2026_11_19/chr_15_wait_02/normalized/yui_crosswalk_wait_02_v01.png",
             "export_sha256": "c69a5531647d67c00ed8985b26dadd4421f192797e7da1a098ef332b6b0284e4",
@@ -5029,14 +6285,95 @@
             "original": "art_working/tokyo_crosswalk_motion_p0_p1_2026_11_19/chr_15_wait_02/source/yui_crosswalk_wait_02_v01.png",
             "original_sha256": "2e1331b3340d240e40ef19c4c6298ff9a877402b22b7396b5f894c939577a53d",
             "prompt": "art_working/tokyo_crosswalk_motion_p0_p1_2026_11_19/chr_15_wait_02/prompt_v01.txt",
-            "prompt_sha256": "d5404b8de7b05aece69f6bf38b35baae1ab634f2f9b21fd42280b9c0c992cad8"
+            "prompt_sha256": "d5404b8de7b05aece69f6bf38b35baae1ab634f2f9b21fd42280b9c0c992cad8",
+            "kind": "ai_generated_reused_original",
+            "archived_original": "art_working/animation_upgrade_2026_11_20/source/yui_crosswalk_wait_02_original.png",
+            "rights": "Existing project AI-generated source; platform terms apply",
+            "processing": "original RGBA retained inside alpha>=128 bounds plus 2px; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              1122,
+              1402
+            ],
+            "source_crop": [
+              330,
+              68,
+              846,
+              1358
+            ],
+            "source_anchor": [
+              519.5,
+              1356.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 82.0
           }
         }
       ],
       "pivot": [
-        48,
-        112
-      ]
+        753,
+        1756
+      ],
+      "runtime": {
+        "frame": [
+          1506,
+          2008
+        ],
+        "count": 2,
+        "scale": 0.06376360808709175,
+        "offset": [
+          0.0,
+          -752.0
+        ],
+        "regions": [
+          {
+            "region": [
+              2,
+              2,
+              516,
+              1290
+            ],
+            "margin": [
+              564,
+              468,
+              990,
+              718
+            ]
+          },
+          {
+            "region": [
+              2,
+              1296,
+              516,
+              1290
+            ],
+            "margin": [
+              564,
+              468,
+              990,
+              718
+            ]
+          }
+        ]
+      },
+      "technical_checks_passed": true,
+      "source_resolution_upgrade": true,
+      "source": {
+        "kind": "ai_generated_reused_original",
+        "export": "art_working/animation_upgrade_2026_11_20/candidates/characters/animations/yui_crosswalk_wait_sheet.png",
+        "tool": "existing project AI originals",
+        "rights": "Project AI-generated content; platform terms apply"
+      },
+      "review": {
+        "date": "2026-11-20",
+        "by": "Codex",
+        "status": "approved for integration after technical and native-scale review",
+        "strict_shared_pixel_grid": false,
+        "per_frame_resampling": false,
+        "authorization": "User requested implementation of currently used animation sprites on 2026-11-20; selection delegated to implementing agent"
+      },
+      "rgba8_mib": 5.1336669921875
     },
     {
       "id": "CHR-15",
@@ -5044,20 +6381,26 @@
       "kind": "animation",
       "status": "approved",
       "size": [
-        384,
-        128
+        1284,
+        2558
       ],
-      "sha256": "ebf9a3b6c969e8d5dbfdcd7a7e7d222b05ceae776639e9bd8b61592e33ec6ed2",
-      "rgba_sha256": "4ea2d87ad708e116ccc8328d8c851f3a625bbd5d2a1abe67223a3682ed74179b",
+      "sha256": "0bf42529fe81d0bc0c093304592a37773dfcf4c07ef100ef4fc35c5803fcbbfc",
+      "rgba_sha256": "c85aa08b81140f370c6017240fc6414bd5f788b689257e45475113c94ccff5aa",
       "frames": [
         {
           "region": [
-            0,
-            0,
-            96,
-            128
+            2,
+            2,
+            638,
+            1265
           ],
-          "rgba_sha256": "b14f925bbb0390b3358b5a802caca439d63983fdf6e99fef93b939a09cb4c1f2",
+          "margin": [
+            504,
+            493,
+            868,
+            743
+          ],
+          "rgba_sha256": "727c15ec94f81f4f92e631b06866044a725e66ad69a51a478901a745f10774c2",
           "source": {
             "export": "art_working/tokyo_crosswalk_motion_p0_p1_2026_11_19/chr_15_step_01/normalized/yui_crosswalk_step_01_v01.png",
             "export_sha256": "e0fc0a143d65a6b0e1ce4755921d6be3d9a76715519aaba51256bb1173919e89",
@@ -5065,17 +6408,45 @@
             "original": "art_working/tokyo_crosswalk_motion_p0_p1_2026_11_19/chr_15_step_01/source/yui_crosswalk_step_01_v01.png",
             "original_sha256": "e086b2621d957b2d976a3cd3610a98a836c228ca03ab28982b518faa1c98c417",
             "prompt": "art_working/tokyo_crosswalk_motion_p0_p1_2026_11_19/chr_15_step_01/prompt_v01.txt",
-            "prompt_sha256": "0eb7a99ce8a354e69d6a8adfaf1aa2f3bda7266b0c74412e7485831f34e73915"
+            "prompt_sha256": "0eb7a99ce8a354e69d6a8adfaf1aa2f3bda7266b0c74412e7485831f34e73915",
+            "kind": "ai_generated_reused_original",
+            "archived_original": "art_working/animation_upgrade_2026_11_20/source/yui_crosswalk_step_01_original.png",
+            "rights": "Existing project AI-generated source; platform terms apply",
+            "processing": "original RGBA retained inside alpha>=128 bounds plus 2px; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              1122,
+              1402
+            ],
+            "source_crop": [
+              191,
+              84,
+              829,
+              1349
+            ],
+            "source_anchor": [
+              440.5,
+              1347.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 80.4059097978227
           }
         },
         {
           "region": [
-            96,
-            0,
-            96,
-            128
+            644,
+            2,
+            607,
+            1263
           ],
-          "rgba_sha256": "87388cac39ae4d67f1b5b4f1ef8fc8e3ab7adf6b58330337c8432c725e35f159",
+          "margin": [
+            457,
+            495,
+            899,
+            745
+          ],
+          "rgba_sha256": "6000b7975fc1fdc1562f28a2cac8bc943f2c03880a4741e90bfae306cddf8563",
           "source": {
             "export": "art_working/tokyo_crosswalk_motion_p0_p1_2026_11_19/chr_15_step_02/normalized/yui_crosswalk_step_02_v01.png",
             "export_sha256": "dfd14d1b24dcae121da31ad7d3b0288eca4f160417dc0a887066cd9f19c31cf8",
@@ -5083,17 +6454,45 @@
             "original": "art_working/tokyo_crosswalk_motion_p0_p1_2026_11_19/chr_15_step_02/source/yui_crosswalk_step_02_v01.png",
             "original_sha256": "a2b7ab6230edbd2964a14f8b6fd3b47cb6d097a6f8de8cce47431da185f88a62",
             "prompt": "art_working/tokyo_crosswalk_motion_p0_p1_2026_11_19/chr_15_step_02/prompt_v01.txt",
-            "prompt_sha256": "ea516c5b1509b40d65c1df42f199fbfd7373fc3f28e946e3e584428b51cc9c7e"
+            "prompt_sha256": "ea516c5b1509b40d65c1df42f199fbfd7373fc3f28e946e3e584428b51cc9c7e",
+            "kind": "ai_generated_reused_original",
+            "archived_original": "art_working/animation_upgrade_2026_11_20/source/yui_crosswalk_step_02_original.png",
+            "rights": "Existing project AI-generated source; platform terms apply",
+            "processing": "original RGBA retained inside alpha>=128 bounds plus 2px; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              1122,
+              1402
+            ],
+            "source_crop": [
+              216,
+              73,
+              823,
+              1336
+            ],
+            "source_anchor": [
+              512.0,
+              1334.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 80.27838258164851
           }
         },
         {
           "region": [
-            192,
-            0,
-            96,
-            128
+            2,
+            1281,
+            514,
+            1275
           ],
-          "rgba_sha256": "bbdd3f63a6e9aeb7e1b61d813202a31e1d34a3315fc42382a4114057cd105516",
+          "margin": [
+            560,
+            483,
+            992,
+            733
+          ],
+          "rgba_sha256": "6703ca5447d902b69669d62dc28a08417c6194be0ec8fabf1528d2283618f334",
           "source": {
             "export": "art_working/tokyo_crosswalk_motion_p0_p1_2026_11_19/chr_15_step_03/normalized/yui_crosswalk_step_03_v01.png",
             "export_sha256": "d02dd5020db7fdbdb9da6d47b7bde3ee7bf0e10f75b3f91877f5ad6a04dc6e68",
@@ -5101,17 +6500,45 @@
             "original": "art_working/tokyo_crosswalk_motion_p0_p1_2026_11_19/chr_15_step_03/source/yui_crosswalk_step_03_v01.png",
             "original_sha256": "e77aa7b5883b486a6b085649142de8c39512d9b50a1e446b035930c8fc6b7d4d",
             "prompt": "art_working/tokyo_crosswalk_motion_p0_p1_2026_11_19/chr_15_step_03/prompt_v01.txt",
-            "prompt_sha256": "e1d76ed4be3706e1b5f822b6499e0d4809394ee33a63f0b8bbb08c02ba9c4d1d"
+            "prompt_sha256": "e1d76ed4be3706e1b5f822b6499e0d4809394ee33a63f0b8bbb08c02ba9c4d1d",
+            "kind": "ai_generated_reused_original",
+            "archived_original": "art_working/animation_upgrade_2026_11_20/source/yui_crosswalk_step_03_original.png",
+            "rights": "Existing project AI-generated source; platform terms apply",
+            "processing": "original RGBA retained inside alpha>=128 bounds plus 2px; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              1122,
+              1402
+            ],
+            "source_crop": [
+              324,
+              71,
+              838,
+              1346
+            ],
+            "source_anchor": [
+              516.5,
+              1344.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 81.04354587869362
           }
         },
         {
           "region": [
-            288,
-            0,
-            96,
-            128
+            644,
+            1281,
+            609,
+            1272
           ],
-          "rgba_sha256": "2480f61c116cb5dca1284ade7c7b6481e673e27d7835bfa8aff9804434a8bf19",
+          "margin": [
+            480,
+            486,
+            897,
+            736
+          ],
+          "rgba_sha256": "391a9bef0a7593e43662968ee01427c3ef329850c10fa054161b6cd4d5f3b57b",
           "source": {
             "export": "art_working/tokyo_crosswalk_motion_p0_p1_2026_11_19/chr_15_step_04/normalized/yui_crosswalk_step_04_v01.png",
             "export_sha256": "74fcc13d587021c04cd640d2d49fcaa2b1488277a5035c9cd796ee28d85ef775",
@@ -5119,14 +6546,123 @@
             "original": "art_working/tokyo_crosswalk_motion_p0_p1_2026_11_19/chr_15_step_04/source/yui_crosswalk_step_04_v01.png",
             "original_sha256": "95108cc1cfd4ac2424164fda8cdc2037507eb2c902f0fa35e6542f277a92e4c1",
             "prompt": "art_working/tokyo_crosswalk_motion_p0_p1_2026_11_19/chr_15_step_04/prompt_v01.txt",
-            "prompt_sha256": "5420e9c95b9d4412059b23dc7d5ee5d2e14cc311dc2ef9838e4a200747363a3d"
+            "prompt_sha256": "5420e9c95b9d4412059b23dc7d5ee5d2e14cc311dc2ef9838e4a200747363a3d",
+            "kind": "ai_generated_reused_original",
+            "archived_original": "art_working/animation_upgrade_2026_11_20/source/yui_crosswalk_step_04_original.png",
+            "rights": "Existing project AI-generated source; platform terms apply",
+            "processing": "original RGBA retained inside alpha>=128 bounds plus 2px; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              1122,
+              1402
+            ],
+            "source_crop": [
+              234,
+              73,
+              843,
+              1345
+            ],
+            "source_anchor": [
+              507.0,
+              1343.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 80.85225505443235
           }
         }
       ],
       "pivot": [
-        48,
-        112
-      ]
+        753,
+        1756
+      ],
+      "runtime": {
+        "frame": [
+          1506,
+          2008
+        ],
+        "count": 4,
+        "scale": 0.06376360808709175,
+        "offset": [
+          0.0,
+          -752.0
+        ],
+        "regions": [
+          {
+            "region": [
+              2,
+              2,
+              638,
+              1265
+            ],
+            "margin": [
+              504,
+              493,
+              868,
+              743
+            ]
+          },
+          {
+            "region": [
+              644,
+              2,
+              607,
+              1263
+            ],
+            "margin": [
+              457,
+              495,
+              899,
+              745
+            ]
+          },
+          {
+            "region": [
+              2,
+              1281,
+              514,
+              1275
+            ],
+            "margin": [
+              560,
+              483,
+              992,
+              733
+            ]
+          },
+          {
+            "region": [
+              644,
+              1281,
+              609,
+              1272
+            ],
+            "margin": [
+              480,
+              486,
+              897,
+              736
+            ]
+          }
+        ]
+      },
+      "technical_checks_passed": true,
+      "source_resolution_upgrade": true,
+      "source": {
+        "kind": "ai_generated_reused_original",
+        "export": "art_working/animation_upgrade_2026_11_20/candidates/characters/animations/yui_crosswalk_step_sheet.png",
+        "tool": "existing project AI originals",
+        "rights": "Project AI-generated content; platform terms apply"
+      },
+      "review": {
+        "date": "2026-11-20",
+        "by": "Codex",
+        "status": "approved for integration after technical and native-scale review",
+        "strict_shared_pixel_grid": false,
+        "per_frame_resampling": false,
+        "authorization": "User requested implementation of currently used animation sprites on 2026-11-20; selection delegated to implementing agent"
+      },
+      "rgba8_mib": 12.529266357421875
     },
     {
       "id": "CHR-15",
@@ -5206,53 +6742,176 @@
       "kind": "animation",
       "status": "approved",
       "size": [
-        128,
-        64
+        724,
+        1016
       ],
-      "sha256": "a5ad4ec24e399ab53fa3f2d1215db9d37f76883a11f0dcb2d593ee3dcae43fb1",
-      "rgba_sha256": "fa3672195391beda703558ac8466e9cdd54a3b1c960dfc8faa2c1a1d6dda18c0",
+      "sha256": "0df99b56aea2d6f9d59f1bd8d237522496d78c5edb3d887421877d09f52c23aa",
+      "rgba_sha256": "46aaa5d788ca30e433decbfeb2de4ad32cc950de0cedbd50b46664afe4d7d7ea",
       "frames": [
         {
           "region": [
-            0,
-            0,
-            64,
-            64
+            2,
+            2,
+            720,
+            475
           ],
-          "rgba_sha256": "38a1e6766c719d39ee8b0647a4126055b7a0654f13edb1da2cd5217ea91e1fe3",
+          "margin": [
+            111,
+            351,
+            222,
+            467
+          ],
+          "rgba_sha256": "de3cbc9150e7f882967088f7aa57ed42a454c3d2d8afad406f46be65bbe092d2",
           "source": {
-            "export": "art_working/gameplay_scale_p0_2026_11_18/mon_01/normalized/moss_slime_idle_v01.png",
-            "export_sha256": "2e0271e278ed715983f5c6c6635d3cf420fd2d147b09b298d8dbb73d5e61c3ef",
-            "manifest": "art_working/gameplay_scale_p0_2026_11_18/manifest.json",
-            "original": "art_working/gameplay_scale_p0_2026_11_18/mon_01/source/moss_slime_idle_v01.png",
-            "original_sha256": "75b996260b3c3c556727086a2bcc202bec5e18ee3d9b728bdaad3db2ba34f957",
-            "prompt": "art_working/gameplay_scale_p0_2026_11_18/mon_01/prompt_v01.txt",
-            "prompt_sha256": "6a0b9cdddfb5825617561c9e3376140d462df1d3420e92d19115630603ac886c"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/moss_slime_idle_v01.png",
+            "original_sha256": "39e82b2f56f40be1af8578d3ef57477c6787ee8d897ba1e803c9bb8802cb1789",
+            "source_region": [
+              0,
+              0,
+              887,
+              887
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/moss_slime_idle_v01.txt",
+            "prompt_sha256": "06e70245b583a99f25e58be40dff0e0cd451a042342a5d5ba2029a028647ce1e",
+            "reference": "art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/moss_slime_idle.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              887,
+              887
+            ],
+            "source_crop": [
+              94,
+              253,
+              814,
+              728
+            ],
+            "source_anchor": [
+              454.0,
+              726.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 32.0
           }
         },
         {
           "region": [
-            64,
-            0,
-            64,
-            64
+            2,
+            510,
+            699,
+            504
           ],
-          "rgba_sha256": "65aad6e5cb81d9d37c43dbb079e1ad945f269fe60fcc22f0f3d3176a001eb649",
+          "margin": [
+            116,
+            322,
+            243,
+            438
+          ],
+          "rgba_sha256": "97eca99898a9ba9def6ba98d86a315d2a172805a5d836f2d88a183b0072da78d",
           "source": {
-            "export": "art_working/trail_idle_animation_p0_p1_2026_11_18/mon_01_idle_second/normalized/moss_slime_idle_02_v01.png",
-            "export_sha256": "8135caf657950a8c154fb1db7673f07d895e37fbfe08b583af226ec9f5ec82f9",
-            "manifest": "art_working/trail_idle_animation_p0_p1_2026_11_18/manifest.json",
-            "original": "art_working/trail_idle_animation_p0_p1_2026_11_18/mon_01_idle_second/source/moss_slime_idle_02_v01.png",
-            "original_sha256": "54b6817b11d50bdcc4db6f4a9f6790288da90ff277e195e3c6d62a88ea61a589",
-            "prompt": "art_working/trail_idle_animation_p0_p1_2026_11_18/mon_01_idle_second/prompt_v01.txt",
-            "prompt_sha256": "fbfd13c47fcd5ff1567b41f0a4f55b612a8de77fbc822efdea3578738ae9c62f"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/moss_slime_idle_v01.png",
+            "original_sha256": "39e82b2f56f40be1af8578d3ef57477c6787ee8d897ba1e803c9bb8802cb1789",
+            "source_region": [
+              887,
+              0,
+              1774,
+              887
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/moss_slime_idle_v01.txt",
+            "prompt_sha256": "06e70245b583a99f25e58be40dff0e0cd451a042342a5d5ba2029a028647ce1e",
+            "reference": "art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/moss_slime_idle.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              887,
+              887
+            ],
+            "source_crop": [
+              100,
+              224,
+              799,
+              728
+            ],
+            "source_anchor": [
+              454.5,
+              726.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 33.97027600849257
           }
         }
       ],
       "pivot": [
-        32,
-        56
-      ]
+        471,
+        824
+      ],
+      "runtime": {
+        "frame": [
+          942,
+          942
+        ],
+        "count": 2,
+        "scale": 0.06794055201698514,
+        "offset": [
+          0.0,
+          -353.0
+        ],
+        "regions": [
+          {
+            "region": [
+              2,
+              2,
+              720,
+              475
+            ],
+            "margin": [
+              111,
+              351,
+              222,
+              467
+            ]
+          },
+          {
+            "region": [
+              2,
+              510,
+              699,
+              504
+            ],
+            "margin": [
+              116,
+              322,
+              243,
+              438
+            ]
+          }
+        ]
+      },
+      "technical_checks_passed": true,
+      "source_resolution_upgrade": true,
+      "source": {
+        "kind": "ai_generated",
+        "export": "art_working/animation_upgrade_2026_11_20/candidates/enemies/animations/moss_slime_idle_sheet.png",
+        "tool": "image_gen built-in",
+        "rights": "Project AI-generated content; platform terms apply"
+      },
+      "review": {
+        "date": "2026-11-20",
+        "by": "Codex",
+        "status": "approved for integration after technical and native-scale review",
+        "strict_shared_pixel_grid": false,
+        "per_frame_resampling": false,
+        "authorization": "User requested implementation of currently used animation sprites on 2026-11-20; selection delegated to implementing agent"
+      },
+      "rgba8_mib": 2.8060302734375
     },
     {
       "id": "MON-01",
@@ -5260,125 +6919,432 @@
       "kind": "animation",
       "status": "approved",
       "size": [
-        384,
-        64
+        461,
+        1974
       ],
-      "sha256": "242c6dd410bd129b2f9492333899ea86b311265527197ae333f489024f3178c5",
-      "rgba_sha256": "7d6a7aad4bd72c6fa277f1446cdabfcfa868719fba1140302f20029cddfb95b3",
+      "sha256": "f7413e224f312d3b4ff1e18bb336d58441a60e919b4a47976444328329213e06",
+      "rgba_sha256": "152cb77288a80fe8b760c59af1500c19cf0f9934fece3325431e735762eede49",
       "frames": [
         {
           "region": [
-            0,
-            0,
-            64,
-            64
+            2,
+            2,
+            457,
+            244
           ],
-          "rgba_sha256": "6ec43849e725bafc5295f43cd60229a3237c911f8682493a6e78ce1637969f2a",
+          "margin": [
+            111,
+            239,
+            164,
+            306
+          ],
+          "rgba_sha256": "4855ad84d2a0ae4021ef439d449fed727b67b341561ff80d3e6446a367d7eb0c",
           "source": {
-            "export": "art_working/first_slime_combat_p0_p1_2026_11_19/mon_01_jump_01/normalized/moss_slime_jump_01_v01.png",
-            "export_sha256": "fca526c1991e8cb165ae3d898fa35d094fe76f825facfc29ae58309ee8387407",
-            "manifest": "art_working/first_slime_combat_p0_p1_2026_11_19/manifest.json",
-            "original": "art_working/first_slime_combat_p0_p1_2026_11_19/mon_01_jump_01/source/moss_slime_jump_01_v01.png",
-            "original_sha256": "e2d3624e9575b2e17ba838cae99b3c3a4696a3f3b9c5398ed478b2f363163a55",
-            "prompt": "art_working/first_slime_combat_p0_p1_2026_11_19/mon_01_jump_01/prompt_v01.txt",
-            "prompt_sha256": "d556736f5de59653a55d9bb4c529ae4edb0f499416700c5be689eb10548588af"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/moss_slime_jump_v01.png",
+            "original_sha256": "b5a49a444cfd4cde04ea12244d1413ef110d20804c24e7e4b63ffca6d5f6b9da",
+            "source_region": [
+              0,
+              0,
+              512,
+              512
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/moss_slime_jump_v01.txt",
+            "prompt_sha256": "cc9b36a3fd8cd64850698d5e66f04c561ace45a0c63ab8999d316603c05d8121",
+            "reference": "art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/moss_slime_idle.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              512,
+              512
+            ],
+            "source_crop": [
+              31,
+              214,
+              488,
+              458
+            ],
+            "source_anchor": [
+              266.5,
+              456.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 27.927272727272726
           }
         },
         {
           "region": [
-            64,
-            0,
-            64,
-            64
+            2,
+            331,
+            396,
+            316
           ],
-          "rgba_sha256": "d090996987ed477721691e3282d1b8439a898f076768f53d93e45b7f8c644a35",
+          "margin": [
+            137,
+            150,
+            225,
+            234
+          ],
+          "rgba_sha256": "7be1300dc410094eae12a2f2095aa45e2ed27adc6d703a55d28d59f761551c98",
           "source": {
-            "export": "art_working/first_slime_combat_p0_p1_2026_11_19/mon_01_jump_02/normalized/moss_slime_jump_02_v01.png",
-            "export_sha256": "96d9af45ceeed2e659cb4ccea84ccfb7806ff3a07f2749e5edf68116d0eb495d",
-            "manifest": "art_working/first_slime_combat_p0_p1_2026_11_19/manifest.json",
-            "original": "art_working/first_slime_combat_p0_p1_2026_11_19/mon_01_jump_02/source/moss_slime_jump_02_v01.png",
-            "original_sha256": "36c35b242999b91126f6abfd319709639ac714149460f97446663185405f42d6",
-            "prompt": "art_working/first_slime_combat_p0_p1_2026_11_19/mon_01_jump_02/prompt_v01.txt",
-            "prompt_sha256": "d70529afe3c122322934783f23ac415daecdf07932bef018776642d0f1f8eef6"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/moss_slime_jump_v01.png",
+            "original_sha256": "b5a49a444cfd4cde04ea12244d1413ef110d20804c24e7e4b63ffca6d5f6b9da",
+            "source_region": [
+              512,
+              0,
+              1024,
+              512
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/moss_slime_jump_v01.txt",
+            "prompt_sha256": "cc9b36a3fd8cd64850698d5e66f04c561ace45a0c63ab8999d316603c05d8121",
+            "reference": "art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/moss_slime_idle.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              512,
+              512
+            ],
+            "source_crop": [
+              59,
+              141,
+              455,
+              457
+            ],
+            "source_anchor": [
+              268.0,
+              455.0
+            ],
+            "air_lift_logical": 2.0,
+            "solid_height_logical": 36.305454545454545
           }
         },
         {
           "region": [
-            128,
-            0,
-            64,
-            64
+            2,
+            660,
+            425,
+            325
           ],
-          "rgba_sha256": "e0b1d2e99e754ee21325a18401e597da581750eeb653ad8e96f7b8ecfeade9f5",
+          "margin": [
+            15,
+            38,
+            196,
+            225
+          ],
+          "rgba_sha256": "615ea6d65028ac807df32638e052ed05ef7671ccdb3b134f3e0c776c1c06c1dc",
           "source": {
-            "export": "art_working/first_slime_combat_p0_p1_2026_11_19/mon_01_jump_03/normalized/moss_slime_jump_03_v01.png",
-            "export_sha256": "d06cce6eb877e0265f3e64942a743696bf6ca90fd27138407a860bb27f8f1748",
-            "manifest": "art_working/first_slime_combat_p0_p1_2026_11_19/manifest.json",
-            "original": "art_working/first_slime_combat_p0_p1_2026_11_19/mon_01_jump_03/source/moss_slime_jump_03_v01.png",
-            "original_sha256": "0333430d131409f9861c79d1e537a7b467c28482d8ff66e854c34769a2691841",
-            "prompt": "art_working/first_slime_combat_p0_p1_2026_11_19/mon_01_jump_03/prompt_v01.txt",
-            "prompt_sha256": "61f81700b4cc037d5ee9676bf04e4eb79021b63e183b2f001492ebbe91c72d6d"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/moss_slime_jump_v01.png",
+            "original_sha256": "b5a49a444cfd4cde04ea12244d1413ef110d20804c24e7e4b63ffca6d5f6b9da",
+            "source_region": [
+              1024,
+              0,
+              1536,
+              512
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/moss_slime_jump_v01.txt",
+            "prompt_sha256": "cc9b36a3fd8cd64850698d5e66f04c561ace45a0c63ab8999d316603c05d8121",
+            "reference": "art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/moss_slime_idle.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              512,
+              512
+            ],
+            "source_crop": [
+              32,
+              99,
+              457,
+              424
+            ],
+            "source_anchor": [
+              363.5,
+              422.0
+            ],
+            "air_lift_logical": 14.0,
+            "solid_height_logical": 37.35272727272727
           }
         },
         {
           "region": [
-            192,
-            0,
-            64,
-            64
+            2,
+            989,
+            441,
+            304
           ],
-          "rgba_sha256": "63dcb49db865a624ef49cd85ab9e48989e429206794d85650570a36bc14c94f9",
+          "margin": [
+            0,
+            93,
+            180,
+            246
+          ],
+          "rgba_sha256": "54131c674306a7c3112b31f6b3776f8349eecb37edb034dd6f286df68a84c7fd",
           "source": {
-            "export": "art_working/first_slime_combat_p0_p1_2026_11_19/mon_01_jump_04/normalized/moss_slime_jump_04_v01.png",
-            "export_sha256": "75dcc3894bfe847c5ee4f48a0d8700a64b1b17277a17d66e4472f1356c218db4",
-            "manifest": "art_working/first_slime_combat_p0_p1_2026_11_19/manifest.json",
-            "original": "art_working/first_slime_combat_p0_p1_2026_11_19/mon_01_jump_04/source/moss_slime_jump_04_v01.png",
-            "original_sha256": "dbd35d91cd81f799e383393664db8ea9442b6ea0fe65cd9373788056861cd26c",
-            "prompt": "art_working/first_slime_combat_p0_p1_2026_11_19/mon_01_jump_04/prompt_v01.txt",
-            "prompt_sha256": "8259652880175aaaacdd47b8ddf5ce2c6505fd6b9ad3d61707d1063c75ca7c5b"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/moss_slime_jump_v01.png",
+            "original_sha256": "b5a49a444cfd4cde04ea12244d1413ef110d20804c24e7e4b63ffca6d5f6b9da",
+            "source_region": [
+              0,
+              512,
+              512,
+              1024
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/moss_slime_jump_v01.txt",
+            "prompt_sha256": "cc9b36a3fd8cd64850698d5e66f04c561ace45a0c63ab8999d316603c05d8121",
+            "reference": "art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/moss_slime_idle.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              512,
+              512
+            ],
+            "source_crop": [
+              15,
+              89,
+              456,
+              393
+            ],
+            "source_anchor": [
+              361.0,
+              391.0
+            ],
+            "air_lift_logical": 10.0,
+            "solid_height_logical": 34.90909090909091
           }
         },
         {
           "region": [
-            256,
-            0,
-            64,
-            64
+            2,
+            1318,
+            452,
+            253
           ],
-          "rgba_sha256": "3f402938ca41c4bbff17e5130508448267c2c78c2a3af1c7b20e8ddf9b081208",
+          "margin": [
+            110,
+            230,
+            169,
+            297
+          ],
+          "rgba_sha256": "281072fe7a12c618283a201f74602ebf479cca8ea78f77d17910dfcf03410479",
           "source": {
-            "export": "art_working/first_slime_combat_p0_p1_2026_11_19/mon_01_jump_05/normalized/moss_slime_jump_05_v01.png",
-            "export_sha256": "346b30b73a20b08c7758926fcb0b8b22515c9f7198468c0285739ff20b547198",
-            "manifest": "art_working/first_slime_combat_p0_p1_2026_11_19/manifest.json",
-            "original": "art_working/first_slime_combat_p0_p1_2026_11_19/mon_01_jump_05/source/moss_slime_jump_05_v01.png",
-            "original_sha256": "5c8c723fe2a73591c3658a9ba15712186746cf5aa2dac27025e1b0be179c4fd7",
-            "prompt": "art_working/first_slime_combat_p0_p1_2026_11_19/mon_01_jump_05/prompt_v01.txt",
-            "prompt_sha256": "331cb331c2811a11daea3014087cf4397d627f9d3601c80926230330a5283391"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/moss_slime_jump_v01.png",
+            "original_sha256": "b5a49a444cfd4cde04ea12244d1413ef110d20804c24e7e4b63ffca6d5f6b9da",
+            "source_region": [
+              512,
+              512,
+              1024,
+              1024
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/moss_slime_jump_v01.txt",
+            "prompt_sha256": "cc9b36a3fd8cd64850698d5e66f04c561ace45a0c63ab8999d316603c05d8121",
+            "reference": "art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/moss_slime_idle.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              512,
+              512
+            ],
+            "source_crop": [
+              28,
+              206,
+              480,
+              459
+            ],
+            "source_anchor": [
+              264.0,
+              457.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 28.974545454545453
           }
         },
         {
           "region": [
-            320,
-            0,
-            64,
-            64
+            2,
+            1647,
+            419,
+            279
           ],
-          "rgba_sha256": "38a1e6766c719d39ee8b0647a4126055b7a0654f13edb1da2cd5217ea91e1fe3",
+          "margin": [
+            135,
+            204,
+            202,
+            271
+          ],
+          "rgba_sha256": "8802e2c53019003e523f64cb34b8050aab142db5c7adbfca0ef9dc4713e63970",
           "source": {
-            "export": "art_working/gameplay_scale_p0_2026_11_18/mon_01/normalized/moss_slime_idle_v01.png",
-            "export_sha256": "2e0271e278ed715983f5c6c6635d3cf420fd2d147b09b298d8dbb73d5e61c3ef",
-            "manifest": "art_working/gameplay_scale_p0_2026_11_18/manifest.json",
-            "original": "art_working/gameplay_scale_p0_2026_11_18/mon_01/source/moss_slime_idle_v01.png",
-            "original_sha256": "75b996260b3c3c556727086a2bcc202bec5e18ee3d9b728bdaad3db2ba34f957",
-            "prompt": "art_working/gameplay_scale_p0_2026_11_18/mon_01/prompt_v01.txt",
-            "prompt_sha256": "6a0b9cdddfb5825617561c9e3376140d462df1d3420e92d19115630603ac886c"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/moss_slime_jump_v01.png",
+            "original_sha256": "b5a49a444cfd4cde04ea12244d1413ef110d20804c24e7e4b63ffca6d5f6b9da",
+            "source_region": [
+              1024,
+              512,
+              1536,
+              1024
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/moss_slime_jump_v01.txt",
+            "prompt_sha256": "cc9b36a3fd8cd64850698d5e66f04c561ace45a0c63ab8999d316603c05d8121",
+            "reference": "art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/moss_slime_idle.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              512,
+              512
+            ],
+            "source_crop": [
+              52,
+              181,
+              471,
+              460
+            ],
+            "source_anchor": [
+              263.0,
+              458.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 32.0
           }
         }
       ],
       "pivot": [
-        32,
-        56
-      ]
+        346,
+        481
+      ],
+      "runtime": {
+        "frame": [
+          621,
+          550
+        ],
+        "count": 6,
+        "scale": 0.11636363636363636,
+        "offset": [
+          -35.5,
+          -206.0
+        ],
+        "regions": [
+          {
+            "region": [
+              2,
+              2,
+              457,
+              244
+            ],
+            "margin": [
+              111,
+              239,
+              164,
+              306
+            ]
+          },
+          {
+            "region": [
+              2,
+              331,
+              396,
+              316
+            ],
+            "margin": [
+              137,
+              150,
+              225,
+              234
+            ]
+          },
+          {
+            "region": [
+              2,
+              660,
+              425,
+              325
+            ],
+            "margin": [
+              15,
+              38,
+              196,
+              225
+            ]
+          },
+          {
+            "region": [
+              2,
+              989,
+              441,
+              304
+            ],
+            "margin": [
+              0,
+              93,
+              180,
+              246
+            ]
+          },
+          {
+            "region": [
+              2,
+              1318,
+              452,
+              253
+            ],
+            "margin": [
+              110,
+              230,
+              169,
+              297
+            ]
+          },
+          {
+            "region": [
+              2,
+              1647,
+              419,
+              279
+            ],
+            "margin": [
+              135,
+              204,
+              202,
+              271
+            ]
+          }
+        ]
+      },
+      "technical_checks_passed": true,
+      "source_resolution_upgrade": true,
+      "source": {
+        "kind": "ai_generated",
+        "export": "art_working/animation_upgrade_2026_11_20/candidates/enemies/animations/moss_slime_jump_sheet.png",
+        "tool": "image_gen built-in",
+        "rights": "Project AI-generated content; platform terms apply"
+      },
+      "review": {
+        "date": "2026-11-20",
+        "by": "Codex",
+        "status": "approved for integration after technical and native-scale review",
+        "strict_shared_pixel_grid": false,
+        "per_frame_resampling": false,
+        "authorization": "User requested implementation of currently used animation sprites on 2026-11-20; selection delegated to implementing agent"
+      },
+      "rgba8_mib": 3.4714279174804688
     },
     {
       "id": "MON-01",
@@ -5386,53 +7352,176 @@
       "kind": "animation",
       "status": "approved",
       "size": [
-        128,
-        64
+        731,
+        964
       ],
-      "sha256": "177a06fb6ba76801c16f820eccb99af1f7fc0194c71e67c5af778f4bc73c4479",
-      "rgba_sha256": "771c1491d4565f817f6d99211187acc99cc240f7b195b0534db0cb34c580dbb0",
+      "sha256": "35bdb163f09806c41322273986685f186bd1919a04737a7cd71ab17935f3e21d",
+      "rgba_sha256": "f2112a09205a8ca109308b364ecfbefe82067231855e33da11d143bb7874c3b9",
       "frames": [
         {
           "region": [
-            0,
-            0,
-            64,
-            64
+            2,
+            2,
+            727,
+            427
           ],
-          "rgba_sha256": "7333668a062cf9deacac990a388a533c1ab7cd27125e71471bb879f922d2035c",
+          "margin": [
+            138,
+            405,
+            221,
+            521
+          ],
+          "rgba_sha256": "62023e6399ee06e893dfc5f280cdf791245f0e885dbae0544b9ab937fe264084",
           "source": {
-            "export": "art_working/first_slime_combat_p0_p1_2026_11_19/mon_01_hit_01/normalized/moss_slime_hit_01_v01.png",
-            "export_sha256": "217a678e96f2138dc996ecdabe1a9b726dd1040ec297e38c96db6d65d5be8733",
-            "manifest": "art_working/first_slime_combat_p0_p1_2026_11_19/manifest.json",
-            "original": "art_working/first_slime_combat_p0_p1_2026_11_19/mon_01_hit_01/source/moss_slime_hit_01_v01.png",
-            "original_sha256": "0be50004d471718aeb0a419569cad70d14e193b579c24f5eaa3e4de2c340f0b1",
-            "prompt": "art_working/first_slime_combat_p0_p1_2026_11_19/mon_01_hit_01/prompt_v01.txt",
-            "prompt_sha256": "8c0b3eec98a41bc23b8b809d047e11fe548a96a72b850ead04d9c13251103d2a"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/moss_slime_hit_v01.png",
+            "original_sha256": "957f43bb6eb01f4c5070a7c7f2c22e78ccaa6fab0be27b77b93230368932cac5",
+            "source_region": [
+              0,
+              0,
+              887,
+              887
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/moss_slime_hit_v01.txt",
+            "prompt_sha256": "c4f636b24d2b3c19c85cf2b60faab7f30ea278d3897a396b005751ea7ebf9080",
+            "reference": "art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/moss_slime_idle.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              887,
+              887
+            ],
+            "source_crop": [
+              96,
+              285,
+              823,
+              712
+            ],
+            "source_anchor": [
+              432.5,
+              710.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 28.556962025316455
           }
         },
         {
           "region": [
-            64,
-            0,
-            64,
-            64
+            2,
+            484,
+            719,
+            478
           ],
-          "rgba_sha256": "625e100510f2ddf8b15426365eb9ffa289d58b62d8c66ed4f44dd16d16c8f0a7",
+          "margin": [
+            112,
+            354,
+            229,
+            470
+          ],
+          "rgba_sha256": "b3ae5ce07a672589370b6f0f4213eb1e3371c07feb5e4e597f70eec645c4badc",
           "source": {
-            "export": "art_working/first_slime_combat_p0_p1_2026_11_19/mon_01_hit_02/normalized/moss_slime_hit_02_v01.png",
-            "export_sha256": "644d64f41a1822066b6ddcf8fc360ad9ca2d1707bc0b3987dde700d2c9d386e9",
-            "manifest": "art_working/first_slime_combat_p0_p1_2026_11_19/manifest.json",
-            "original": "art_working/first_slime_combat_p0_p1_2026_11_19/mon_01_hit_02/source/moss_slime_hit_02_v01.png",
-            "original_sha256": "d7e5a1049affe6c7f56100f49b110c31564691221946bd4d530345cb05fb4a0a",
-            "prompt": "art_working/first_slime_combat_p0_p1_2026_11_19/mon_01_hit_02/prompt_v01.txt",
-            "prompt_sha256": "77bf3b21ca962a540fd4cfddc3a7b2f62178f98fab2d6be0f8ca6a8a0ca6765f"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/moss_slime_hit_v01.png",
+            "original_sha256": "957f43bb6eb01f4c5070a7c7f2c22e78ccaa6fab0be27b77b93230368932cac5",
+            "source_region": [
+              887,
+              0,
+              1774,
+              887
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/moss_slime_hit_v01.txt",
+            "prompt_sha256": "c4f636b24d2b3c19c85cf2b60faab7f30ea278d3897a396b005751ea7ebf9080",
+            "reference": "art_working/visual_upgrade_2026_11_20/source_resolution_test/candidates/moss_slime_idle.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              887,
+              887
+            ],
+            "source_crop": [
+              85,
+              234,
+              804,
+              712
+            ],
+            "source_anchor": [
+              446.5,
+              710.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 32.0
           }
         }
       ],
       "pivot": [
-        32,
-        56
-      ]
+        474,
+        830
+      ],
+      "runtime": {
+        "frame": [
+          948,
+          948
+        ],
+        "count": 2,
+        "scale": 0.06751054852320675,
+        "offset": [
+          0.0,
+          -356.0
+        ],
+        "regions": [
+          {
+            "region": [
+              2,
+              2,
+              727,
+              427
+            ],
+            "margin": [
+              138,
+              405,
+              221,
+              521
+            ]
+          },
+          {
+            "region": [
+              2,
+              484,
+              719,
+              478
+            ],
+            "margin": [
+              112,
+              354,
+              229,
+              470
+            ]
+          }
+        ]
+      },
+      "technical_checks_passed": true,
+      "source_resolution_upgrade": true,
+      "source": {
+        "kind": "ai_generated",
+        "export": "art_working/animation_upgrade_2026_11_20/candidates/enemies/animations/moss_slime_hit_sheet.png",
+        "tool": "image_gen built-in",
+        "rights": "Project AI-generated content; platform terms apply"
+      },
+      "review": {
+        "date": "2026-11-20",
+        "by": "Codex",
+        "status": "approved for integration after technical and native-scale review",
+        "strict_shared_pixel_grid": false,
+        "per_frame_resampling": false,
+        "authorization": "User requested implementation of currently used animation sprites on 2026-11-20; selection delegated to implementing agent"
+      },
+      "rgba8_mib": 2.6881561279296875
     },
     {
       "id": "MON-02",
@@ -5440,53 +7529,176 @@
       "kind": "animation",
       "status": "approved",
       "size": [
-        192,
-        96
+        748,
+        1330
       ],
-      "sha256": "f873804a5c5472fb9b039a55706bc51b1376ba0d4be32a83e1ecee033e957c20",
-      "rgba_sha256": "92418d211f2227fe2642974e2bd5ae459ce9c8bb8426b395a453cc01fb106fbc",
+      "sha256": "f7191682a6e1023b2ee51a957bf946f432c5001ede7dcf6329b0ce5e5d9d0e2b",
+      "rgba_sha256": "e11acb756593a19e1c001d112f0d20e8252b9bf592e2d67f683414e76c97bace",
       "frames": [
         {
           "region": [
-            0,
-            0,
-            96,
-            96
+            2,
+            2,
+            739,
+            660
           ],
-          "rgba_sha256": "87de153a727e288a6c58aa7d120dc1e47d5a270f1222d1bca6e282a3ca60c460",
+          "margin": [
+            175,
+            444,
+            521,
+            600
+          ],
+          "rgba_sha256": "c612997b8a672052bfb93b799fbfbc44bb31a5584922a9f498041886c93bdd79",
           "source": {
-            "export": "art_working/copper_compass_road_p1_2026_11_18/mon_02/normalized/goblin_scout_idle_v01.png",
-            "export_sha256": "a12b212ec6ad6448b3cd29c950c5d12a1378d11dfedda8595216c5ad994d7330",
-            "manifest": "art_working/copper_compass_road_p1_2026_11_18/manifest.json",
-            "original": "art_working/copper_compass_road_p1_2026_11_18/mon_02/source/goblin_scout_idle_v01.png",
-            "original_sha256": "ba5236ce10d00af9d7ea000d78871ae5265187d84cd1e7eff7ee390ee8b7f183",
-            "prompt": "art_working/copper_compass_road_p1_2026_11_18/mon_02/prompt_v01.txt",
-            "prompt_sha256": "01b40026619b8ee93171c33d48d43a303e5375f82751c2e033bd489e108516e5"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/goblin_scout_idle_v01.png",
+            "original_sha256": "fea020919c6b38b79617516d83baad16bdc70c264a74963c5ef9db82aeabbe75",
+            "source_region": [
+              0,
+              0,
+              887,
+              887
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/goblin_scout_idle_v01.txt",
+            "prompt_sha256": "7c149ba2a291e0a8aa605456ed8430f53ce0f2d3e0d1c1d521f3616d10f77a52",
+            "reference": "art_working/copper_compass_road_p1_2026_11_18/mon_02/source/goblin_scout_idle_v01.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              887,
+              887
+            ],
+            "source_crop": [
+              61,
+              121,
+              800,
+              781
+            ],
+            "source_anchor": [
+              516.0,
+              779.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 50.0
           }
         },
         {
           "region": [
-            96,
-            0,
-            96,
-            96
+            2,
+            667,
+            744,
+            661
           ],
-          "rgba_sha256": "f3496a9c0b19bfb55d543834d20e2b36b5d8feb6802946e98483cece47d94711",
+          "margin": [
+            173,
+            443,
+            516,
+            599
+          ],
+          "rgba_sha256": "0f146b0dd6d3db51453f19e5612d2137d8591c0297b03b4ec7c4664cf333d260",
           "source": {
-            "export": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_idle_02/normalized/goblin_scout_idle_02_v01.png",
-            "export_sha256": "026c45f360ec29af6118123074167afc2decdae0cc371192e77713350c83999d",
-            "manifest": "art_working/daijiro_cart_motion_p1_2026_11_19/manifest.json",
-            "original": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_idle_02/source/goblin_scout_idle_02_v01.png",
-            "original_sha256": "45d7c41be0edbd04f13dccad8f0368f3db6c2754f52749ef76be0c0e376e60a9",
-            "prompt": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_idle_02/prompt_v01.txt",
-            "prompt_sha256": "caf1086730716245e9d2d6e6598a18c8a95095fda03ec38adc8d6ef8273fc623"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/goblin_scout_idle_v01.png",
+            "original_sha256": "fea020919c6b38b79617516d83baad16bdc70c264a74963c5ef9db82aeabbe75",
+            "source_region": [
+              887,
+              0,
+              1774,
+              887
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/goblin_scout_idle_v01.txt",
+            "prompt_sha256": "7c149ba2a291e0a8aa605456ed8430f53ce0f2d3e0d1c1d521f3616d10f77a52",
+            "reference": "art_working/copper_compass_road_p1_2026_11_18/mon_02/source/goblin_scout_idle_v01.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              887,
+              887
+            ],
+            "source_crop": [
+              59,
+              120,
+              803,
+              781
+            ],
+            "source_anchor": [
+              516.0,
+              779.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 50.076219512195124
           }
         }
       ],
       "pivot": [
-        48,
-        84
-      ]
+        630,
+        1102
+      ],
+      "runtime": {
+        "frame": [
+          1260,
+          1260
+        ],
+        "count": 2,
+        "scale": 0.07621951219512195,
+        "offset": [
+          0.0,
+          -472.0
+        ],
+        "regions": [
+          {
+            "region": [
+              2,
+              2,
+              739,
+              660
+            ],
+            "margin": [
+              175,
+              444,
+              521,
+              600
+            ]
+          },
+          {
+            "region": [
+              2,
+              667,
+              744,
+              661
+            ],
+            "margin": [
+              173,
+              443,
+              516,
+              599
+            ]
+          }
+        ]
+      },
+      "technical_checks_passed": true,
+      "source_resolution_upgrade": true,
+      "source": {
+        "kind": "ai_generated",
+        "export": "art_working/animation_upgrade_2026_11_20/candidates/enemies/animations/goblin_scout_idle_sheet.png",
+        "tool": "image_gen built-in",
+        "rights": "Project AI-generated content; platform terms apply"
+      },
+      "review": {
+        "date": "2026-11-20",
+        "by": "Codex",
+        "status": "approved for integration after technical and native-scale review",
+        "strict_shared_pixel_grid": false,
+        "per_frame_resampling": false,
+        "authorization": "User requested implementation of currently used animation sprites on 2026-11-20; selection delegated to implementing agent"
+      },
+      "rgba8_mib": 3.795013427734375
     },
     {
       "id": "MON-02",
@@ -5494,125 +7706,432 @@
       "kind": "animation",
       "status": "approved",
       "size": [
-        576,
-        96
+        446,
+        2478
       ],
-      "sha256": "161393d9452427dc975febe2a00cfc1c3a597d2673651278aaec15025df0a3c0",
-      "rgba_sha256": "f9597a5a24f62fa3e6250db79fce6e5ee9aeba227c17706fbfc7889101edcc0e",
+      "sha256": "c826ebcd4d70b0a640227d20838e289137fe8d958260acc34bca942d0da3e678",
+      "rgba_sha256": "89f3ef4c8f47b7a8cd8d1a06b7d9de1e1dd44ac85e5becfdc103fcde9e2a3cca",
       "frames": [
         {
           "region": [
-            0,
-            0,
-            96,
-            96
+            2,
+            2,
+            410,
+            409
           ],
-          "rgba_sha256": "e0f632413a87f8cea9dc7833a781eb1a393f69ce76d274ca0d250edd3315f8dc",
+          "margin": [
+            138,
+            273,
+            368,
+            369
+          ],
+          "rgba_sha256": "51a236a7c2db6e7f9a9746f1e16d11820754c28f0928a1b951ffd5221f4d9c4f",
           "source": {
-            "export": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_double_slash_01/normalized/goblin_scout_double_slash_01_v01.png",
-            "export_sha256": "05e95605282ae307196460ebf1385fa85671d98554d42e0f4942bcd065cc78fe",
-            "manifest": "art_working/daijiro_cart_motion_p1_2026_11_19/manifest.json",
-            "original": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_double_slash_01/source/goblin_scout_double_slash_01_v01.png",
-            "original_sha256": "f62ffa16225c4d037c1900e96faab717d01b3ff218a416604e20dea5b968ebe6",
-            "prompt": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_double_slash_01/prompt_v01.txt",
-            "prompt_sha256": "d38c77ae3296225afcb2dad86df9f273941b3b26448ff282e8edd15da6621d64"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/goblin_scout_double_slash_v01.png",
+            "original_sha256": "7d8823aa331f10c0a51894a7ed0ed0972e2118b21aa02948211a81b7fc221d27",
+            "source_region": [
+              0,
+              0,
+              512,
+              512
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/goblin_scout_double_slash_v01.txt",
+            "prompt_sha256": "6d97fa3c9b42e31b775af780c70d87d585ebdb836421fdf55d59dba43ca432ca",
+            "reference": "art_working/copper_compass_road_p1_2026_11_18/mon_02/source/goblin_scout_idle_v01.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              512,
+              512
+            ],
+            "source_crop": [
+              50,
+              41,
+              460,
+              450
+            ],
+            "source_anchor": [
+              301.5,
+              448.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 50.0
           }
         },
         {
           "region": [
-            96,
-            0,
-            96,
-            96
+            2,
+            415,
+            442,
+            405
           ],
-          "rgba_sha256": "968b2fee4d3b868bf5464f41786dc3415cea465272c51071cf199a1999749986",
+          "margin": [
+            120,
+            277,
+            336,
+            373
+          ],
+          "rgba_sha256": "c1bf1dc1ab89f3fde482db336e8c3124b2dfe77960b7d85dc00aad056548052d",
           "source": {
-            "export": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_double_slash_02/normalized/goblin_scout_double_slash_02_v01.png",
-            "export_sha256": "5c3cf336e8002fc9cfa347f63a313cb54af9541c53bea2bbd44af783eca37ac4",
-            "manifest": "art_working/daijiro_cart_motion_p1_2026_11_19/manifest.json",
-            "original": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_double_slash_02/source/goblin_scout_double_slash_02_v01.png",
-            "original_sha256": "23a1db5ef557055390b37800e99e7708b2d10f12e932f2b9d112585e286095c9",
-            "prompt": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_double_slash_02/prompt_v01.txt",
-            "prompt_sha256": "170bd7e7b835db672168a786dc4e717fb33283b94213eaf73584effbff0d517b"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/goblin_scout_double_slash_v01.png",
+            "original_sha256": "7d8823aa331f10c0a51894a7ed0ed0972e2118b21aa02948211a81b7fc221d27",
+            "source_region": [
+              512,
+              0,
+              1024,
+              512
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/goblin_scout_double_slash_v01.txt",
+            "prompt_sha256": "6d97fa3c9b42e31b775af780c70d87d585ebdb836421fdf55d59dba43ca432ca",
+            "reference": "art_working/copper_compass_road_p1_2026_11_18/mon_02/source/goblin_scout_idle_v01.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              512,
+              512
+            ],
+            "source_crop": [
+              36,
+              46,
+              478,
+              451
+            ],
+            "source_anchor": [
+              305.5,
+              449.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 49.50617283950618
           }
         },
         {
           "region": [
-            192,
-            0,
-            96,
-            96
+            2,
+            828,
+            422,
+            403
           ],
-          "rgba_sha256": "15d1ed07fef530d43359a93738fdb3914773c4759d50a5470d7f26831d94f50d",
+          "margin": [
+            150,
+            279,
+            356,
+            375
+          ],
+          "rgba_sha256": "e76a5a60d2e2f3bc3689877e6bb1c6d3e63644191f3f63e2d09cb89ca9d1d098",
           "source": {
-            "export": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_double_slash_03/normalized/goblin_scout_double_slash_03_v01.png",
-            "export_sha256": "5ccadf4f789441b8a363244f5b6616f25532110dc2625c4d2ae4122c85ec0238",
-            "manifest": "art_working/daijiro_cart_motion_p1_2026_11_19/manifest.json",
-            "original": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_double_slash_03/source/goblin_scout_double_slash_03_v01.png",
-            "original_sha256": "670b078fce35bb43f78b8b42edbc74cc87acd1a20bde6ae897ce33675e68ddc1",
-            "prompt": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_double_slash_03/prompt_v01.txt",
-            "prompt_sha256": "090411c1ce6db662257ebde4e03d7a478a2e8fe3c5867004b1b8194831c7b556"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/goblin_scout_double_slash_v01.png",
+            "original_sha256": "7d8823aa331f10c0a51894a7ed0ed0972e2118b21aa02948211a81b7fc221d27",
+            "source_region": [
+              1024,
+              0,
+              1536,
+              512
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/goblin_scout_double_slash_v01.txt",
+            "prompt_sha256": "6d97fa3c9b42e31b775af780c70d87d585ebdb836421fdf55d59dba43ca432ca",
+            "reference": "art_working/copper_compass_road_p1_2026_11_18/mon_02/source/goblin_scout_idle_v01.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              512,
+              512
+            ],
+            "source_crop": [
+              61,
+              47,
+              483,
+              450
+            ],
+            "source_anchor": [
+              299.5,
+              448.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 49.25925925925926
           }
         },
         {
           "region": [
-            288,
-            0,
-            96,
-            96
+            2,
+            1241,
+            425,
+            405
           ],
-          "rgba_sha256": "71cbb7e7ca4da024823e2696b7c25f05f0a4bb790246526681803bd1070900cc",
+          "margin": [
+            145,
+            277,
+            353,
+            373
+          ],
+          "rgba_sha256": "a369dee5c29c2e3d3184987d499cbaa53ef6006d25457962f6fc28c2e23e3a69",
           "source": {
-            "export": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_double_slash_04/normalized/goblin_scout_double_slash_04_v01.png",
-            "export_sha256": "c1efd48c33ea134045272a021b61b8b6af15407d995fb9b0fd5f64e612eb2096",
-            "manifest": "art_working/daijiro_cart_motion_p1_2026_11_19/manifest.json",
-            "original": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_double_slash_04/source/goblin_scout_double_slash_04_v01.png",
-            "original_sha256": "dc0f154a8983002fb8c2e0c995a393bb80a052a268a70876dfc9601871bb79dc",
-            "prompt": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_double_slash_04/prompt_v01.txt",
-            "prompt_sha256": "a9e49b3416a6e038ad96a2eec7f2053905ae7f1a7ae66192a863a668b1d7558c"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/goblin_scout_double_slash_v01.png",
+            "original_sha256": "7d8823aa331f10c0a51894a7ed0ed0972e2118b21aa02948211a81b7fc221d27",
+            "source_region": [
+              0,
+              512,
+              512,
+              1024
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/goblin_scout_double_slash_v01.txt",
+            "prompt_sha256": "6d97fa3c9b42e31b775af780c70d87d585ebdb836421fdf55d59dba43ca432ca",
+            "reference": "art_working/copper_compass_road_p1_2026_11_18/mon_02/source/goblin_scout_idle_v01.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              512,
+              512
+            ],
+            "source_crop": [
+              51,
+              47,
+              476,
+              452
+            ],
+            "source_anchor": [
+              295.0,
+              450.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 49.50617283950618
           }
         },
         {
           "region": [
-            384,
-            0,
-            96,
-            96
+            2,
+            1654,
+            410,
+            374
           ],
-          "rgba_sha256": "91cbe13bb2055609b3de4c5199dbfc01e673719fa55e9272d92a72dad0facb09",
+          "margin": [
+            153,
+            308,
+            368,
+            404
+          ],
+          "rgba_sha256": "3c3d7368ef9f74bb1656799c92a7ef38c34118d2e59ea9562f84db4ee9e5306c",
           "source": {
-            "export": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_double_slash_05/normalized/goblin_scout_double_slash_05_v01.png",
-            "export_sha256": "c01f3896115293c808f9224701d6cdf6c4f39159120dcc5d277b5f50477a7bf4",
-            "manifest": "art_working/daijiro_cart_motion_p1_2026_11_19/manifest.json",
-            "original": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_double_slash_05/source/goblin_scout_double_slash_05_v01.png",
-            "original_sha256": "ccec6f6041e1ee5f8020441abaaec4d2775f123a34e3af185b7bfb7e355f1d52",
-            "prompt": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_double_slash_05/prompt_v01.txt",
-            "prompt_sha256": "217e087d2c27cb9dbb7d4e3c7b936cdfba3aaf5459c8c94a1a6db51d2da23597"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/goblin_scout_double_slash_v01.png",
+            "original_sha256": "7d8823aa331f10c0a51894a7ed0ed0972e2118b21aa02948211a81b7fc221d27",
+            "source_region": [
+              512,
+              512,
+              1024,
+              1024
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/goblin_scout_double_slash_v01.txt",
+            "prompt_sha256": "6d97fa3c9b42e31b775af780c70d87d585ebdb836421fdf55d59dba43ca432ca",
+            "reference": "art_working/copper_compass_road_p1_2026_11_18/mon_02/source/goblin_scout_idle_v01.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              512,
+              512
+            ],
+            "source_crop": [
+              45,
+              76,
+              455,
+              450
+            ],
+            "source_anchor": [
+              281.0,
+              448.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 45.67901234567901
           }
         },
         {
           "region": [
-            480,
-            0,
-            96,
-            96
+            2,
+            2067,
+            418,
+            407
           ],
-          "rgba_sha256": "3ce9eba172c98629a7f77bd903a20b1cfc78430c761bce3c6a78945517d3c4b1",
+          "margin": [
+            132,
+            275,
+            360,
+            371
+          ],
+          "rgba_sha256": "f5b86b4dfa99bb3bedbaf764be3d4137d7edd3a518d3ccf0e49c9b851abeb615",
           "source": {
-            "export": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_double_slash_06/normalized/goblin_scout_double_slash_06_v01.png",
-            "export_sha256": "092179ae31b464e063ab902e4567ea234b290028406854cda4bdc2c871b3e34d",
-            "manifest": "art_working/daijiro_cart_motion_p1_2026_11_19/manifest.json",
-            "original": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_double_slash_06/source/goblin_scout_double_slash_06_v01.png",
-            "original_sha256": "44f2737acca669915a295305775800b8e9eaf88ea735b6b28d8568efec1b878a",
-            "prompt": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_double_slash_06/prompt_v01.txt",
-            "prompt_sha256": "5552af1e87599628a8b691d0e64b07756e791679a3d67ed1c84845be9dfd7557"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/goblin_scout_double_slash_v01.png",
+            "original_sha256": "7d8823aa331f10c0a51894a7ed0ed0972e2118b21aa02948211a81b7fc221d27",
+            "source_region": [
+              1024,
+              512,
+              1536,
+              1024
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/goblin_scout_double_slash_v01.txt",
+            "prompt_sha256": "6d97fa3c9b42e31b775af780c70d87d585ebdb836421fdf55d59dba43ca432ca",
+            "reference": "art_working/copper_compass_road_p1_2026_11_18/mon_02/source/goblin_scout_idle_v01.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              512,
+              512
+            ],
+            "source_crop": [
+              40,
+              45,
+              458,
+              452
+            ],
+            "source_anchor": [
+              297.5,
+              450.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 49.75308641975309
           }
         }
       ],
       "pivot": [
-        48,
-        84
-      ]
+        389,
+        680
+      ],
+      "runtime": {
+        "frame": [
+          778,
+          778
+        ],
+        "count": 6,
+        "scale": 0.1234567901234568,
+        "offset": [
+          0.0,
+          -291.0
+        ],
+        "regions": [
+          {
+            "region": [
+              2,
+              2,
+              410,
+              409
+            ],
+            "margin": [
+              138,
+              273,
+              368,
+              369
+            ]
+          },
+          {
+            "region": [
+              2,
+              415,
+              442,
+              405
+            ],
+            "margin": [
+              120,
+              277,
+              336,
+              373
+            ]
+          },
+          {
+            "region": [
+              2,
+              828,
+              422,
+              403
+            ],
+            "margin": [
+              150,
+              279,
+              356,
+              375
+            ]
+          },
+          {
+            "region": [
+              2,
+              1241,
+              425,
+              405
+            ],
+            "margin": [
+              145,
+              277,
+              353,
+              373
+            ]
+          },
+          {
+            "region": [
+              2,
+              1654,
+              410,
+              374
+            ],
+            "margin": [
+              153,
+              308,
+              368,
+              404
+            ]
+          },
+          {
+            "region": [
+              2,
+              2067,
+              418,
+              407
+            ],
+            "margin": [
+              132,
+              275,
+              360,
+              371
+            ]
+          }
+        ]
+      },
+      "technical_checks_passed": true,
+      "source_resolution_upgrade": true,
+      "source": {
+        "kind": "ai_generated",
+        "export": "art_working/animation_upgrade_2026_11_20/candidates/enemies/animations/goblin_scout_double_slash_sheet.png",
+        "tool": "image_gen built-in",
+        "rights": "Project AI-generated content; platform terms apply"
+      },
+      "review": {
+        "date": "2026-11-20",
+        "by": "Codex",
+        "status": "approved for integration after technical and native-scale review",
+        "strict_shared_pixel_grid": false,
+        "per_frame_resampling": false,
+        "authorization": "User requested implementation of currently used animation sprites on 2026-11-20; selection delegated to implementing agent"
+      },
+      "rgba8_mib": 4.2159576416015625
     },
     {
       "id": "MON-02",
@@ -5620,71 +8139,240 @@
       "kind": "animation",
       "status": "approved",
       "size": [
-        288,
-        96
+        605,
+        1578
       ],
-      "sha256": "b1b8db405a05c8266af1c0355f82399b74a28d68a1520ad61b848fd1ba75cc15",
-      "rgba_sha256": "c6e71728dfa57e5950fb7a8c9daa47c4d2cb683a4e2a5092f0f62dbf9df85e6f",
+      "sha256": "8afe89d48b8c8f461f8415bb6bc3580084b03cba34e1341d677ba3d8b45de5ed",
+      "rgba_sha256": "8973268cf780c096a1909e7cf3599ad0142f571068713e23c993ceea8be34867",
       "frames": [
         {
           "region": [
-            0,
-            0,
-            96,
-            96
+            2,
+            2,
+            589,
+            516
           ],
-          "rgba_sha256": "15ec549a50b6746eb19029371566ede161e2fe7044e65f31451067c8b4c576ef",
+          "margin": [
+            173,
+            338,
+            385,
+            458
+          ],
+          "rgba_sha256": "bfed5254564db75508994e702255b7758de8213cfe366e93fa886ff4b014620a",
           "source": {
-            "export": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_retreat_01/normalized/goblin_scout_retreat_01_v01.png",
-            "export_sha256": "fe65bb69da5f7489cce3f31f265d78cc1cbc0e7a3e49b2d44052873012f5072f",
-            "manifest": "art_working/daijiro_cart_motion_p1_2026_11_19/manifest.json",
-            "original": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_retreat_01/source/goblin_scout_retreat_01_v01.png",
-            "original_sha256": "ee58591d5dfa786d85276b2a7645d215ff8c5bd3d049c44fabaefe422c3a3dec",
-            "prompt": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_retreat_01/prompt_v01.txt",
-            "prompt_sha256": "ce4bf6981ae1311d9193b3ce30927e2c3103a354ad938dd9072f0612b364fd95"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/goblin_scout_retreat_v01.png",
+            "original_sha256": "f58f719b193cc5b398d54c52574797d4298487d7105ef444f7ce0189b09f386c",
+            "source_region": [
+              0,
+              0,
+              724,
+              724
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/goblin_scout_retreat_v01.txt",
+            "prompt_sha256": "b1f2d964ff54f8bf225cc7b8a9348ee749fc236930cca5b52db065b42d29638f",
+            "reference": "art_working/copper_compass_road_p1_2026_11_18/mon_02/source/goblin_scout_idle_v01.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              724,
+              724
+            ],
+            "source_crop": [
+              65,
+              119,
+              654,
+              635
+            ],
+            "source_anchor": [
+              379.0,
+              633.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 50.493096646942796
           }
         },
         {
           "region": [
-            96,
-            0,
-            96,
-            96
+            2,
+            528,
+            575,
+            522
           ],
-          "rgba_sha256": "7828e10e57e0373a02c6fc249c3c4a6ec59b690af24f01d85d1d32da81457074",
+          "margin": [
+            182,
+            261,
+            399,
+            452
+          ],
+          "rgba_sha256": "29e164114b83dd22e3f3ceeacb29410e6ae8f1155ff166aff07b089672c3325f",
           "source": {
-            "export": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_retreat_02/normalized/goblin_scout_retreat_02_v01.png",
-            "export_sha256": "dbf7048534ea215feded1957122cd925ccc44ce8649e95d70d5908ffb5cfbd32",
-            "manifest": "art_working/daijiro_cart_motion_p1_2026_11_19/manifest.json",
-            "original": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_retreat_02/source/goblin_scout_retreat_02_v01.png",
-            "original_sha256": "e5ae02bd947162d32b6a7a4da884c0b0a69c6c939a131dc2c19f61a0e9f40bf5",
-            "prompt": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_retreat_02/prompt_v01.txt",
-            "prompt_sha256": "265d1a34ba82764ccc3ea27ca39a45b958e92275b141cf10b3f8146b560d7c16"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/goblin_scout_retreat_v01.png",
+            "original_sha256": "f58f719b193cc5b398d54c52574797d4298487d7105ef444f7ce0189b09f386c",
+            "source_region": [
+              724,
+              0,
+              1448,
+              724
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/goblin_scout_retreat_v01.txt",
+            "prompt_sha256": "b1f2d964ff54f8bf225cc7b8a9348ee749fc236930cca5b52db065b42d29638f",
+            "reference": "art_working/copper_compass_road_p1_2026_11_18/mon_02/source/goblin_scout_idle_v01.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              724,
+              724
+            ],
+            "source_crop": [
+              87,
+              85,
+              662,
+              607
+            ],
+            "source_anchor": [
+              392.5,
+              605.0
+            ],
+            "air_lift_logical": 7.0,
+            "solid_height_logical": 51.08481262327416
           }
         },
         {
           "region": [
-            192,
-            0,
-            96,
-            96
+            2,
+            1054,
+            601,
+            511
           ],
-          "rgba_sha256": "dffae2f90ce5fb11b7193e86af700a8e83998faf0b4116951ef04654bf46ae63",
+          "margin": [
+            136,
+            343,
+            373,
+            463
+          ],
+          "rgba_sha256": "51d885cb47a8233d9fda843127eab157a2c4f9a4a58afaeaab9ac542731ac40b",
           "source": {
-            "export": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_retreat_03/normalized/goblin_scout_retreat_03_v01.png",
-            "export_sha256": "5b69dab58e456cb3c748377fe30a2edce15bf1ca0b68db18e71895fd4c2aba4f",
-            "manifest": "art_working/daijiro_cart_motion_p1_2026_11_19/manifest.json",
-            "original": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_retreat_03/source/goblin_scout_retreat_03_v01.png",
-            "original_sha256": "c687b59a832e1d33661c1d5f8dc46ec496a7f5bdbd619793d099ba205997c0e1",
-            "prompt": "art_working/daijiro_cart_motion_p1_2026_11_19/mon_02_retreat_03/prompt_v01.txt",
-            "prompt_sha256": "999a96264507348d326911694436438c8af842e309951e7aa0f368d6afacc209"
+            "kind": "ai_generated",
+            "tool": "image_gen built-in",
+            "original": "art_working/animation_upgrade_2026_11_20/source/goblin_scout_retreat_v01.png",
+            "original_sha256": "f58f719b193cc5b398d54c52574797d4298487d7105ef444f7ce0189b09f386c",
+            "source_region": [
+              1448,
+              0,
+              2172,
+              724
+            ],
+            "prompt": "art_working/animation_upgrade_2026_11_20/prompts/goblin_scout_retreat_v01.txt",
+            "prompt_sha256": "b1f2d964ff54f8bf225cc7b8a9348ee749fc236930cca5b52db065b42d29638f",
+            "reference": "art_working/copper_compass_road_p1_2026_11_18/mon_02/source/goblin_scout_idle_v01.png",
+            "rights": "AI-generated from project-owned AI reference; platform terms apply",
+            "processing": "native RGB; discard alpha <224 glow and disconnected neighbour fragments; trim and atlas pack; no resampling"
+          },
+          "registration": {
+            "source_size": [
+              724,
+              724
+            ],
+            "source_crop": [
+              64,
+              124,
+              665,
+              635
+            ],
+            "source_anchor": [
+              414.5,
+              633.0
+            ],
+            "air_lift_logical": 0.0,
+            "solid_height_logical": 50.0
           }
         }
       ],
       "pivot": [
-        48,
-        84
-      ]
+        487,
+        852
+      ],
+      "runtime": {
+        "frame": [
+          974,
+          974
+        ],
+        "count": 3,
+        "scale": 0.09861932938856015,
+        "offset": [
+          0.0,
+          -365.0
+        ],
+        "regions": [
+          {
+            "region": [
+              2,
+              2,
+              589,
+              516
+            ],
+            "margin": [
+              173,
+              338,
+              385,
+              458
+            ]
+          },
+          {
+            "region": [
+              2,
+              528,
+              575,
+              522
+            ],
+            "margin": [
+              182,
+              261,
+              399,
+              452
+            ]
+          },
+          {
+            "region": [
+              2,
+              1054,
+              601,
+              511
+            ],
+            "margin": [
+              136,
+              343,
+              373,
+              463
+            ]
+          }
+        ]
+      },
+      "technical_checks_passed": true,
+      "source_resolution_upgrade": true,
+      "source": {
+        "kind": "ai_generated",
+        "export": "art_working/animation_upgrade_2026_11_20/candidates/enemies/animations/goblin_scout_retreat_sheet.png",
+        "tool": "image_gen built-in",
+        "rights": "Project AI-generated content; platform terms apply"
+      },
+      "review": {
+        "date": "2026-11-20",
+        "by": "Codex",
+        "status": "approved for integration after technical and native-scale review",
+        "strict_shared_pixel_grid": false,
+        "per_frame_resampling": false,
+        "authorization": "User requested implementation of currently used animation sprites on 2026-11-20; selection delegated to implementing agent"
+      },
+      "rgba8_mib": 3.6418533325195312
     },
     {
       "id": "MON-03",
@@ -7145,6 +9833,281 @@
         "prompt": "art_working/winds_edge_summon_motion_p0_p1_2026_11_19/warden_summon/prompt_v01.txt",
         "prompt_sha256": "5b3d79b389601b3b8148aa8761645060611e60ed38cef18a33ee97624843491e"
       }
+    },
+    {
+      "id": "UI-SETTINGS-GEAR-STEEL",
+      "path": "ui/icons/settings_gear_steel_icon.png",
+      "kind": "texture",
+      "status": "approved",
+      "size": [
+        24,
+        24
+      ],
+      "sha256": "dc2ac46e2f7a74baa48d16f64db41068bd8093a627387e7d053f83449f3cd801",
+      "rgba_sha256": "297971b5a0bdfc8c16add9efa9dc539499f56025c84e7f80c0d8daa5e0a25a52",
+      "priority": "P1",
+      "source": {
+        "export": "art_working/ui_gameplay_icons_2026_11_21/normalized/settings_gear_steel_icon.png",
+        "export_sha256": "dc2ac46e2f7a74baa48d16f64db41068bd8093a627387e7d053f83449f3cd801",
+        "original": "art_working/ui_gameplay_icons_2026_11_21/build_settings_gear.py",
+        "original_sha256": "4c9ea2cc80410adc9ecee03649cfe02171bfe1541de6bda39bdd2894908beedd",
+        "prompt": "art_working/ui_gameplay_icons_2026_11_21/brief.md",
+        "prompt_sha256": "3471d94034debcb91f0415bee624115ed2e41dc468c46d2830c860e7e9d70dc5"
+      },
+      "pivot": [
+        12,
+        12
+      ]
+    },
+    {
+      "id": "UI-MERCHANT",
+      "path": "ui/icons/merchant_icon.png",
+      "kind": "texture",
+      "status": "approved",
+      "size": [
+        24,
+        24
+      ],
+      "sha256": "befea7679437df8e34f04b79396c11ff28565a02cd4c5c09f0ed97ad9b82d9be",
+      "rgba_sha256": "b96fee16c3a736a8566884d4cbf124f9ddeaf1e69ccd4b9d16c3d702d748e5b5",
+      "priority": "P1",
+      "source": {
+        "export": "art_working/ui_gameplay_icons_2026_11_21/normalized/merchant_icon.png",
+        "export_sha256": "befea7679437df8e34f04b79396c11ff28565a02cd4c5c09f0ed97ad9b82d9be",
+        "original": "art_working/ui_gameplay_icons_2026_11_21/masters/merchant_icon.svg",
+        "original_sha256": "17354103710164def3c55e6e9eb011b1802391788994950298369b9eb5144334",
+        "prompt": "art_working/ui_gameplay_icons_2026_11_21/brief.md",
+        "prompt_sha256": "3471d94034debcb91f0415bee624115ed2e41dc468c46d2830c860e7e9d70dc5"
+      },
+      "pivot": [
+        12,
+        12
+      ]
+    },
+    {
+      "id": "UI-SKIP-CUTSCENE",
+      "path": "ui/icons/skip_cutscene_icon.png",
+      "kind": "texture",
+      "status": "approved",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "c01f403d012560ef60fcd84a5cfc452521a4a2304a7d411e0cb5a7d2ce1125ea",
+      "rgba_sha256": "10eed9140103ea9fa6e104bb05fcaf2419aadfee2e0bb5b2483e9ace7b44b3c3",
+      "priority": "P1",
+      "source": {
+        "export": "art_working/ui_gameplay_icons_2026_11_21/normalized/skip_cutscene_icon.png",
+        "export_sha256": "c01f403d012560ef60fcd84a5cfc452521a4a2304a7d411e0cb5a7d2ce1125ea",
+        "original": "art_working/ui_gameplay_icons_2026_11_21/masters/skip_cutscene_icon.svg",
+        "original_sha256": "5ba9f5926024700641ef860a880b97d04cebfd3d1723afe7280f9c7a9a2383b6",
+        "prompt": "art_working/ui_gameplay_icons_2026_11_21/brief.md",
+        "prompt_sha256": "3471d94034debcb91f0415bee624115ed2e41dc468c46d2830c860e7e9d70dc5"
+      },
+      "pivot": [
+        8,
+        8
+      ]
+    },
+    {
+      "id": "UI-SLOT-HELMET",
+      "path": "ui/icons/slot_helmet_icon.png",
+      "kind": "texture",
+      "status": "approved",
+      "size": [
+        20,
+        20
+      ],
+      "sha256": "de8add22ffb7bfa6e56b495902e5a6ba0101680a251852056ad47463366b5be2",
+      "rgba_sha256": "d2995181a2847d8645513357f9bed3a644c8bd2147ea35ba61c5a4e0d5d3b4c3",
+      "priority": "P1",
+      "source": {
+        "export": "art_working/ui_gameplay_icons_2026_11_21/normalized/slot_helmet_icon.png",
+        "export_sha256": "de8add22ffb7bfa6e56b495902e5a6ba0101680a251852056ad47463366b5be2",
+        "original": "art_working/ui_gameplay_icons_2026_11_21/masters/slot_helmet_icon.svg",
+        "original_sha256": "8bb224000d216f32d1c057f32081bcbb5b4bc8703fab7c213f26b9b935c3a314",
+        "prompt": "art_working/ui_gameplay_icons_2026_11_21/brief.md",
+        "prompt_sha256": "3471d94034debcb91f0415bee624115ed2e41dc468c46d2830c860e7e9d70dc5"
+      },
+      "pivot": [
+        10,
+        10
+      ]
+    },
+    {
+      "id": "UI-SLOT-ARMOR",
+      "path": "ui/icons/slot_armor_icon.png",
+      "kind": "texture",
+      "status": "approved",
+      "size": [
+        20,
+        20
+      ],
+      "sha256": "391ecbec11dd316c2a1bf5f1aa562eb5d31c882a755e939265820df6f15c55b8",
+      "rgba_sha256": "aa7c890c4acc93ed1b78b875a78c80f79e7137cdac0a581eb3d5606cbe699156",
+      "priority": "P1",
+      "source": {
+        "export": "art_working/ui_gameplay_icons_2026_11_21/normalized/slot_armor_icon.png",
+        "export_sha256": "391ecbec11dd316c2a1bf5f1aa562eb5d31c882a755e939265820df6f15c55b8",
+        "original": "art_working/ui_gameplay_icons_2026_11_21/masters/slot_armor_icon.svg",
+        "original_sha256": "358c7702752d61373d4afad43758d88be4f80a7220ae9af176ea8c34865d5cec",
+        "prompt": "art_working/ui_gameplay_icons_2026_11_21/brief.md",
+        "prompt_sha256": "3471d94034debcb91f0415bee624115ed2e41dc468c46d2830c860e7e9d70dc5"
+      },
+      "pivot": [
+        10,
+        10
+      ]
+    },
+    {
+      "id": "UI-SLOT-BOOTS",
+      "path": "ui/icons/slot_boots_icon.png",
+      "kind": "texture",
+      "status": "approved",
+      "size": [
+        20,
+        20
+      ],
+      "sha256": "0ff7d6d58eb35eb4a03999a88268525bff818d1a9b5e13999cf93ab4c42a8be6",
+      "rgba_sha256": "b168e2343217a1d080c32398c58a6afcedb52488c816e0f62d7f60d4bead06e2",
+      "priority": "P1",
+      "source": {
+        "export": "art_working/ui_gameplay_icons_2026_11_21/normalized/slot_boots_icon.png",
+        "export_sha256": "0ff7d6d58eb35eb4a03999a88268525bff818d1a9b5e13999cf93ab4c42a8be6",
+        "original": "art_working/ui_gameplay_icons_2026_11_21/masters/slot_boots_icon.svg",
+        "original_sha256": "354b9bc244ef06cb43bba47105a9e6ae69eedf7a5d943334f0a7e41b13a50b5e",
+        "prompt": "art_working/ui_gameplay_icons_2026_11_21/brief.md",
+        "prompt_sha256": "3471d94034debcb91f0415bee624115ed2e41dc468c46d2830c860e7e9d70dc5"
+      },
+      "pivot": [
+        10,
+        10
+      ]
+    },
+    {
+      "id": "UI-SLOT-SHOULDERS",
+      "path": "ui/icons/slot_shoulders_icon.png",
+      "kind": "texture",
+      "status": "approved",
+      "size": [
+        20,
+        20
+      ],
+      "sha256": "ffe42dee9cd1db277fa0e893b9b23e4d3a6dc402b7dd8f42b542308734fface3",
+      "rgba_sha256": "9659e6a4f45ea17aec2a0e7429c17c197efad39e944a71ff81e19db62538cf79",
+      "priority": "P1",
+      "source": {
+        "export": "art_working/ui_gameplay_icons_2026_11_21/normalized/slot_shoulders_icon.png",
+        "export_sha256": "ffe42dee9cd1db277fa0e893b9b23e4d3a6dc402b7dd8f42b542308734fface3",
+        "original": "art_working/ui_gameplay_icons_2026_11_21/masters/slot_shoulders_icon.svg",
+        "original_sha256": "c35b47b7b7153c6188651cc377b22106bbc50dae4027aa9014fd7bf7838e03c6",
+        "prompt": "art_working/ui_gameplay_icons_2026_11_21/brief.md",
+        "prompt_sha256": "3471d94034debcb91f0415bee624115ed2e41dc468c46d2830c860e7e9d70dc5"
+      },
+      "pivot": [
+        10,
+        10
+      ]
+    },
+    {
+      "id": "UI-SLOT-FAMILIAR",
+      "path": "ui/icons/slot_familiar_icon.png",
+      "kind": "texture",
+      "status": "approved",
+      "size": [
+        20,
+        20
+      ],
+      "sha256": "d2cf3820a16eb923e8f664ced664dfb189722683caa55a441a702671edfe260c",
+      "rgba_sha256": "4dc094d4a48541c7fb49b95d5ee8c88d4fcd9c82ecacb477a6bb7f2525d3df2e",
+      "priority": "P1",
+      "source": {
+        "export": "art_working/ui_gameplay_icons_2026_11_21/normalized/slot_familiar_icon.png",
+        "export_sha256": "d2cf3820a16eb923e8f664ced664dfb189722683caa55a441a702671edfe260c",
+        "original": "art_working/ui_gameplay_icons_2026_11_21/masters/slot_familiar_icon.svg",
+        "original_sha256": "a3a44bcfa51ed893df93193438910b19d3f19b842e7f8b24b83b67b7cfcf9d9b",
+        "prompt": "art_working/ui_gameplay_icons_2026_11_21/brief.md",
+        "prompt_sha256": "3471d94034debcb91f0415bee624115ed2e41dc468c46d2830c860e7e9d70dc5"
+      },
+      "pivot": [
+        10,
+        10
+      ]
+    },
+    {
+      "id": "UI-SLOT-AMULET",
+      "path": "ui/icons/slot_amulet_icon.png",
+      "kind": "texture",
+      "status": "approved",
+      "size": [
+        20,
+        20
+      ],
+      "sha256": "52cf17f134f11fa6d869254f099b24477121ce63641d813c00570a73d8eadab1",
+      "rgba_sha256": "5516fe7fbeee40f39b47bb65a4889e12d785ccd3438d780d0f3ee7fe6da03f1a",
+      "priority": "P1",
+      "source": {
+        "export": "art_working/ui_gameplay_icons_2026_11_21/normalized/slot_amulet_icon.png",
+        "export_sha256": "52cf17f134f11fa6d869254f099b24477121ce63641d813c00570a73d8eadab1",
+        "original": "art_working/ui_gameplay_icons_2026_11_21/masters/slot_amulet_icon.svg",
+        "original_sha256": "f077e3cd4584423bbd3e463db06c256f9bc472c25a9720e8fa8b579b02abe728",
+        "prompt": "art_working/ui_gameplay_icons_2026_11_21/brief.md",
+        "prompt_sha256": "3471d94034debcb91f0415bee624115ed2e41dc468c46d2830c860e7e9d70dc5"
+      },
+      "pivot": [
+        10,
+        10
+      ]
+    },
+    {
+      "id": "UI-SLOT-RING",
+      "path": "ui/icons/slot_ring_icon.png",
+      "kind": "texture",
+      "status": "approved",
+      "size": [
+        20,
+        20
+      ],
+      "sha256": "06429ddcb3c75c49c3c50c0acb44453e05f6d63897dc16fcc1d47a99f8b8b0d4",
+      "rgba_sha256": "725113af8be01a614005f7b2594417b408d15946719a3480e8b608932c3f7849",
+      "priority": "P1",
+      "source": {
+        "export": "art_working/ui_gameplay_icons_2026_11_21/normalized/slot_ring_icon.png",
+        "export_sha256": "06429ddcb3c75c49c3c50c0acb44453e05f6d63897dc16fcc1d47a99f8b8b0d4",
+        "original": "art_working/ui_gameplay_icons_2026_11_21/masters/slot_ring_icon.svg",
+        "original_sha256": "ace5e04233c190f06f87069f155fe25da0cf294d0af4103ecc900da71a965bfe",
+        "prompt": "art_working/ui_gameplay_icons_2026_11_21/brief.md",
+        "prompt_sha256": "3471d94034debcb91f0415bee624115ed2e41dc468c46d2830c860e7e9d70dc5"
+      },
+      "pivot": [
+        10,
+        10
+      ]
+    },
+    {
+      "id": "UI-CHARACTERS",
+      "path": "ui/icons/characters_icon.png",
+      "kind": "texture",
+      "status": "approved",
+      "size": [
+        24,
+        24
+      ],
+      "sha256": "2723d88c05f6a51c32845479acbb8682fec720eb487e7c1ec49f631c13e92576",
+      "rgba_sha256": "957771461cf4f2dac659ea8957dad1891e2d8ba7877523fb1d9b269ce7c66838",
+      "priority": "P1",
+      "source": {
+        "export": "art_working/ui_gameplay_icons_2026_11_21/normalized/characters_icon.png",
+        "export_sha256": "2723d88c05f6a51c32845479acbb8682fec720eb487e7c1ec49f631c13e92576",
+        "original": "art_working/ui_gameplay_icons_2026_11_21/masters/characters_icon.svg",
+        "original_sha256": "a11fda15f01ffc077d3e115389dfd35fb6fcdf6590d2b47f68d808ffeeda6ec1",
+        "prompt": "art_working/ui_gameplay_icons_2026_11_21/brief.md",
+        "prompt_sha256": "3471d94034debcb91f0415bee624115ed2e41dc468c46d2830c860e7e9d70dc5"
+      },
+      "pivot": [
+        12,
+        12
+      ]
     }
   ]
 }

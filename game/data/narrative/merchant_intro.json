@@ -1,0 +1,6 @@
+[
+  {"id":"DIA_MERCHANT_001","speaker":"Дайдзиро","text":"Назад! У меня в коробке очень опасные товары!","shot":"daijiro_cart","once":true},
+  {"id":"DIA_MERCHANT_004","speaker":"Харуто","text":"Эй! Зелёный! На меня посмотри!","shot":"daijiro_cart","once":true},
+  {"id":"DIA_MERCHANT_005","speaker":"Дайдзиро","text":"Прекрасный план, молодой человек. Есть продолжение?","shot":"daijiro_cart","once":true},
+  {"id":"DIA_MERCHANT_006","speaker":"Харуто","text":"Пока только эта часть!","shot":"daijiro_cart","once":true,"destination":"world","commands":[{"type":"set_world_flag","key":"daijiro_intervened","value":true}]}
+]

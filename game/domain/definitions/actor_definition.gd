@@ -21,5 +21,8 @@ extends Resource
 @export var attack_multiplier: float = 1.0
 @export var vulnerability_multiplier: float = 2.0
 @export var attack_cooldown_ticks: int = 24
+## Замах героя: контакт наступает через столько тиков после начала атаки.
+@export var attack_startup_ticks: int = 18
 @export var dodge_duration_ticks: int = 24
 @export var dodge_cooldown_ticks: int = 42
+@export var abilities: Array[AbilityDefinition] = []

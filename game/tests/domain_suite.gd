@@ -4,6 +4,7 @@ const ACTOR_PATHS: Array[String] = [
 	"res://data/actors/haruto.tres",
 	"res://data/actors/moss_slime.tres",
 	"res://data/actors/goblin_scout.tres",
+	"res://data/actors/goblin_trial.tres",
 ]
 
 class TestContext:
@@ -13,6 +14,16 @@ class TestContext:
 
 	func check(condition: bool, message: String) -> void:
 		checks.append({"passed": condition, "message": message})
+
+static func prepare_pending_choices(session: GameSession) -> void:
+	for entry: Dictionary in session.pending_battle_result.get("items", []):
+		var entry_id: String = String(entry.get("entry_id", ""))
+		if not session.pending_battle_result.get("choices", {}).has(entry_id):
+			session.choose_battle_reward(entry_id, "store")
+
+static func claim_pending(session: GameSession) -> bool:
+	prepare_pending_choices(session)
+	return session.claim_battle_result(String(session.pending_battle_result.get("result_id", "")))
 
 class SignalCounter:
 	extends RefCounted
@@ -30,6 +41,7 @@ func run() -> Array[Dictionary]:
 	results.append(_run_case("hp_damage_heal_and_clamp", _test_hp_boundaries))
 	results.append(_run_case("death_at_zero_and_only_once", _test_death_once))
 	results.append(_run_case("xp_remainder_levels_and_upgrades", _test_xp_and_upgrades))
+	results.append(_run_case("character_power_and_upgrade_preview", _test_character_power_and_upgrade_preview))
 	results.append(_run_case("damage_formula_and_minimum", _test_damage_formula))
 	return results
 
@@ -61,7 +73,7 @@ func _test_actor_definitions(context: TestContext) -> void:
 		context.check(hero.strength == 3, "Haruto starts with 3 strength")
 		context.check(hero.defense == 2, "Haruto starts with 2 defense")
 		context.check(hero.mana == 1, "Haruto starts with 1 mana")
-		context.check(hero.xp_thresholds == [4, 8, 12], "Haruto uses the blockout XP table")
+		context.check(hero.xp_thresholds == [4, 8, 12, 18], "Haruto uses the slice XP table up to narrative level 5")
 
 func _test_item_contract(context: TestContext) -> void:
 	var modifier := StatModifierDefinition.new()
@@ -94,6 +106,19 @@ func _test_runtime_independence(context: TestContext) -> void:
 	context.check(first.definition.max_hp == 12, "Upgrade does not mutate base max HP")
 	first.choose_upgrade("strength")
 	context.check(second.strength == 3 and first.definition.strength == 3, "Other state and base strength stay unchanged")
+
+func _test_character_power_and_upgrade_preview(context: TestContext) -> void:
+	var state := _hero()
+	context.check(state.power_rating() == 34, "Power includes all four effective stats")
+	state.take_damage(1)
+	context.check(state.power_rating() == 34, "Power is independent of current HP")
+	state.set_void_traces(3)
+	var before: int = state.max_hp
+	var gains: Dictionary[String, int] = state.upgrade_gains()
+	context.check(gains["max_hp"] == 3 and state.max_hp == before, "HP preview includes trace rounding without changing the character")
+	state.gain_xp(4)
+	state.choose_upgrade("max_hp")
+	context.check(state.max_hp - before == gains["max_hp"], "Applying the choice matches the displayed gain")
 
 func _test_hp_boundaries(context: TestContext) -> void:
 	var state := _hero()

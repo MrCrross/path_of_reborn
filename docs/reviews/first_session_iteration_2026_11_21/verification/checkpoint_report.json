@@ -1,0 +1,77 @@
+{
+	"captures": [
+		{
+			"error": 0,
+			"label": "14_checkpoint_failed",
+			"size": [
+				360,
+				640
+			]
+		},
+		{
+			"error": 0,
+			"label": "15_checkpoint_reopened",
+			"size": [
+				360,
+				640
+			]
+		}
+	],
+	"checks": [
+		{
+			"message": "Creation failure blocker is ready",
+			"ok": true
+		},
+		{
+			"message": "Creation failure exposes retry",
+			"ok": true
+		},
+		{
+			"message": "Capture 14_checkpoint_failed",
+			"ok": true
+		},
+		{
+			"message": "Reopening commits exactly one pending point",
+			"ok": true
+		},
+		{
+			"message": "Reopened creation reaches the disk once",
+			"ok": true
+		},
+		{
+			"message": "Capture 15_checkpoint_reopened",
+			"ok": true
+		},
+		{
+			"message": "Deletion failure blocker is ready",
+			"ok": true
+		},
+		{
+			"message": "Delete opens the real confirmation dialog",
+			"ok": true
+		},
+		{
+			"message": "Failed deletion preserves the point",
+			"ok": true
+		},
+		{
+			"message": "Delete failure focuses Retry after modal closes",
+			"ok": true
+		},
+		{
+			"message": "Failed deletion preserves the disk point",
+			"ok": true
+		},
+		{
+			"message": "Delete retry removes the point once",
+			"ok": true
+		},
+		{
+			"message": "Checkpoint flow preserves the current save schema",
+			"ok": true
+		}
+	],
+	"checks_count": 13,
+	"failed": 0,
+	"windows": []
+}

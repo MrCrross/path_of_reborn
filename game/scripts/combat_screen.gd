@@ -1,143 +1,561 @@
 extends Control
 
 signal navigate_requested(destination: String)
+signal claim_requested(result_id: String)
+
+const VICTORY_FONT_SIZE := 24
+const VICTORY_REACTION_SECONDS := 0.65
+const DEFEAT_TO_CHECKPOINT_SECONDS := 0.8
 
 var session: GameSession
 var resolver: CombatResolver
-var last_event: String = ""
 
-@onready var enemy_name: Label = %EnemyName
-@onready var hero_hp_text: Label = %HeroHpText
-@onready var hero_hp_bar: ProgressBar = %HeroHpBar
-@onready var enemy_hp_text: Label = %EnemyHpText
-@onready var enemy_hp_bar: ProgressBar = %EnemyHpBar
-@onready var hero_marker: Label = %HeroMarker
-@onready var enemy_marker: Label = %EnemyMarker
-@onready var phase_label: Label = %PhaseLabel
+@onready var arena: Control = %Arena
+@onready var telegraph: Sprite2D = %Telegraph
+@onready var phase_cue: Label = %PhaseCue
+@onready var hero_sprite: AnimatedSprite2D = %HeroSprite
+@onready var enemy_sprite: AnimatedSprite2D = %EnemySprite
 @onready var hint_label: Label = %HintLabel
-@onready var result_label: Label = %ResultLabel
+@onready var victory_label: Label = %VictoryLabel
 @onready var actions: HBoxContainer = %Actions
 @onready var attack_button: Button = %AttackButton
+@onready var attack_cooldown: ProgressBar = %AttackCooldown
+@onready var ability_button: Button = %AbilityButton
+@onready var ability_cooldown: ProgressBar = %AbilityCooldown
 @onready var dodge_button: Button = %DodgeButton
-@onready var retry_button: Button = %RetryButton
-@onready var continue_button: Button = %ContinueButton
+@onready var dodge_cooldown: ProgressBar = %DodgeCooldown
+@onready var pause_button: Button = %PauseButton
+@onready var pause_layer: Control = %PauseLayer
+@onready var resume_button: Button = %ResumeButton
+@onready var forfeit_button: Button = %ForfeitButton
+@onready var format_switch: Button = %FormatSwitch
+@onready var speed_switch: Button = %SpeedSwitch
+@onready var format_label: Label = %FormatLabel
+@onready var result_panel: CombatResultView = %ResultPanel
+@onready var result_rows: VBoxContainer = result_panel.rows
+@onready var claim_button: Button = result_panel.claim_button
+@onready var details_layer: Control = %DetailsLayer
+@onready var details_view: ItemDetailsView = %DetailsView
+@onready var detail_close: Button = details_view.close_button
+@onready var equipment_strip: EquipmentStrip = %EquipmentStrip
+
+var hero_health: ActorHealthDisplay
+var enemy_health: ActorHealthDisplay
+var weapon_sprite: Sprite2D
+var arena_presenter: CombatArenaPresenter
+
+var _intro_active: bool = false
+var _feedback_ticks: int = 0
+var _pause_open: bool = false
+var _navigating: bool = false
+## Результат ждёт игрока: ни auto-dismiss, ни auto-world. Каждая находка
+## получает выбор «В рюкзак»/«Надеть», затем выполняется один атомарный claim.
+var _result_visible: bool = false
+var _pointer_candidate: Dictionary = {}
+var _pointer_down: bool = false
+var _pointer_down_began_at_result: bool = false
+var _details_open: bool = false
+var _focus_guard := ModalFocus.new()
 
 func configure(game_session: GameSession) -> void:
 	session = game_session
+
+func handle_back() -> bool:
+	if _details_open:
+		_close_details()
+		return true
+	if _result_visible:
+		# Из несобранного результата Back не уводит: состояние не теряется.
+		return true
+	# Android Back в бою управляет только паузой: открыть или закрыть.
+	if resolver == null or resolver.is_finished:
+		return false
+	_set_pause(not _pause_open)
+	return true
 
 func _ready() -> void:
 	if session == null:
 		session = GameSession.new()
 		session.select_encounter("moss_slime")
-	_set_resolver(session.start_combat(session.current_enemy_id))
-	attack_button.grab_focus()
+	arena_presenter = CombatArenaPresenter.new()
+	arena_presenter.name = "ArenaPresenter"
+	add_child(arena_presenter)
+	arena_presenter.configure(session, arena, hero_sprite, enemy_sprite, telegraph, phase_cue)
+	arena_presenter.intro_finished.connect(_finish_intro)
+	hero_health = arena_presenter.hero_health
+	enemy_health = arena_presenter.enemy_health
+	weapon_sprite = arena_presenter.weapon_sprite
+	details_view.configure(session)
+	details_view.close_requested.connect(_close_details)
+	result_panel.claim_requested.connect(_claim_result)
+	result_panel.choice_requested.connect(_on_reward_choice)
+	result_panel.item_requested.connect(_open_details)
+	equipment_strip.configure(session, "combat")
+	UiIcons.apply(attack_button, "attack", "Атака")
+	UiIcons.apply(ability_button, "attack", "Точный удар")
+	UiIcons.apply(dodge_button, "dodge", "Уклонение")
+	# Короткая подпись режима поверх яркого фона арены: тёмная компактная
+	# подложка, чтобы текст не сливался со светлой листвой.
+	var format_box := AppTheme.flat(Color("0e1811e8"), Color("2f4433"), 1, 2)
+	format_box.content_margin_left = 3
+	format_box.content_margin_right = 3
+	format_label.add_theme_stylebox_override("normal", format_box)
+	_refresh_format_ui()
+	if session.has_pending_battle_result():
+		# Восстановление после relaunch: тот же pending-result, без нового
+		# resolver'а, вступления и боя; RNG не перебрасывается.
+		_show_restored_result()
+		return
+	var next_resolver: CombatResolver = session.start_combat(session.current_enemy_id)
+	if next_resolver == null:
+		_show_start_failure()
+		return
+	_set_resolver(next_resolver)
+	arena_presenter.layout()
+	_start_intro()
 
 func _physics_process(_delta: float) -> void:
-	if resolver != null:
-		resolver.advance_ticks(1)
-		_refresh()
+	_update_marker_positions()
+	if resolver != null and not resolver.is_finished and not _intro_active and not _pause_open:
+		var ticks: int = int(session.active_encounter_context.get("auto_speed", 1)) if _current_combat_format() == GameSession.COMBAT_FORMAT_AUTO else 1
+		resolver.advance_ticks(ticks)
+		_refresh_cooldowns()
+		if _feedback_ticks > 0:
+			_feedback_ticks -= 1
+			if _feedback_ticks == 0:
+				hint_label.hide()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("primary"):
-		_on_attack_pressed()
+	if not is_inside_tree() or event.is_action_pressed("ui_cancel"):
+		return
+	if event is InputEventMouseButton and event.device == InputEvent.DEVICE_ID_EMULATION:
+		return
+	if event is InputEventScreenTouch and event.canceled:
+		if _matches_pointer(event, "touch"):
+			get_viewport().set_input_as_handled()
+		_cancel_pointer()
+		return
+	if event is InputEventScreenDrag:
+		if _matches_pointer(event, "touch"):
+			_cancel_pointer()
+			get_viewport().set_input_as_handled()
+		return
+	if not _result_visible and _current_combat_format() == GameSession.COMBAT_FORMAT_ACTIVE:
+		if event.is_action_pressed("primary"):
+			get_viewport().set_input_as_handled()
+			_on_attack_pressed()
+			return
+		if event.is_action_pressed("secondary"):
+			get_viewport().set_input_as_handled()
+			_on_dodge_pressed()
+			return
+		if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_Q:
+			get_viewport().set_input_as_handled()
+			_on_ability_pressed()
+			return
+	if _is_press(event):
 		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed("secondary"):
-		_on_dodge_pressed()
-		get_viewport().set_input_as_handled()
+		_on_press_began(event)
+	elif _is_release(event):
+		var canceled: bool = event is InputEventScreenTouch and event.canceled
+		var matches: bool = _matches_event_pointer(event)
+		if matches or canceled:
+			get_viewport().set_input_as_handled()
+		_on_press_ended(event, canceled)
+
+func _is_press(event: InputEvent) -> bool:
+	if event is InputEventScreenTouch:
+		return event.pressed
+	if event is InputEventMouseButton:
+		return event.pressed and event.button_index == MOUSE_BUTTON_LEFT
+	return event.is_action_pressed("primary") or event.is_action_pressed("secondary")
+
+func _is_release(event: InputEvent) -> bool:
+	if event is InputEventScreenTouch:
+		return not event.pressed
+	if event is InputEventMouseButton:
+		return not event.pressed and event.button_index == MOUSE_BUTTON_LEFT
+	return event.is_action_released("primary") or event.is_action_released("secondary")
+
+func _on_press_began(event: InputEvent = null) -> void:
+	if _intro_active or _pause_open or _navigating or _details_open:
+		return
+	if event is InputEventScreenTouch and not _pointer_candidate.is_empty():
+		_cancel_pointer()
+		return
+	if not _pointer_candidate.is_empty():
+		return
+	_pointer_candidate = _pointer_identity(event)
+	_pointer_down = true
+	_pointer_down_began_at_result = _result_visible
+	if _result_visible:
+		return
+
+func _on_press_ended(_event: InputEvent = null, _canceled: bool = false) -> void:
+	_cancel_pointer()
+
+func _pointer_identity(event: InputEvent) -> Dictionary:
+	var kind: String = "key"
+	var index: int = 0
+	var device: int = 0
+	var pointer_position: Vector2 = Vector2.ZERO
+	if event is InputEventScreenTouch:
+		kind = "touch"
+		index = event.index
+		device = event.device
+		pointer_position = event.position
+	elif event is InputEventMouseButton:
+		kind = "mouse"
+		index = event.button_index
+		device = event.device
+		pointer_position = event.position
+	return {"kind": kind, "index": index, "device": device, "position": pointer_position}
+
+func _matches_event_pointer(event: InputEvent) -> bool:
+	if event is InputEventScreenTouch:
+		return _matches_pointer(event, "touch")
+	if event is InputEventMouseButton:
+		return _matches_pointer(event, "mouse")
+	return not _pointer_candidate.is_empty() and _pointer_candidate.get("kind", "") == "key" and (event == null or not (event is InputEventScreenTouch or event is InputEventMouseButton))
+
+func _matches_pointer(event: InputEvent, kind: String) -> bool:
+	if _pointer_candidate.is_empty() or _pointer_candidate.get("kind", "") != kind:
+		return false
+	var event_index: Variant = event.get("index") if kind == "touch" else event.get("button_index")
+	return _pointer_candidate.get("index", -1) == event_index and _pointer_candidate.get("device", -1) == event.get("device")
+
+func _cancel_pointer() -> void:
+	_pointer_candidate = {}
+	_pointer_down = false
+	_pointer_down_began_at_result = false
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+		_cancel_pointer()
+		if resolver != null and not resolver.is_finished and not _result_visible:
+			_set_pause(true)
+
+## Отказ домена (awaiting_return, три Следа, неизвестный враг) — безопасное
+## состояние вместо падения на сигналах resolver (UX-12).
+func _show_start_failure() -> void:
+	actions.visible = false
+	pause_button.visible = false
+	equipment_strip.set_suppressed(true)
+	hint_label.text = "Бой сейчас недоступен."
+	hint_label.show()
+	_navigating = true
+	await get_tree().create_timer(0.9).timeout
+	navigate_requested.emit("world")
+
+func _layout_arena() -> void:
+	arena_presenter.layout()
+
+func _update_marker_positions() -> void:
+	arena_presenter.update_positions()
+
+func _start_intro() -> void:
+	_intro_active = true
+	actions.visible = false
+	arena_presenter.start_intro()
+
+func _finish_intro() -> void:
+	if not _intro_active:
+		return
+	_intro_active = false
+	arena_presenter.layout()
+	_refresh_actions_visibility()
+	if _current_combat_format() == GameSession.COMBAT_FORMAT_ACTIVE:
+		_show_feedback("Атакуйте и уклоняйтесь вручную")
+		_feedback_ticks = 90
+	if attack_button.visible:
+		attack_button.grab_focus()
+	elif dodge_button.visible:
+		dodge_button.grab_focus()
+	else:
+		pause_button.grab_focus()
 
 func _set_resolver(next_resolver: CombatResolver) -> void:
 	resolver = next_resolver
-	last_event = ""
-	resolver.phase_changed.connect(_on_phase_changed)
-	resolver.damage_dealt.connect(_on_damage_dealt)
 	resolver.dodge_resolved.connect(_on_dodge_resolved)
 	resolver.finished.connect(_on_finished)
-	result_label.text = ""
-	retry_button.hide()
-	continue_button.hide()
-	_refresh()
+	arena_presenter.bind_resolver(next_resolver)
+
+func _current_combat_format() -> String:
+	return resolver.combat_format if resolver != null else session.current_combat_format()
 
 func _on_attack_pressed() -> void:
-	if resolver != null and resolver.request_attack():
-		last_event = ""
+	if _intro_active or _pause_open or _navigating or _result_visible:
+		return
+	if _current_combat_format() != GameSession.COMBAT_FORMAT_ACTIVE:
+		return
+	if resolver != null and not resolver.is_finished and resolver.request_attack():
+		_refresh()
+
+func _on_ability_pressed() -> void:
+	if _intro_active or _pause_open or _navigating or _result_visible:
+		return
+	if _current_combat_format() != GameSession.COMBAT_FORMAT_ACTIVE:
+		return
+	if resolver != null and not resolver.is_finished and resolver.request_ability():
+		_show_feedback("Точный удар")
 		_refresh()
 
 func _on_dodge_pressed() -> void:
-	if resolver != null and resolver.request_dodge():
-		last_event = "Уклонение активно"
+	if _intro_active or _pause_open or _navigating or _result_visible:
+		return
+	if _current_combat_format() != GameSession.COMBAT_FORMAT_ACTIVE:
+		return
+	if resolver != null and not resolver.is_finished and resolver.request_dodge():
 		_refresh()
 
-func _on_retry_pressed() -> void:
+func _on_pause_pressed() -> void:
+	if resolver == null or resolver.is_finished or _result_visible:
+		return
+	_set_pause(not _pause_open)
+
+func _on_resume_pressed() -> void:
+	_set_pause(false)
+
+## Сдача — это поражение без катсцены: далее выбор точки возврата в Печати,
+## точку за игрока никто не выбирает.
+func _on_forfeit_pressed() -> void:
+	if _navigating:
+		return
+	_navigating = true
+	session.abandon_combat()
 	navigate_requested.emit("checkpoint")
 
-func _on_continue_pressed() -> void:
-	navigate_requested.emit("reward" if not session.pending_reward.is_empty() else "world")
+func _on_speed_switch_pressed() -> void:
+	session.set_auto_speed(2 if session.auto_speed == 1 else 1)
+	_refresh_format_ui()
 
-func _on_phase_changed(_phase: int, _ticks_remaining: int) -> void:
-	last_event = ""
-	_refresh()
+## Смена формата — минимальный пункт паузы: применяется со следующего боя,
+## текущий бой (cooldown/замах) не трогаем; предпочтение живёт вне Checkpoint.
+func _on_format_switch_pressed() -> void:
+	var next_format: String = (
+		GameSession.COMBAT_FORMAT_ACTIVE
+		if session.combat_format == GameSession.COMBAT_FORMAT_AUTO
+		else GameSession.COMBAT_FORMAT_AUTO
+	)
+	session.set_combat_format(next_format)
+	_refresh_format_ui()
 
-func _on_damage_dealt(_target_id: String, _amount: int) -> void:
-	_refresh()
+func _refresh_format_ui() -> void:
+	var current_format: String = _current_combat_format()
+	var is_auto: bool = current_format == GameSession.COMBAT_FORMAT_AUTO
+	if format_label != null:
+		format_label.text = "Авто ×%d" % int(session.active_encounter_context.get("auto_speed", session.auto_speed)) if is_auto else "Ручной"
+		format_label.reset_size()
+		format_label.visible = not _result_visible
+	equipment_strip.offset_bottom = -8.0 if is_auto else actions.offset_top - 6.0
+	equipment_strip.offset_top = equipment_strip.offset_bottom - equipment_strip.get_combined_minimum_size().y
+	if format_switch != null:
+		var next_action: String = "ручной бой" if session.combat_format == GameSession.COMBAT_FORMAT_AUTO else "автобой"
+		format_switch.text = "Включить %s\nсо следующего боя" % next_action
+		format_switch.tooltip_text = "Текущий бой и cooldown не меняются"
+	if speed_switch != null:
+		speed_switch.text = "Скорость автобоя: ×%d\nсо следующего боя" % session.auto_speed
+	if attack_button != null:
+		attack_button.visible = not is_auto
+	if ability_button != null:
+		ability_button.visible = not is_auto and session.hero.first_ability() != null and session.hero.level >= session.hero.first_ability().unlock_level
+	if dodge_button != null:
+		dodge_button.visible = not is_auto
+	if resolver != null:
+		_refresh_cooldowns()
+
+## Один владелец паузы gameplay+presentation: resolver стоит, клипы и tweens
+## замирают на своём кадре; resume продолжает с того же места без catch-up.
+func _set_pause(open: bool) -> void:
+	if _pause_open == open:
+		return
+	_pause_open = open
+	pause_layer.visible = open
+	pause_button.visible = not open
+	equipment_strip.set_suppressed(open)
+	_refresh_actions_visibility()
+	arena_presenter.set_pause(open)
+	if open:
+		resume_button.grab_focus()
+	elif attack_button.is_visible_in_tree() and not attack_button.disabled:
+		attack_button.grab_focus()
+	elif dodge_button.is_visible_in_tree() and not dodge_button.disabled:
+		dodge_button.grab_focus()
+	else:
+		pause_button.grab_focus()
 
 func _on_dodge_resolved(success: bool) -> void:
-	last_event = "Удар отклонён" if success else "Удар получен"
-	_refresh()
+	if success:
+		_show_feedback("Уклонение")
+
+func _show_feedback(text: String) -> void:
+	hint_label.text = text
+	hint_label.show()
+	_feedback_ticks = 45
 
 func _on_finished(player_won: bool) -> void:
+	format_label.hide()
+	hint_label.hide()
+	actions.visible = false
+	pause_button.visible = false
+	equipment_strip.set_suppressed(true)
+	if pause_layer.visible:
+		pause_layer.hide()
+	_pause_open = false
+	arena_presenter.finish(player_won)
 	if player_won:
-		session.apply_victory(session.current_enemy_id)
-		continue_button.text = "Получить награду" if not session.pending_reward.is_empty() else "Вернуться к пути"
-		result_label.text = "ПОБЕДА\nУровень %d · XP %d/%d" % [
-			session.hero.level,
-			session.hero.experience,
-			session.hero.xp_to_next_level(),
-		]
+		_play_victory_sequence()
 	else:
-		retry_button.text = "Выбрать возврат"
-		result_label.text = "ПОРАЖЕНИЕ\nПечать Пути требует возврата."
-	_refresh()
-	if player_won:
-		continue_button.grab_focus()
+		_play_defeat_sequence()
+
+func _play_victory_sequence() -> void:
+	victory_label.text = "Победа"
+	victory_label.modulate.a = 0.0
+	victory_label.position = Vector2(victory_label.position.x, 48.0)
+	victory_label.show()
+	var tween := create_tween().set_parallel(true)
+	tween.tween_property(victory_label, "modulate:a", 1.0, 0.28)
+	tween.tween_property(victory_label, "position:y", 44.0, 0.28)
+	# Сначала читаем реакцию победы и исчезновение врага; только затем
+	# в нижней части появляется pending-result и ждёт нового нажатия.
+	await get_tree().create_timer(VICTORY_REACTION_SECONDS).timeout
+	if not _navigating:
+		_show_result_panel(session.pending_battle_result)
+
+func _play_defeat_sequence() -> void:
+	# Короткая честная реакция, затем сразу выбор возврата без промежуточного шага.
+	var tween := create_tween().set_parallel(true)
+	tween.tween_property(hero_sprite, "modulate:a", 0.35, DEFEAT_TO_CHECKPOINT_SECONDS)
+	await get_tree().create_timer(DEFEAT_TO_CHECKPOINT_SECONDS).timeout
+	_navigate_once("checkpoint")
+
+func _navigate_once(destination: String) -> void:
+	if _navigating:
+		return
+	_navigating = true
+	navigate_requested.emit(destination)
+
+## --- Результат боя: выбор по каждой находке, затем одна атомарная запись ---
+
+func _show_restored_result() -> void:
+	arena_presenter.show_restored()
+	victory_label.text = "Победа"
+	victory_label.modulate.a = 1.0
+	victory_label.show()
+	_layout_arena()
+	_show_result_panel(session.pending_battle_result)
+
+func _show_result_panel(result: Dictionary) -> void:
+	_cancel_pointer()
+	format_label.hide()
+	pause_button.hide()
+	actions.hide()
+	equipment_strip.set_suppressed(true)
+	result_panel.present(session, result)
+	result_panel.fit_to_view.call_deferred(size.y)
+	_result_visible = true
+
+func _open_details(item_id: String, aspect_id: String, quantity: int = 1) -> void:
+	_cancel_pointer()
+	var reward: Dictionary = {}
+	for entry: Dictionary in session.pending_battle_result.get("items", []):
+		if String(entry.get("item_id", "")) == item_id and String(entry.get("aspect_id", "")) == aspect_id and int(entry.get("quantity", 1)) == quantity:
+			reward = entry
+			break
+	if not details_view.present_reward(item_id, aspect_id, quantity, reward):
+		return
+	details_layer.show()
+	_details_open = true
+	_focus_guard.capture(details_layer)
+	detail_close.grab_focus()
+
+func _close_details() -> void:
+	_cancel_pointer()
+	details_layer.hide()
+	_details_open = false
+	_focus_guard.restore()
+	if _result_visible:
+		claim_button.grab_focus()
+
+func _on_detail_close_pressed() -> void:
+	_close_details()
+
+func _on_details_dismiss(event: InputEvent) -> void:
+	if _is_press(event):
+		get_viewport().set_input_as_handled()
+		_close_details()
+
+func _on_claim_pressed() -> void:
+	_claim_result()
+
+func _on_reward_choice(entry_id: String, action: String) -> void:
+	if _navigating or not session.choose_battle_reward(entry_id, action):
+		result_panel.present(session, session.pending_battle_result)
+		return
+	if session.reward_choices_complete():
+		_claim_result()
 	else:
-		retry_button.grab_focus()
+		result_panel.present(session, session.pending_battle_result)
+
+func _claim_result() -> void:
+	if _navigating or not session.reward_choices_complete():
+		return
+	var result_id: String = String(session.pending_battle_result.get("result_id", ""))
+	if result_id.is_empty():
+		return
+	_navigating = true
+	claim_requested.emit(result_id)
+
+func show_claim_error() -> void:
+	result_panel.show_write_error()
+	_result_visible = true
+	_navigating = false
 
 func _refresh() -> void:
 	if resolver == null:
 		return
-	enemy_name.text = resolver.enemy.definition.display_name
-	hero_hp_text.text = "Харуто · %d/%d" % [resolver.hero.current_hp, resolver.hero.max_hp]
-	hero_hp_bar.max_value = resolver.hero.max_hp
-	hero_hp_bar.value = resolver.hero.current_hp
-	enemy_hp_text.text = "Противник · %d/%d" % [resolver.enemy.current_hp, resolver.enemy.max_hp]
-	enemy_hp_bar.max_value = resolver.enemy.max_hp
-	enemy_hp_bar.value = resolver.enemy.current_hp
-	hero_marker.text = "ГЕРОЙ\nСила %d" % resolver.hero.strength
-	enemy_marker.text = resolver.enemy.definition.display_name.to_upper()
-	phase_label.text = "%s\n%02d ticks" % [_phase_text(), resolver.phase_ticks_remaining]
-	if not last_event.is_empty():
-		hint_label.text = last_event
-	elif resolver.is_vulnerable():
-		hint_label.text = "Окно ответа: урон ×%d" % roundi(resolver.enemy.definition.vulnerability_multiplier)
-	else:
-		hint_label.text = "Space: атака · E: уклонение"
-	actions.visible = not resolver.is_finished
-	attack_button.disabled = resolver.is_finished or resolver.hero_attack_cooldown > 0
-	dodge_button.disabled = resolver.is_finished or resolver.dodge_cooldown > 0
-	retry_button.visible = resolver.is_finished and not resolver.won
-	continue_button.visible = resolver.is_finished and resolver.won
+	arena_presenter.refresh()
+	_refresh_actions_visibility()
+	_refresh_cooldowns()
 
-func _phase_text() -> String:
-	var is_slime: bool = resolver.enemy.definition.behavior_id == "slime"
-	match resolver.enemy_phase:
-		CombatResolver.Phase.TELEGRAPH:
-			return "!! СЖАТИЕ — ПРИГОТОВЬСЯ" if is_slime else "!! ЗАМАХ — ПРИГОТОВЬСЯ"
-		CombatResolver.Phase.STARTUP:
-			return "ПРЫЖОК" if is_slime else "ЗАМАХ %d/2" % (resolver.strike_index + 1)
-		CombatResolver.Phase.ACTIVE:
-			return "СТОЛКНОВЕНИЕ" if is_slime else "SLASH %d/2" % (resolver.strike_index + 1)
-		CombatResolver.Phase.RECOVERY:
-			return "ПРИЗЕМЛЕНИЕ" if is_slime else "ОТСТУПЛЕНИЕ"
-		CombatResolver.Phase.VULNERABILITY:
-			return "ЯДРО ОТКРЫТО — АТАКУЙ" if is_slime else "ПРОТИВНИК ОТКРЫТ — АТАКУЙ"
-	return ""
+func _refresh_actions_visibility() -> void:
+	actions.visible = (
+		resolver != null and not resolver.is_finished and not _intro_active
+		and not _pause_open and _current_combat_format() == GameSession.COMBAT_FORMAT_ACTIVE
+	)
+
+func _refresh_cooldowns() -> void:
+	if resolver == null:
+		return
+	attack_button.disabled = (
+		resolver.is_finished
+		or resolver.hero_attack_cooldown > 0
+		or _intro_active
+		or _pause_open
+	)
+	attack_cooldown.value = 1.0 - float(resolver.hero_attack_cooldown) / maxi(1, resolver.hero.definition.attack_cooldown_ticks)
+	attack_cooldown.visible = resolver.hero_attack_cooldown > 0 and attack_button.visible
+	ability_button.disabled = (
+		resolver.is_finished
+		or resolver.hero_attack_cooldown > 0
+		or resolver.hero_ability_cooldown > 0
+		or _intro_active
+		or _pause_open
+	)
+	var ability: AbilityDefinition = resolver.hero.first_ability()
+	ability_cooldown.max_value = 1.0
+	ability_cooldown.value = 1.0 - float(resolver.hero_ability_cooldown) / maxi(1, ability.cooldown_ticks if ability != null else 1)
+	ability_cooldown.visible = resolver.hero_ability_cooldown > 0 and ability_button.visible
+	dodge_button.disabled = (
+		resolver.is_finished
+		or resolver.dodge_cooldown > 0
+		or _intro_active
+		or _pause_open
+	)
+	dodge_cooldown.value = 1.0 - float(resolver.dodge_cooldown) / maxi(1, resolver.hero.definition.dodge_cooldown_ticks)
+	dodge_cooldown.visible = resolver.dodge_cooldown > 0 and dodge_button.visible
+
+## Число урона у туловища цели, сбоку от полосы HP: обратная связь у события,
+## а не в общей строке.
+func _spawn_damage_number(target_id: String, amount: int) -> void:
+	arena_presenter.spawn_damage_number(target_id, amount)

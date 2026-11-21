@@ -1,0 +1,289 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/characters_screen.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/ui/safe_area.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/ui/equipment_strip.gd" id="3"]
+[ext_resource type="Script" path="res://scripts/ui/item_details_view.gd" id="4"]
+
+[node name="Characters" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.07, 0.114, 0.099, 1)
+
+[node name="CatalogArt" type="TextureRect" parent="."]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+modulate = Color(0.19, 0.26, 0.23, 1)
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Margin" type="MarginContainer" parent="."]
+script = ExtResource("2")
+padding = 8
+
+[node name="Column" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 7
+
+[node name="Header" type="HBoxContainer" parent="Margin/Column"]
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="Margin/Column/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Heading" type="Label" parent="Margin/Column/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 13
+text = "Персонажи"
+horizontal_alignment = 1
+text_overrun_behavior = 3
+
+[node name="Spacer" type="Control" parent="Margin/Column/Header"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Catalog" type="ScrollContainer" parent="Margin/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="Contents" type="VBoxContainer" parent="Margin/Column/Catalog"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="CatalogSummary" type="HBoxContainer" parent="Margin/Column/Catalog/Contents"]
+layout_mode = 2
+
+[node name="RosterCount" type="Label" parent="Margin/Column/Catalog/Contents/CatalogSummary"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 8
+
+[node name="TotalPower" type="Label" parent="Margin/Column/Catalog/Contents/CatalogSummary"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 9
+
+[node name="Roster" type="GridContainer" parent="Margin/Column/Catalog/Contents"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+columns = 2
+
+[node name="Profile" type="ScrollContainer" parent="Margin/Column"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="Contents" type="VBoxContainer" parent="Margin/Column/Profile"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 5
+
+[node name="Summary" type="HBoxContainer" parent="Margin/Column/Profile/Contents"]
+layout_mode = 2
+
+[node name="Level" type="Label" parent="Margin/Column/Profile/Contents/Summary"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 10
+
+[node name="Power" type="Label" parent="Margin/Column/Profile/Contents/Summary"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+
+[node name="Stage" type="PanelContainer" parent="Margin/Column/Profile/Contents"]
+layout_mode = 2
+clip_contents = true
+mouse_filter = 2
+
+[node name="StageArt" type="TextureRect" parent="Margin/Column/Profile/Contents/Stage"]
+unique_name_in_owner = true
+modulate = Color(0.54, 0.6, 0.53, 1)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Inset" type="MarginContainer" parent="Margin/Column/Profile/Contents/Stage"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="EquipmentStrip" type="PanelContainer" parent="Margin/Column/Profile/Contents/Stage/Inset"]
+unique_name_in_owner = true
+layout_mode = 2
+script = ExtResource("3")
+
+[node name="Stats" type="Label" parent="Margin/Column/Profile/Contents"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 9
+autowrap_mode = 3
+horizontal_alignment = 1
+
+[node name="SlotHint" type="Label" parent="Margin/Column/Profile/Contents"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+autowrap_mode = 3
+horizontal_alignment = 1
+
+[node name="Progression" type="PanelContainer" parent="Margin/Column/Profile/Contents"]
+layout_mode = 2
+
+[node name="Inset" type="MarginContainer" parent="Margin/Column/Profile/Contents/Progression"]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="ProgressionStack" type="VBoxContainer" parent="Margin/Column/Profile/Contents/Progression/Inset"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="ProgressHeader" type="HBoxContainer" parent="Margin/Column/Profile/Contents/Progression/Inset/ProgressionStack"]
+layout_mode = 2
+
+[node name="NextLevel" type="Label" parent="Margin/Column/Profile/Contents/Progression/Inset/ProgressionStack/ProgressHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 10
+
+[node name="Experience" type="Label" parent="Margin/Column/Profile/Contents/Progression/Inset/ProgressionStack/ProgressHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+
+[node name="ExperienceBar" type="ProgressBar" parent="Margin/Column/Profile/Contents/Progression/Inset/ProgressionStack"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 4)
+layout_mode = 2
+mouse_filter = 2
+show_percentage = false
+
+[node name="NextGain" type="Label" parent="Margin/Column/Profile/Contents/Progression/Inset/ProgressionStack"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+autowrap_mode = 3
+
+[node name="UpgradeCount" type="Label" parent="Margin/Column/Profile/Contents/Progression/Inset/ProgressionStack"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 9
+
+[node name="UpgradeRow" type="HBoxContainer" parent="Margin/Column/Profile/Contents/Progression/Inset/ProgressionStack"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="StrengthUpgrade" type="Button" parent="Margin/Column/Profile/Contents/Progression/Inset/ProgressionStack/UpgradeRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 8
+text_overrun_behavior = 3
+
+[node name="HpUpgrade" type="Button" parent="Margin/Column/Profile/Contents/Progression/Inset/ProgressionStack/UpgradeRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 8
+text_overrun_behavior = 3
+
+[node name="Abilities" type="Label" parent="Margin/Column/Profile/Contents"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+autowrap_mode = 3
+
+[node name="FamiliarPanel" type="VBoxContainer" parent="Margin/Column/Profile/Contents"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="FamiliarStatus" type="Label" parent="Margin/Column/Profile/Contents/FamiliarPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+autowrap_mode = 3
+
+[node name="FamiliarOption" type="OptionButton" parent="Margin/Column/Profile/Contents/FamiliarPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+theme_override_font_sizes/font_size = 9
+clip_text = true
+fit_to_longest_item = false
+
+[node name="FamiliarButton" type="Button" parent="Margin/Column/Profile/Contents/FamiliarPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+theme_override_font_sizes/font_size = 9
+
+[node name="ItemDetailsLayer" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 0
+
+[node name="Dim" type="ColorRect" parent="ItemDetailsLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.02, 0.03, 0.05, 0.8)
+
+[node name="SafeArea" type="MarginContainer" parent="ItemDetailsLayer"]
+mouse_filter = 2
+script = ExtResource("2")
+padding = 12
+
+[node name="Center" type="VBoxContainer" parent="ItemDetailsLayer/SafeArea"]
+layout_mode = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="ItemDetails" type="PanelContainer" parent="ItemDetailsLayer/SafeArea/Center"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 216)
+layout_mode = 2
+script = ExtResource("4")

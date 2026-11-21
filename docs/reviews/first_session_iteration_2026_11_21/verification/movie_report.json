@@ -1,0 +1,12 @@
+{
+	"captures": [],
+	"checks": [
+		{
+			"message": "Movie route completes a normal-speed encounter",
+			"ok": true
+		}
+	],
+	"checks_count": 1,
+	"failed": 0,
+	"windows": []
+}

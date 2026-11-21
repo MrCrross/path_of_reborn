@@ -1,0 +1,69 @@
+{
+	"combat_1080x1920": {
+		"path": "docs/reviews/plan_acceptance_repair_2026_11_20/graphics/combat_1080x1920.png",
+		"save_error": 0,
+		"size": [
+			1080,
+			1920
+		]
+	},
+	"combat_360x640": {
+		"path": "docs/reviews/plan_acceptance_repair_2026_11_20/graphics/combat_360x640.png",
+		"save_error": 0,
+		"size": [
+			360,
+			640
+		]
+	},
+	"logical_viewport": [
+		180,
+		320
+	],
+	"measurements": [
+		{
+			"first_draw_ms": 283.528,
+			"load_ms": 272.357,
+			"memory_static_after_bytes": 61998546,
+			"memory_static_before_bytes": 58929192,
+			"name": "prologue_first",
+			"node_count": 41,
+			"resource_count": 59,
+			"scene": "prologue"
+		},
+		{
+			"first_draw_ms": 233.548,
+			"load_ms": 219.757,
+			"memory_static_after_bytes": 62679657,
+			"memory_static_before_bytes": 63119417,
+			"name": "prologue_repeat",
+			"node_count": 41,
+			"resource_count": 65,
+			"scene": "prologue"
+		},
+		{
+			"first_draw_ms": 180.494,
+			"load_ms": 172.94,
+			"memory_static_after_bytes": 65027976,
+			"memory_static_before_bytes": 62678361,
+			"name": "combat_first",
+			"node_count": 95,
+			"resource_count": 71,
+			"scene": "combat"
+		},
+		{
+			"first_draw_ms": 25.24,
+			"load_ms": 8.327,
+			"memory_static_after_bytes": 64082352,
+			"memory_static_before_bytes": 64782888,
+			"name": "combat_repeat",
+			"node_count": 95,
+			"resource_count": 71,
+			"scene": "combat"
+		}
+	],
+	"native_memory_static_bytes": 85933416,
+	"renderer": "gl_compatibility",
+	"scale_mode": "integer",
+	"skip_to_world_ms": 100.075,
+	"stretch": "canvas_items"
+}

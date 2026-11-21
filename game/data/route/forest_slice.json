@@ -1,0 +1,13 @@
+{
+  "route_id": "forest_edge_slice",
+  "prototype": true,
+  "completion_label": "Участок пройден",
+  "nodes": [
+    {
+      "node_id": "forest_edge_slime",
+      "enemy_id": "moss_slime",
+      "first_clear_rewards": []
+    },
+    {"node_id": "forest_edge_goblin", "enemy_id": "goblin_scout"}
+  ]
+}

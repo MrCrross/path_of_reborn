@@ -1,0 +1,53 @@
+{
+	"captures": [
+		{
+			"error": 0,
+			"label": "17_active_next",
+			"size": [
+				360,
+				640
+			]
+		}
+	],
+	"checks": [
+		{
+			"message": "Active fixture enters its first combat",
+			"ok": true
+		},
+		{
+			"message": "Pause names the next-click action",
+			"ok": true
+		},
+		{
+			"message": "Pause changes only the next-battle preference",
+			"ok": true
+		},
+		{
+			"message": "Every visible reward card participates in one atomic claim",
+			"ok": true
+		},
+		{
+			"message": "Daijiro's intervention leads to the story scout encounter",
+			"ok": true
+		},
+		{
+			"message": "Next encounter enables intentional manual attack and dodge",
+			"ok": true
+		},
+		{
+			"message": "The touch attack button drives the real resolver",
+			"ok": true
+		},
+		{
+			"message": "Active mode HUD does not overlap Pause",
+			"ok": true
+		},
+		{
+			"message": "Capture 17_active_next",
+			"ok": true
+		}
+	],
+	"checks_count": 9,
+	"failed": 0,
+	"windows": []
+}

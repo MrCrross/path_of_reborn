@@ -4,6 +4,7 @@ extends RefCounted
 signal changed
 signal transition_started(cue: Dictionary)
 signal command_requested(command: Dictionary)
+signal cue_completed(cue_id: String)
 signal finished(destination: String)
 
 const TRANSITION_TICKS: int = 12
@@ -16,6 +17,11 @@ const ALLOWED_COMMANDS: Array[String] = ["set_world_flag", "set_npc_flag"]
 
 var entries: Array[Dictionary] = []
 var session: GameSession
+var first_pass_only: bool = false
+## Character fallback for standalone/headless callers without a shaped policy.
+var page_character_limit: int = PAGE_CHARACTERS
+## Presentation can inject shaped pages; standalone use keeps the text fallback.
+var page_policy: Callable
 var index: int = 0
 var part_index: int = 0
 var page_index: int = 0
@@ -54,7 +60,7 @@ func start() -> bool:
 	is_finished = false
 	destination = ""
 	index = 0
-	_skip_seen()
+	_skip_unavailable_cues()
 	if is_finished:
 		return true
 	_enter_current()
@@ -116,6 +122,30 @@ func release_hold() -> void:
 	hold_ticks = 0
 	changed.emit()
 
+## Идемпотентный пропуск линейной последовательности. Схема данных гарантирует
+## линейность (validate_entries проходит граф одним проходом), поэтому безопасно
+## дойти до конца; ветвящиеся диалоги схема не допускает и автовыбором ветки
+## не занимается. Whitelisted story-команды выполняются ровно один раз;
+## пропущенные cue НЕ помечаются seen — «пропущено» не равно «прочитано».
+func skip_sequence() -> void:
+	if is_finished:
+		return
+	holding = false
+	hold_ticks = 0
+	transition_ticks = 0
+	var executed: Dictionary = {}
+	for cue: Dictionary in entries:
+		for command: Dictionary in cue.get("commands", []):
+			if String(command.get("type", "")) not in ALLOWED_COMMANDS:
+				continue
+			var signature: String = JSON.stringify(command)
+			if executed.has(signature):
+				continue
+			executed[signature] = true
+			command_requested.emit(command.duplicate(true))
+	index = entries.size()
+	_finish("world")
+
 func current_cue() -> Dictionary:
 	return entries[index] if index >= 0 and index < entries.size() else {}
 
@@ -167,7 +197,7 @@ static func validate_entries(cues: Array[Dictionary]) -> bool:
 			return false
 		if String(cue.get("enter", "")) not in ALLOWED_ENTERS:
 			return false
-		if typeof(cue.get("once", false)) != TYPE_BOOL:
+		if typeof(cue.get("once", false)) != TYPE_BOOL or typeof(cue.get("first_pass", true)) != TYPE_BOOL:
 			return false
 		if cue.has("destination") and String(cue["destination"]) not in ALLOWED_DESTINATIONS:
 			return false
@@ -217,10 +247,31 @@ func _set_pages() -> void:
 	var parts: Array = current_cue().get("parts", [])
 	if part_index < parts.size():
 		text = String(parts[part_index].get("text", ""))
-	pages = paginate(text)
+	if page_policy.is_valid():
+		pages = page_policy.call(text)
+	else:
+		pages = paginate(text, page_character_limit)
 	if pages.is_empty():
 		pages.append("")
 	page_index = 0
+
+
+## Пере-разбить текущую реплику на страницы после смены политики/размеров layout.
+## Полный текст реплики сохраняется; меняется только нарезка.
+func repaginate_current() -> void:
+	if is_finished:
+		return
+	# Keep the current reading position when a resize changes page boundaries.
+	var read_characters: int = 0
+	for page: int in range(page_index):
+		read_characters += pages[page].length() + 1
+	_set_pages()
+	var consumed: int = 0
+	for page: int in range(pages.size()):
+		if consumed <= read_characters:
+			page_index = page
+		consumed += pages[page].length() + 1
+	changed.emit()
 
 func _can_interact() -> bool:
 	return not is_finished and transition_ticks == 0 and not current_cue().is_empty()
@@ -231,6 +282,7 @@ func _complete_current() -> void:
 		session.seen_cue_ids[cue["id"]] = true
 	for command: Dictionary in cue.get("commands", []):
 		command_requested.emit(command.duplicate(true))
+	cue_completed.emit(String(cue.get("id", "")))
 	if cue.has("destination"):
 		_finish(String(cue["destination"]))
 		return
@@ -239,12 +291,17 @@ func _complete_current() -> void:
 		index = entries.find_custom(func(candidate: Dictionary) -> bool: return candidate["id"] == next_id)
 	else:
 		index += 1
-	_skip_seen()
+	_skip_unavailable_cues()
 	if not is_finished:
 		_enter_current()
 
-func _skip_seen() -> void:
-	while index < entries.size() and bool(entries[index].get("once", false)) and session.seen_cue_ids.has(entries[index]["id"]):
+func _skip_unavailable_cues() -> void:
+	while index < entries.size():
+		var cue: Dictionary = entries[index]
+		var seen: bool = bool(cue.get("once", false)) and session.seen_cue_ids.has(cue["id"])
+		var outside_first_pass: bool = first_pass_only and not bool(cue.get("first_pass", false))
+		if not seen and not outside_first_pass:
+			break
 		index += 1
 	if index >= entries.size():
 		_finish("world")

@@ -17,6 +17,8 @@ func run() -> Array[Dictionary]:
 	results.append(_run_case("hold_release_cancels_and_completion_fires_once", _test_hold))
 	results.append(_run_case("once_seen_survives_save_and_checkpoint_restores_npc", _test_once_and_npc))
 	results.append(_run_case("full_prologue_reaches_world_with_bounded_input", _test_full_prologue))
+	results.append(_run_case("first_pass_preserves_canonical_ids_and_continue", _test_first_pass))
+	results.append(_run_case("skip_sequence_finishes_with_postconditions_once", _test_skip))
 	return results
 
 func _run_case(case_name: String, test: Callable) -> Dictionary:
@@ -114,6 +116,7 @@ func _test_once_and_npc(context: TestContext) -> void:
 	session.npc_flags["npc"] = "present"
 	session.checkpoints.begin()
 	session.checkpoints.advance_ticks(CheckpointService.CHANNEL_TICKS)
+	session.checkpoints.apply_completion()
 	session.npc_flags.erase("npc")
 	session.awaiting_return = true
 	session.checkpoints.restore()
@@ -152,6 +155,108 @@ func _test_full_prologue(context: TestContext) -> void:
 	context.check(runner.is_finished and runner.destination == "world" and steps < 1000, "Every required cue reaches gameplay within the bounded loop")
 	context.check(session.seen_cue_ids.size() == EXPECTED_IDS.size(), "Every cue records its Once flag exactly once")
 	context.check(session.world_flags.get("prologue_completed") == true, "Title command reaches the session owner")
+
+func _test_first_pass(context: TestContext) -> void:
+	var session := GameSession.new()
+	var runner := DialogueRunner.new()
+	runner.configure(session)
+	runner.first_pass_only = true
+	runner.command_requested.connect(func(command: Dictionary) -> void: session.world_flags[command["key"]] = command["value"])
+	context.check(runner.load_file("res://data/narrative/prologue.json") and runner.entries.size() == EXPECTED_IDS.size(), "First pass retains the canonical 44-cue source")
+	context.check(runner.start() and runner.current_cue().get("id") == "DIA_INTRO_001", "First pass starts at the shortened opening")
+	var visited: Array[String] = []
+	var guard: int = 0
+	while not runner.is_finished and guard < 300:
+		runner.advance_ticks(DialogueRunner.TRANSITION_TICKS)
+		var cue_id: String = String(runner.current_cue().get("id", ""))
+		match runner.current_kind():
+			"look": runner.look()
+			"hold":
+				runner.begin_hold()
+				runner.advance_ticks(DialogueRunner.HOLD_TICKS)
+			_:
+				_tap_through(runner)
+		if not cue_id.is_empty() and not visited.has(cue_id):
+			visited.append(cue_id)
+		guard += 1
+	context.check(runner.is_finished and visited.size() == 15, "First pass reaches World through 15 selected cues")
+	context.check(visited.has("DIA_INTRO_007") and visited.has("DIA_GODDESS_006") and visited.has("TITLE"), "First pass keeps the rescue, Yui outcome and exit")
+	context.check(not visited.has("DIA_GODDESS_019") and not session.seen_cue_ids.has("DIA_GODDESS_019"), "Deferred system explanations are not marked as read")
+	context.check(session.world_flags.get("prologue_completed") == true, "First pass executes the Title postcondition")
+	var mid_session := GameSession.new()
+	var mid := DialogueRunner.new()
+	mid.configure(mid_session)
+	mid.first_pass_only = true
+	mid.load_file("res://data/narrative/prologue.json")
+	mid.start()
+	mid.tap()
+	var continued_session := GameSession.new()
+	continued_session.apply_state_dto(SaveService.new().capture(mid_session))
+	var continued := DialogueRunner.new()
+	continued.configure(continued_session)
+	continued.first_pass_only = true
+	continued.load_file("res://data/narrative/prologue.json")
+	continued.start()
+	context.check(mid.current_cue().get("id") == "TUT_STORY_002" and continued.current_cue().get("id") == "TUT_STORY_002", "Continue resumes after the last completed first-pass cue")
+	var completed_session := GameSession.new()
+	completed_session.apply_state_dto(SaveService.new().capture(session))
+	context.check(completed_session.world_flags.get("prologue_completed") == true, "Completed first pass continues through the existing save DTO")
+
+func _test_skip(context: TestContext) -> void:
+	var session := GameSession.new()
+	var command_counts: Dictionary = {}
+	var runner := DialogueRunner.new()
+	runner.configure(session)
+	runner.command_requested.connect(func(command: Dictionary) -> void:
+		session.world_flags[command["key"]] = command["value"]
+		command_counts[command["key"]] = int(command_counts.get(command["key"], 0)) + 1
+	)
+	context.check(runner.load_file("res://data/narrative/prologue.json") and runner.start(), "Prologue ready for skip from the first cue")
+	runner.skip_sequence()
+	context.check(runner.is_finished, "Skip reaches the same terminal state as normal completion")
+	context.check(runner.destination == "world", "Skip exits to gameplay, never to a montage")
+	context.check(session.world_flags.get("prologue_completed") == true, "Skip applies the required story postconditions")
+	context.check(int(command_counts.get("prologue_completed", 0)) == 1, "Whitelisted commands run exactly once")
+	context.check(session.seen_cue_ids.is_empty(), "Skipped cues are not recorded as read")
+	runner.skip_sequence()
+	context.check(int(command_counts.get("prologue_completed", 0)) == 1 and runner.is_finished, "Second skip is a no-op")
+	# Граница экрана пролога (mark_path_started): снимок «Первый след» переснимается
+	# со story-флагами, иначе возврат откатывает prologue_completed и Continue
+	# снова отправляет в катсцену.
+	session.mark_path_started()
+	var refreshed: Dictionary = session.checkpoints.first_trace_snapshot
+	context.check(refreshed.get("profile", {}).get("world_flags", {}).get("prologue_completed") == true, "Path start refreshes the First Trace snapshot with story flags")
+	# Пропуск из середины hold: тот же единственный переход и постусловия.
+	var mid_session := GameSession.new()
+	var mid := DialogueRunner.new()
+	mid.configure(mid_session)
+	mid.command_requested.connect(func(command: Dictionary) -> void: mid_session.world_flags[command["key"]] = command["value"])
+	context.check(mid.load_file("res://data/narrative/prologue.json") and mid.start(), "Second runner starts for mid-hold skip")
+	# Доходим до TUT_STORY_003 (hold): 0–1 line, 2 look, 3–6 line, 7 hold.
+	for cue_number: int in range(7):
+		mid.advance_ticks(DialogueRunner.TRANSITION_TICKS)
+		if mid.current_kind() == "look":
+			mid.look()
+		else:
+			_tap_through(mid)
+	mid.advance_ticks(DialogueRunner.TRANSITION_TICKS)
+	context.check(mid.current_kind() == "hold", "Fixture reaches the hold cue")
+	mid.begin_hold()
+	mid.advance_ticks(3)
+	context.check(mid.holding, "Hold is in progress before skip")
+	mid.skip_sequence()
+	context.check(mid.is_finished and not mid.holding and mid.hold_ticks == 0, "Skip stops hold state and finishes")
+	context.check(mid_session.world_flags.get("prologue_completed") == true, "Mid-hold skip keeps postconditions")
+	context.check(not mid_session.seen_cue_ids.has("TUT_STORY_003") and not mid_session.seen_cue_ids.has("DIA_GODDESS_001") and not mid_session.seen_cue_ids.has("TITLE"), "Skipped cues are not recorded as read")
+	context.check(mid_session.seen_cue_ids.size() == 7, "Only the seven actually played cues keep their seen flags")
+
+func _tap_through(runner: DialogueRunner) -> void:
+	# Реплика завершается проходом по страницам, а не одним tap.
+	var index: int = runner.index
+	for step: int in range(24):
+		if runner.index != index or runner.is_finished:
+			return
+		runner.tap()
 
 func _normalized(text: String) -> String:
 	return " ".join(text.split(" ", false))

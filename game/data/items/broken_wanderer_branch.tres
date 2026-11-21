@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://domain/definitions/item_definition.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = "broken_wanderer_branch"
+display_name = "Прут странника"
+description = "Сухая ветвь, с которой Харуто начал путь."
+rarity_id = "common"
+type_id = "weapon"
+slot_id = "weapon"
+stack_limit = 1
+level = 1
+sale_price_copper = 0
+sellable = false
+modifiers = Array[StatModifierDefinition]([])

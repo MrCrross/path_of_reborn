@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ActorDefinition" format=3]
+
+[ext_resource type="Script" path="res://domain/definitions/actor_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "road_companion"
+display_name = "Спутник"
+max_hp = 14
+strength = 3
+defense = 2
+mana = 1
+xp_thresholds = Array[int]([4, 8, 12, 18])
+strength_upgrade_amount = 1
+max_hp_upgrade_amount = 3

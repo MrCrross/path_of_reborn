@@ -1,0 +1,13 @@
+{
+	"image_error": 0,
+	"items": 0,
+	"label": "runtime_world",
+	"level": 1,
+	"pending_upgrades": 0,
+	"route": {
+		"completed": false,
+		"next_index": 0,
+		"route_id": "forest_edge_slice"
+	},
+	"screen": "World"
+}

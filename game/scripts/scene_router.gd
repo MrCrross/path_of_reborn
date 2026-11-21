@@ -8,9 +8,11 @@ const SCENES: Dictionary = {
 	"prologue": "res://scenes/prologue.tscn",
 	"world": "res://scenes/world.tscn",
 	"combat": "res://scenes/combat.tscn",
-	"reward": "res://scenes/reward.tscn",
 	"inventory": "res://scenes/inventory.tscn",
 	"checkpoint": "res://scenes/checkpoint.tscn",
+	"merchant": "res://scenes/merchant.tscn",
+	"characters": "res://scenes/characters.tscn",
+	"settings": "res://scenes/settings.tscn",
 }
 
 var current_screen: Control
@@ -22,11 +24,15 @@ func configure(host: Control, session: GameSession) -> void:
 	_session = session
 
 func go_to(scene_id: String) -> bool:
-	if not SCENES.has(scene_id):
+	var open_hero: bool = scene_id == "hero_profile"
+	var screen_id: String = "characters" if open_hero else scene_id
+	if not SCENES.has(screen_id):
 		return false
-	var packed: PackedScene = load(SCENES[scene_id])
+	var packed: PackedScene = load(SCENES[screen_id])
 	var screen: Control = packed.instantiate()
-	if screen.has_method("configure"):
+	if open_hero:
+		screen.call("configure", _session, true)
+	elif screen.has_method("configure"):
 		screen.call("configure", _session)
 	if screen.has_signal("navigate_requested"):
 		screen.connect("navigate_requested", go_to)

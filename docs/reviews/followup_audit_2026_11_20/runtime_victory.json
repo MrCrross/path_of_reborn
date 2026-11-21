@@ -1,0 +1,22 @@
+{
+	"enemy_frame": 1,
+	"enemy_hp": 0,
+	"finished": true,
+	"hero_begin_connections": 0,
+	"hero_clip_is_idle": true,
+	"hero_frame": 0,
+	"hero_hp": 9,
+	"image_error": 0,
+	"items": 1,
+	"label": "runtime_victory",
+	"level": 2,
+	"pending_upgrades": 1,
+	"phase": 3,
+	"route": {
+		"completed": false,
+		"next_index": 1,
+		"route_id": "forest_edge_slice"
+	},
+	"screen": "Combat",
+	"tick": 259
+}

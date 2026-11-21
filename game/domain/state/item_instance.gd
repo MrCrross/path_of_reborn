@@ -6,6 +6,9 @@ var definition_id: String = ""
 var quantity: int = 1
 var aspect_id: String = ""
 var secured: bool = false
+var level: int = 1
+var sale_price_copper: int = 0
+var sellable: bool = false
 
 func capture_dto() -> Dictionary:
 	return {
@@ -14,4 +17,7 @@ func capture_dto() -> Dictionary:
 		"quantity": quantity,
 		"aspect_id": aspect_id,
 		"secured": secured,
+		"level": level,
+		"sale_price_copper": sale_price_copper,
+		"sellable": sellable,
 	}

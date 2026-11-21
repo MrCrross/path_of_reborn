@@ -1,0 +1,851 @@
+{
+	"captures": [
+		{
+			"error": 0,
+			"label": "01_title",
+			"size": [
+				360,
+				640
+			]
+		},
+		{
+			"error": 0,
+			"label": "02_tokyo",
+			"size": [
+				360,
+				640
+			]
+		},
+		{
+			"error": 0,
+			"label": "03_crosswalk_hold",
+			"size": [
+				360,
+				640
+			]
+		},
+		{
+			"error": 0,
+			"label": "04_threshold",
+			"size": [
+				360,
+				640
+			]
+		},
+		{
+			"error": 0,
+			"label": "05_first_trail",
+			"size": [
+				360,
+				640
+			]
+		},
+		{
+			"error": 0,
+			"label": "16_tall_view",
+			"size": [
+				360,
+				778
+			]
+		},
+		{
+			"error": 0,
+			"label": "13_checkpoint",
+			"size": [
+				360,
+				640
+			]
+		},
+		{
+			"error": 0,
+			"label": "06_slime",
+			"size": [
+				360,
+				640
+			]
+		},
+		{
+			"error": 0,
+			"label": "07_first_loot",
+			"size": [
+				360,
+				640
+			]
+		},
+		{
+			"error": 0,
+			"label": "08_trail_after_loot",
+			"size": [
+				360,
+				640
+			]
+		},
+		{
+			"error": 0,
+			"label": "09_bag",
+			"size": [
+				360,
+				640
+			]
+		},
+		{
+			"error": 0,
+			"label": "10_goblin_loot",
+			"size": [
+				360,
+				640
+			]
+		},
+		{
+			"error": 0,
+			"label": "11_end_of_trail",
+			"size": [
+				360,
+				640
+			]
+		},
+		{
+			"error": 0,
+			"label": "12_encounter_sheet",
+			"size": [
+				360,
+				640
+			]
+		}
+	],
+	"checks": [
+		{
+			"message": "Capture 01_title",
+			"ok": true
+		},
+		{
+			"message": "Begin starts the prologue",
+			"ok": true
+		},
+		{
+			"message": "Capture 02_tokyo",
+			"ok": true
+		},
+		{
+			"message": "Capture 03_crosswalk_hold",
+			"ok": true
+		},
+		{
+			"message": "Capture 04_threshold",
+			"ok": true
+		},
+		{
+			"message": "First-pass prologue reaches World",
+			"ok": true
+		},
+		{
+			"message": "First pass visits the authored 15 cues",
+			"ok": true
+		},
+		{
+			"message": "Capture 05_first_trail",
+			"ok": true
+		},
+		{
+			"message": "world uses the real (360, 640) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "world has no visible out-of-window controls at (360, 640)",
+			"ok": true
+		},
+		{
+			"message": "world uses the real (360, 800) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "world has no visible out-of-window controls at (360, 800)",
+			"ok": true
+		},
+		{
+			"message": "world uses the real (390, 844) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "world has no visible out-of-window controls at (390, 844)",
+			"ok": true
+		},
+		{
+			"message": "Capture 16_tall_view",
+			"ok": true
+		},
+		{
+			"message": "world uses the real (412, 915) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "world has no visible out-of-window controls at (412, 915)",
+			"ok": true
+		},
+		{
+			"message": "Capture 13_checkpoint",
+			"ok": true
+		},
+		{
+			"message": "checkpoint uses the real (360, 640) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "checkpoint has no visible out-of-window controls at (360, 640)",
+			"ok": true
+		},
+		{
+			"message": "checkpoint uses the real (360, 800) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "checkpoint has no visible out-of-window controls at (360, 800)",
+			"ok": true
+		},
+		{
+			"message": "checkpoint uses the real (390, 844) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "checkpoint has no visible out-of-window controls at (390, 844)",
+			"ok": true
+		},
+		{
+			"message": "checkpoint uses the real (412, 915) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "checkpoint has no visible out-of-window controls at (412, 915)",
+			"ok": true
+		},
+		{
+			"message": "A free-area tap starts the first encounter",
+			"ok": true
+		},
+		{
+			"message": "Clean profile keeps full auto as the default",
+			"ok": true
+		},
+		{
+			"message": "Capture 06_slime",
+			"ok": true
+		},
+		{
+			"message": "Mode HUD and Pause do not intersect at 360x640",
+			"ok": true
+		},
+		{
+			"message": "Capture 07_first_loot",
+			"ok": true
+		},
+		{
+			"message": "Victory waits for claim without granting the crystal",
+			"ok": true
+		},
+		{
+			"message": "Result remains open after four seconds",
+			"ok": true
+		},
+		{
+			"message": "Every visible reward card participates in one atomic claim",
+			"ok": true
+		},
+		{
+			"message": "One atomic claim returns to World",
+			"ok": true
+		},
+		{
+			"message": "Claim settles the displayed result",
+			"ok": true
+		},
+		{
+			"message": "First route clear grants crystals, not the story sword",
+			"ok": true
+		},
+		{
+			"message": "Capture 08_trail_after_loot",
+			"ok": true
+		},
+		{
+			"message": "World exposes the pending upgrade",
+			"ok": true
+		},
+		{
+			"message": "Capture 09_bag",
+			"ok": true
+		},
+		{
+			"message": "First upgrade receives focus",
+			"ok": true
+		},
+		{
+			"message": "Strength choice applies once and updates immediately",
+			"ok": true
+		},
+		{
+			"message": "inventory uses the real (360, 640) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "inventory has no visible out-of-window controls at (360, 640)",
+			"ok": true
+		},
+		{
+			"message": "inventory uses the real (360, 800) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "inventory has no visible out-of-window controls at (360, 800)",
+			"ok": true
+		},
+		{
+			"message": "inventory uses the real (390, 844) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "inventory has no visible out-of-window controls at (390, 844)",
+			"ok": true
+		},
+		{
+			"message": "inventory uses the real (412, 915) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "inventory has no visible out-of-window controls at (412, 915)",
+			"ok": true
+		},
+		{
+			"message": "Daijiro's intervention leads to the story scout encounter",
+			"ok": true
+		},
+		{
+			"message": "Daijiro's introduction starts the story fight without an early sword",
+			"ok": true
+		},
+		{
+			"message": "Capture 10_goblin_loot",
+			"ok": true
+		},
+		{
+			"message": "Every visible reward card participates in one atomic claim",
+			"ok": true
+		},
+		{
+			"message": "The story win returns to Daijiro before granting the sword",
+			"ok": true
+		},
+		{
+			"message": "Gratitude opens the separate gift card before its claim",
+			"ok": true
+		},
+		{
+			"message": "Daijiro grants exactly one sword after the completed introduction",
+			"ok": true
+		},
+		{
+			"message": "Capture 11_end_of_trail",
+			"ok": true
+		},
+		{
+			"message": "Scout completion promotes the trial",
+			"ok": true
+		},
+		{
+			"message": "Capture 12_encounter_sheet",
+			"ok": true
+		},
+		{
+			"message": "Repeats remain available as secondary access",
+			"ok": true
+		},
+		{
+			"message": "A free-area tap directly starts the trial",
+			"ok": true
+		}
+	],
+	"checks_count": 62,
+	"failed": 0,
+	"final_actions": 41,
+	"first_upgrade": {
+		"actions": 24,
+		"hp_before": 12,
+		"seconds_from_new_game": 15.58,
+		"strength_after": 4,
+		"strength_before": 3
+	},
+	"prologue": {
+		"actions": 18,
+		"cues": 15,
+		"seconds_to_world": 3.55
+	},
+	"windows": [
+		{
+			"gameplay_area_ratio": 1.0,
+			"gameplay_pixels": [
+				360.0,
+				640.0
+			],
+			"image": [
+				720,
+				1280
+			],
+			"logical_viewport": [
+				180.0,
+				320.0
+			],
+			"offset": [
+				0.0,
+				0.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				320.0
+			],
+			"screen_state": "world",
+			"window": [
+				360,
+				640
+			]
+		},
+		{
+			"gameplay_area_ratio": 1.0,
+			"gameplay_pixels": [
+				360.0,
+				800.0
+			],
+			"image": [
+				720,
+				1600
+			],
+			"logical_viewport": [
+				180.0,
+				400.0
+			],
+			"offset": [
+				0.0,
+				0.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				400.0
+			],
+			"screen_state": "world",
+			"window": [
+				360,
+				800
+			]
+		},
+		{
+			"gameplay_area_ratio": 0.851,
+			"gameplay_pixels": [
+				360.0,
+				778.0
+			],
+			"image": [
+				720,
+				1556
+			],
+			"logical_viewport": [
+				180.0,
+				389.0
+			],
+			"offset": [
+				15.0,
+				33.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				389.0
+			],
+			"screen_state": "world",
+			"window": [
+				390,
+				844
+			]
+		},
+		{
+			"gameplay_area_ratio": 0.762,
+			"gameplay_pixels": [
+				360.0,
+				798.0
+			],
+			"image": [
+				720,
+				1596
+			],
+			"logical_viewport": [
+				180.0,
+				399.0
+			],
+			"offset": [
+				26.0,
+				59.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				399.0
+			],
+			"screen_state": "world",
+			"window": [
+				412,
+				915
+			]
+		},
+		{
+			"gameplay_area_ratio": 1.0,
+			"gameplay_pixels": [
+				360.0,
+				640.0
+			],
+			"image": [
+				720,
+				1280
+			],
+			"logical_viewport": [
+				180.0,
+				320.0
+			],
+			"offset": [
+				0.0,
+				0.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				320.0
+			],
+			"screen_state": "checkpoint",
+			"window": [
+				360,
+				640
+			]
+		},
+		{
+			"gameplay_area_ratio": 1.0,
+			"gameplay_pixels": [
+				360.0,
+				800.0
+			],
+			"image": [
+				720,
+				1600
+			],
+			"logical_viewport": [
+				180.0,
+				400.0
+			],
+			"offset": [
+				0.0,
+				0.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				400.0
+			],
+			"screen_state": "checkpoint",
+			"window": [
+				360,
+				800
+			]
+		},
+		{
+			"gameplay_area_ratio": 0.851,
+			"gameplay_pixels": [
+				360.0,
+				778.0
+			],
+			"image": [
+				720,
+				1556
+			],
+			"logical_viewport": [
+				180.0,
+				389.0
+			],
+			"offset": [
+				15.0,
+				33.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				389.0
+			],
+			"screen_state": "checkpoint",
+			"window": [
+				390,
+				844
+			]
+		},
+		{
+			"gameplay_area_ratio": 0.762,
+			"gameplay_pixels": [
+				360.0,
+				798.0
+			],
+			"image": [
+				720,
+				1596
+			],
+			"logical_viewport": [
+				180.0,
+				399.0
+			],
+			"offset": [
+				26.0,
+				59.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				399.0
+			],
+			"screen_state": "checkpoint",
+			"window": [
+				412,
+				915
+			]
+		},
+		{
+			"gameplay_area_ratio": 1.0,
+			"gameplay_pixels": [
+				360.0,
+				640.0
+			],
+			"image": [
+				720,
+				1280
+			],
+			"logical_viewport": [
+				180.0,
+				320.0
+			],
+			"offset": [
+				0.0,
+				0.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				320.0
+			],
+			"screen_state": "inventory",
+			"window": [
+				360,
+				640
+			]
+		},
+		{
+			"gameplay_area_ratio": 1.0,
+			"gameplay_pixels": [
+				360.0,
+				800.0
+			],
+			"image": [
+				720,
+				1600
+			],
+			"logical_viewport": [
+				180.0,
+				400.0
+			],
+			"offset": [
+				0.0,
+				0.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				400.0
+			],
+			"screen_state": "inventory",
+			"window": [
+				360,
+				800
+			]
+		},
+		{
+			"gameplay_area_ratio": 0.851,
+			"gameplay_pixels": [
+				360.0,
+				778.0
+			],
+			"image": [
+				720,
+				1556
+			],
+			"logical_viewport": [
+				180.0,
+				389.0
+			],
+			"offset": [
+				15.0,
+				33.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				389.0
+			],
+			"screen_state": "inventory",
+			"window": [
+				390,
+				844
+			]
+		},
+		{
+			"gameplay_area_ratio": 0.762,
+			"gameplay_pixels": [
+				360.0,
+				798.0
+			],
+			"image": [
+				720,
+				1596
+			],
+			"logical_viewport": [
+				180.0,
+				399.0
+			],
+			"offset": [
+				26.0,
+				59.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				399.0
+			],
+			"screen_state": "inventory",
+			"window": [
+				412,
+				915
+			]
+		}
+	]
+}

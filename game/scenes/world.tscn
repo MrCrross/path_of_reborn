@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/world.gd" id="1_world"]
+[ext_resource type="Texture2D" path="res://art/characters/haruto_exiled_idle.png" id="2_hero"]
+[ext_resource type="Script" path="res://scripts/ui/safe_area.gd" id="3_safe"]
 
 [node name="World" type="Control"]
 layout_mode = 3
@@ -18,83 +20,278 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.08, 0.14, 0.12, 1)
+color = Color(0.05, 0.09, 0.07, 1)
 mouse_filter = 2
 
-[node name="Margin" type="MarginContainer" parent="."]
+[node name="ArtBackground" type="TextureRect" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 12.0
-offset_top = 10.0
-offset_right = -12.0
-offset_bottom = -10.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HeroSprite" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+offset_right = 96.0
+offset_bottom = 128.0
+mouse_filter = 2
+texture = ExtResource("2_hero")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+script = ExtResource("3_safe")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+padding = 6
 
 [node name="Column" type="VBoxContainer" parent="Margin"]
 layout_mode = 2
 theme_override_constants/separation = 5
 
-[node name="Heading" type="Label" parent="Margin/Column"]
+[node name="TopBar" type="VBoxContainer" parent="Margin/Column"]
+layout_mode = 2
+theme_override_constants/separation = 1
+
+[node name="Row" type="HBoxContainer" parent="Margin/Column/TopBar"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="LeftZone" type="Control" parent="Margin/Column/TopBar/Row"]
+layout_mode = 2
+custom_minimum_size = Vector2(48, 24)
+
+[node name="SettingsButton" type="Button" parent="Margin/Column/TopBar/Row/LeftZone"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 24.0
+offset_bottom = 24.0
+accessibility_name = "Настройки"
+
+[node name="CenterBlock" type="VBoxContainer" parent="Margin/Column/TopBar/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 0
+
+[node name="HeroLabel" type="Label" parent="Margin/Column/TopBar/Row/CenterBlock"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "ГРАНИЦА ЛЕСА"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_outline_color = Color(0.06, 0.11, 0.08, 1)
+theme_override_constants/outline_size = 3
+
+[node name="LocationLabel" type="Label" parent="Margin/Column/TopBar/Row/CenterBlock"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.78, 0.8, 0.86, 1)
+theme_override_colors/font_outline_color = Color(0.06, 0.11, 0.08, 1)
+theme_override_constants/outline_size = 3
+autowrap_mode = 2
+
+[node name="RightZone" type="Control" parent="Margin/Column/TopBar/Row"]
+layout_mode = 2
+custom_minimum_size = Vector2(48, 24)
+
+[node name="BalanceButton" type="Button" parent="Margin/Column/TopBar/Row/RightZone"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(26, 24)
+layout_mode = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -26.0
+offset_bottom = 24.0
+grow_horizontal = 0
+theme_type_variation = &"HudIconButton"
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_outline_color = Color(0.06, 0.11, 0.08, 1)
+theme_override_constants/outline_size = 3
+icon_alignment = 2
+accessibility_name = "Баланс астр"
+
+[node name="TracesLabel" type="Label" parent="Margin/Column/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.78, 0.8, 0.86, 1)
+theme_override_colors/font_outline_color = Color(0.06, 0.11, 0.08, 1)
+theme_override_constants/outline_size = 3
+
+[node name="GoalPanel" type="PanelContainer" parent="Margin/Column"]
+visible = false
+layout_mode = 2
+theme_type_variation = &"HudPanel"
+
+[node name="GoalLabel" type="Label" parent="Margin/Column/GoalPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.78, 0.8, 0.86, 1)
+autowrap_mode = 2
+
+[node name="LockedPanel" type="PanelContainer" parent="Margin/Column"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"HudPanel"
+
+[node name="LockedLabel" type="Label" parent="Margin/Column/LockedPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.78, 0.8, 0.86, 1)
+autowrap_mode = 2
 horizontal_alignment = 1
 
-[node name="StatusText" type="Label" parent="Margin/Column"]
+[node name="SceneSpacer" type="Control" parent="Margin/Column"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="BottomColumn" type="VBoxContainer" parent="Margin/Column"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="UpgradeButton" type="Button" parent="Margin/Column/BottomColumn"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+custom_minimum_size = Vector2(0, 26)
+theme_type_variation = &"PrimaryButton"
+theme_override_font_sizes/font_size = 9
+text = "Выбрать улучшение"
+
+[node name="MerchantButton" type="Button" parent="Margin/Column/BottomColumn"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+custom_minimum_size = Vector2(0, 22)
+theme_override_font_sizes/font_size = 8
+text = "Оценка кристаллов у Дайдзиро"
+
+[node name="RepeatsButton" type="Button" parent="Margin/Column/BottomColumn"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+custom_minimum_size = Vector2(0, 20)
+theme_override_font_sizes/font_size = 9
+text = "Повторы и испытание"
+tooltip_text = "Добровольный выбор встреч: повторы и испытание"
+
+[node name="MainActionButton" type="Button" parent="Margin/Column/BottomColumn"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+theme_type_variation = &"PrimaryButton"
+theme_override_font_sizes/font_size = 11
+text = "Идти дальше"
+
+[node name="NavBar" type="HBoxContainer" parent="Margin/Column/BottomColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 3
+
+[node name="InventoryButton" type="Button" parent="Margin/Column/BottomColumn/NavBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+
+[node name="CheckpointButton" type="Button" parent="Margin/Column/BottomColumn/NavBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+
+[node name="CharactersButton" type="Button" parent="Margin/Column/BottomColumn/NavBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+
+[node name="RestButton" type="Button" parent="Margin/Column/BottomColumn/NavBar"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+
+[node name="EncounterSheet" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dim" type="ColorRect" parent="EncounterSheet"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03, 0.04, 0.05, 0.55)
+
+[node name="Panel" type="PanelContainer" parent="EncounterSheet"]
+layout_mode = 1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -72.0
+offset_top = -70.0
+offset_right = 72.0
+offset_bottom = 70.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"HudPanel"
+
+[node name="Column" type="VBoxContainer" parent="EncounterSheet/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="SheetCaption" type="Label" parent="EncounterSheet/Panel/Column"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 11
+text = "Выбор встречи"
+
+[node name="SheetRows" type="VBoxContainer" parent="EncounterSheet/Panel/Column"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_font_sizes/font_size = 11
-autowrap_mode = 3
-vertical_alignment = 1
+theme_override_constants/separation = 4
 
-[node name="SlimeButton" type="Button" parent="Margin/Column"]
+[node name="SheetClose" type="Button" parent="EncounterSheet/Panel/Column"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 30)
+custom_minimum_size = Vector2(0, 26)
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = "1. Слизь"
+text = "Закрыть"
 
-[node name="GoblinButton" type="Button" parent="Margin/Column"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 30)
-layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = "2. Гоблин"
-
-[node name="InventoryButton" type="Button" parent="Margin/Column"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 28)
-layout_mode = 2
-theme_override_font_sizes/font_size = 11
-text = "Инвентарь · I"
-
-[node name="CheckpointButton" type="Button" parent="Margin/Column"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 30)
-layout_mode = 2
-theme_override_font_sizes/font_size = 11
-text = "Печать Пути · C"
-
-[node name="RestButton" type="Button" parent="Margin/Column"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 28)
-layout_mode = 2
-theme_override_font_sizes/font_size = 11
-text = "Отдохнуть в Лиорене"
-visible = false
-
-[node name="Hint" type="Label" parent="Margin/Column"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 10
-text = "Бой: Space — атака · E — уклонение"
-autowrap_mode = 3
-
-[connection signal="pressed" from="Margin/Column/SlimeButton" to="." method="_on_slime_pressed"]
-[connection signal="pressed" from="Margin/Column/GoblinButton" to="." method="_on_goblin_pressed"]
-[connection signal="pressed" from="Margin/Column/InventoryButton" to="." method="_on_inventory_pressed"]
-[connection signal="pressed" from="Margin/Column/CheckpointButton" to="." method="_on_checkpoint_pressed"]
-[connection signal="pressed" from="Margin/Column/RestButton" to="." method="_on_rest_pressed"]
+[connection signal="pressed" from="Margin/Column/TopBar/Row/LeftZone/SettingsButton" to="." method="_on_settings_pressed"]
+[connection signal="pressed" from="Margin/Column/TopBar/Row/RightZone/BalanceButton" to="." method="_on_balance_pressed"]
+[connection signal="pressed" from="Margin/Column/BottomColumn/UpgradeButton" to="." method="_on_hero_profile_pressed"]
+[connection signal="pressed" from="Margin/Column/BottomColumn/MainActionButton" to="." method="_on_main_action_pressed"]
+[connection signal="pressed" from="Margin/Column/BottomColumn/RepeatsButton" to="." method="_on_repeats_pressed"]
+[connection signal="pressed" from="Margin/Column/BottomColumn/MerchantButton" to="." method="_on_merchant_pressed"]
+[connection signal="gui_input" from="EncounterSheet/Dim" to="." method="_on_sheet_dismiss"]
+[connection signal="pressed" from="EncounterSheet/Panel/Column/SheetClose" to="." method="_on_sheet_close_pressed"]
+[connection signal="pressed" from="Margin/Column/BottomColumn/NavBar/InventoryButton" to="." method="_on_inventory_pressed"]
+[connection signal="pressed" from="Margin/Column/BottomColumn/NavBar/CheckpointButton" to="." method="_on_checkpoint_pressed"]
+[connection signal="pressed" from="Margin/Column/BottomColumn/NavBar/CharactersButton" to="." method="_on_characters_pressed"]
+[connection signal="pressed" from="Margin/Column/BottomColumn/NavBar/RestButton" to="." method="_on_rest_pressed"]

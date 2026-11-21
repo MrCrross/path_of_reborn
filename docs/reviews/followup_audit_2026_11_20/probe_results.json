@@ -1,0 +1,1727 @@
+{
+	"after_settlement": {
+		"beaten": {
+			"moss_slime": true
+		},
+		"route": {
+			"completed": false,
+			"next_index": 1,
+			"route_id": "forest_edge_slice"
+		}
+	},
+	"balance": [
+		{
+			"build": "base",
+			"counts": {
+				"damage": 3,
+				"dodge_requests": 0,
+				"dodged": 0,
+				"enemy_strikes": 3
+			},
+			"enemy": "moss_slime",
+			"hp": 9,
+			"max_hp": 12,
+			"policy": "idle_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 4.31666666666667,
+			"seed": 11,
+			"strength": 3,
+			"ticks": 259,
+			"won": true
+		},
+		{
+			"build": "base",
+			"counts": {
+				"damage": 3,
+				"dodge_requests": 0,
+				"dodged": 0,
+				"enemy_strikes": 3
+			},
+			"enemy": "moss_slime",
+			"hp": 9,
+			"max_hp": 12,
+			"policy": "idle_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 4.31666666666667,
+			"seed": 22,
+			"strength": 3,
+			"ticks": 259,
+			"won": true
+		},
+		{
+			"build": "base",
+			"counts": {
+				"damage": 3,
+				"dodge_requests": 0,
+				"dodged": 0,
+				"enemy_strikes": 3
+			},
+			"enemy": "moss_slime",
+			"hp": 9,
+			"max_hp": 12,
+			"policy": "idle_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 4.31666666666667,
+			"seed": 33,
+			"strength": 3,
+			"ticks": 259,
+			"won": true
+		},
+		{
+			"build": "base",
+			"counts": {
+				"damage": 1,
+				"dodge_requests": 7,
+				"dodged": 2,
+				"enemy_strikes": 3
+			},
+			"enemy": "moss_slime",
+			"hp": 11,
+			"max_hp": 12,
+			"policy": "spam_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 4.31666666666667,
+			"seed": 11,
+			"strength": 3,
+			"ticks": 259,
+			"won": true
+		},
+		{
+			"build": "base",
+			"counts": {
+				"damage": 1,
+				"dodge_requests": 7,
+				"dodged": 2,
+				"enemy_strikes": 3
+			},
+			"enemy": "moss_slime",
+			"hp": 11,
+			"max_hp": 12,
+			"policy": "spam_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 4.31666666666667,
+			"seed": 22,
+			"strength": 3,
+			"ticks": 259,
+			"won": true
+		},
+		{
+			"build": "base",
+			"counts": {
+				"damage": 1,
+				"dodge_requests": 7,
+				"dodged": 2,
+				"enemy_strikes": 3
+			},
+			"enemy": "moss_slime",
+			"hp": 11,
+			"max_hp": 12,
+			"policy": "spam_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 4.31666666666667,
+			"seed": 33,
+			"strength": 3,
+			"ticks": 259,
+			"won": true
+		},
+		{
+			"build": "base",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 3,
+				"dodged": 3,
+				"enemy_strikes": 3
+			},
+			"enemy": "moss_slime",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "react_6_ticks_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 4.31666666666667,
+			"seed": 11,
+			"strength": 3,
+			"ticks": 259,
+			"won": true
+		},
+		{
+			"build": "base",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 3,
+				"dodged": 3,
+				"enemy_strikes": 3
+			},
+			"enemy": "moss_slime",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "react_6_ticks_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 4.31666666666667,
+			"seed": 22,
+			"strength": 3,
+			"ticks": 259,
+			"won": true
+		},
+		{
+			"build": "base",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 3,
+				"dodged": 3,
+				"enemy_strikes": 3
+			},
+			"enemy": "moss_slime",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "react_6_ticks_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 4.31666666666667,
+			"seed": 33,
+			"strength": 3,
+			"ticks": 259,
+			"won": true
+		},
+		{
+			"build": "base",
+			"counts": {
+				"damage": 6,
+				"dodge_requests": 0,
+				"dodged": 0,
+				"enemy_strikes": 6
+			},
+			"enemy": "goblin_scout",
+			"hp": 6,
+			"max_hp": 12,
+			"policy": "idle_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 6.31666666666667,
+			"seed": 11,
+			"strength": 3,
+			"ticks": 379,
+			"won": true
+		},
+		{
+			"build": "base",
+			"counts": {
+				"damage": 6,
+				"dodge_requests": 0,
+				"dodged": 0,
+				"enemy_strikes": 6
+			},
+			"enemy": "goblin_scout",
+			"hp": 6,
+			"max_hp": 12,
+			"policy": "idle_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 6.31666666666667,
+			"seed": 22,
+			"strength": 3,
+			"ticks": 379,
+			"won": true
+		},
+		{
+			"build": "base",
+			"counts": {
+				"damage": 6,
+				"dodge_requests": 0,
+				"dodged": 0,
+				"enemy_strikes": 6
+			},
+			"enemy": "goblin_scout",
+			"hp": 6,
+			"max_hp": 12,
+			"policy": "idle_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 6.31666666666667,
+			"seed": 33,
+			"strength": 3,
+			"ticks": 379,
+			"won": true
+		},
+		{
+			"build": "base",
+			"counts": {
+				"damage": 2,
+				"dodge_requests": 10,
+				"dodged": 4,
+				"enemy_strikes": 6
+			},
+			"enemy": "goblin_scout",
+			"hp": 10,
+			"max_hp": 12,
+			"policy": "spam_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 6.31666666666667,
+			"seed": 11,
+			"strength": 3,
+			"ticks": 379,
+			"won": true
+		},
+		{
+			"build": "base",
+			"counts": {
+				"damage": 2,
+				"dodge_requests": 10,
+				"dodged": 4,
+				"enemy_strikes": 6
+			},
+			"enemy": "goblin_scout",
+			"hp": 10,
+			"max_hp": 12,
+			"policy": "spam_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 6.31666666666667,
+			"seed": 22,
+			"strength": 3,
+			"ticks": 379,
+			"won": true
+		},
+		{
+			"build": "base",
+			"counts": {
+				"damage": 2,
+				"dodge_requests": 10,
+				"dodged": 4,
+				"enemy_strikes": 6
+			},
+			"enemy": "goblin_scout",
+			"hp": 10,
+			"max_hp": 12,
+			"policy": "spam_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 6.31666666666667,
+			"seed": 33,
+			"strength": 3,
+			"ticks": 379,
+			"won": true
+		},
+		{
+			"build": "base",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 3,
+				"dodged": 6,
+				"enemy_strikes": 6
+			},
+			"enemy": "goblin_scout",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "react_6_ticks_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 6.31666666666667,
+			"seed": 11,
+			"strength": 3,
+			"ticks": 379,
+			"won": true
+		},
+		{
+			"build": "base",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 3,
+				"dodged": 6,
+				"enemy_strikes": 6
+			},
+			"enemy": "goblin_scout",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "react_6_ticks_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 6.31666666666667,
+			"seed": 22,
+			"strength": 3,
+			"ticks": 379,
+			"won": true
+		},
+		{
+			"build": "base",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 3,
+				"dodged": 6,
+				"enemy_strikes": 6
+			},
+			"enemy": "goblin_scout",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "react_6_ticks_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 6.31666666666667,
+			"seed": 33,
+			"strength": 3,
+			"ticks": 379,
+			"won": true
+		},
+		{
+			"build": "strength_level_5",
+			"counts": {
+				"damage": 1,
+				"dodge_requests": 0,
+				"dodged": 0,
+				"enemy_strikes": 1
+			},
+			"enemy": "moss_slime",
+			"hp": 11,
+			"max_hp": 12,
+			"policy": "idle_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 1.31666666666667,
+			"seed": 11,
+			"strength": 7,
+			"ticks": 79,
+			"won": true
+		},
+		{
+			"build": "strength_level_5",
+			"counts": {
+				"damage": 1,
+				"dodge_requests": 0,
+				"dodged": 0,
+				"enemy_strikes": 1
+			},
+			"enemy": "moss_slime",
+			"hp": 11,
+			"max_hp": 12,
+			"policy": "idle_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 1.31666666666667,
+			"seed": 22,
+			"strength": 7,
+			"ticks": 79,
+			"won": true
+		},
+		{
+			"build": "strength_level_5",
+			"counts": {
+				"damage": 1,
+				"dodge_requests": 0,
+				"dodged": 0,
+				"enemy_strikes": 1
+			},
+			"enemy": "moss_slime",
+			"hp": 11,
+			"max_hp": 12,
+			"policy": "idle_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 1.31666666666667,
+			"seed": 33,
+			"strength": 7,
+			"ticks": 79,
+			"won": true
+		},
+		{
+			"build": "strength_level_5",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 2,
+				"dodged": 1,
+				"enemy_strikes": 1
+			},
+			"enemy": "moss_slime",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "spam_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 1.31666666666667,
+			"seed": 11,
+			"strength": 7,
+			"ticks": 79,
+			"won": true
+		},
+		{
+			"build": "strength_level_5",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 2,
+				"dodged": 1,
+				"enemy_strikes": 1
+			},
+			"enemy": "moss_slime",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "spam_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 1.31666666666667,
+			"seed": 22,
+			"strength": 7,
+			"ticks": 79,
+			"won": true
+		},
+		{
+			"build": "strength_level_5",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 2,
+				"dodged": 1,
+				"enemy_strikes": 1
+			},
+			"enemy": "moss_slime",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "spam_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 1.31666666666667,
+			"seed": 33,
+			"strength": 7,
+			"ticks": 79,
+			"won": true
+		},
+		{
+			"build": "strength_level_5",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 1,
+				"dodged": 1,
+				"enemy_strikes": 1
+			},
+			"enemy": "moss_slime",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "react_6_ticks_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 1.31666666666667,
+			"seed": 11,
+			"strength": 7,
+			"ticks": 79,
+			"won": true
+		},
+		{
+			"build": "strength_level_5",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 1,
+				"dodged": 1,
+				"enemy_strikes": 1
+			},
+			"enemy": "moss_slime",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "react_6_ticks_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 1.31666666666667,
+			"seed": 22,
+			"strength": 7,
+			"ticks": 79,
+			"won": true
+		},
+		{
+			"build": "strength_level_5",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 1,
+				"dodged": 1,
+				"enemy_strikes": 1
+			},
+			"enemy": "moss_slime",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "react_6_ticks_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 1.31666666666667,
+			"seed": 33,
+			"strength": 7,
+			"ticks": 79,
+			"won": true
+		},
+		{
+			"build": "strength_level_5",
+			"counts": {
+				"damage": 2,
+				"dodge_requests": 0,
+				"dodged": 0,
+				"enemy_strikes": 2
+			},
+			"enemy": "goblin_scout",
+			"hp": 10,
+			"max_hp": 12,
+			"policy": "idle_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 2.31666666666667,
+			"seed": 11,
+			"strength": 7,
+			"ticks": 139,
+			"won": true
+		},
+		{
+			"build": "strength_level_5",
+			"counts": {
+				"damage": 2,
+				"dodge_requests": 0,
+				"dodged": 0,
+				"enemy_strikes": 2
+			},
+			"enemy": "goblin_scout",
+			"hp": 10,
+			"max_hp": 12,
+			"policy": "idle_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 2.31666666666667,
+			"seed": 22,
+			"strength": 7,
+			"ticks": 139,
+			"won": true
+		},
+		{
+			"build": "strength_level_5",
+			"counts": {
+				"damage": 2,
+				"dodge_requests": 0,
+				"dodged": 0,
+				"enemy_strikes": 2
+			},
+			"enemy": "goblin_scout",
+			"hp": 10,
+			"max_hp": 12,
+			"policy": "idle_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 2.31666666666667,
+			"seed": 33,
+			"strength": 7,
+			"ticks": 139,
+			"won": true
+		},
+		{
+			"build": "strength_level_5",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 4,
+				"dodged": 2,
+				"enemy_strikes": 2
+			},
+			"enemy": "goblin_scout",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "spam_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 2.31666666666667,
+			"seed": 11,
+			"strength": 7,
+			"ticks": 139,
+			"won": true
+		},
+		{
+			"build": "strength_level_5",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 4,
+				"dodged": 2,
+				"enemy_strikes": 2
+			},
+			"enemy": "goblin_scout",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "spam_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 2.31666666666667,
+			"seed": 22,
+			"strength": 7,
+			"ticks": 139,
+			"won": true
+		},
+		{
+			"build": "strength_level_5",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 4,
+				"dodged": 2,
+				"enemy_strikes": 2
+			},
+			"enemy": "goblin_scout",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "spam_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 2.31666666666667,
+			"seed": 33,
+			"strength": 7,
+			"ticks": 139,
+			"won": true
+		},
+		{
+			"build": "strength_level_5",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 1,
+				"dodged": 2,
+				"enemy_strikes": 2
+			},
+			"enemy": "goblin_scout",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "react_6_ticks_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 2.31666666666667,
+			"seed": 11,
+			"strength": 7,
+			"ticks": 139,
+			"won": true
+		},
+		{
+			"build": "strength_level_5",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 1,
+				"dodged": 2,
+				"enemy_strikes": 2
+			},
+			"enemy": "goblin_scout",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "react_6_ticks_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 2.31666666666667,
+			"seed": 22,
+			"strength": 7,
+			"ticks": 139,
+			"won": true
+		},
+		{
+			"build": "strength_level_5",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 1,
+				"dodged": 2,
+				"enemy_strikes": 2
+			},
+			"enemy": "goblin_scout",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "react_6_ticks_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 2.31666666666667,
+			"seed": 33,
+			"strength": 7,
+			"ticks": 139,
+			"won": true
+		},
+		{
+			"build": "health_level_5",
+			"counts": {
+				"damage": 3,
+				"dodge_requests": 0,
+				"dodged": 0,
+				"enemy_strikes": 3
+			},
+			"enemy": "moss_slime",
+			"hp": 25,
+			"max_hp": 28,
+			"policy": "idle_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 4.31666666666667,
+			"seed": 11,
+			"strength": 3,
+			"ticks": 259,
+			"won": true
+		},
+		{
+			"build": "health_level_5",
+			"counts": {
+				"damage": 3,
+				"dodge_requests": 0,
+				"dodged": 0,
+				"enemy_strikes": 3
+			},
+			"enemy": "moss_slime",
+			"hp": 25,
+			"max_hp": 28,
+			"policy": "idle_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 4.31666666666667,
+			"seed": 22,
+			"strength": 3,
+			"ticks": 259,
+			"won": true
+		},
+		{
+			"build": "health_level_5",
+			"counts": {
+				"damage": 3,
+				"dodge_requests": 0,
+				"dodged": 0,
+				"enemy_strikes": 3
+			},
+			"enemy": "moss_slime",
+			"hp": 25,
+			"max_hp": 28,
+			"policy": "idle_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 4.31666666666667,
+			"seed": 33,
+			"strength": 3,
+			"ticks": 259,
+			"won": true
+		},
+		{
+			"build": "health_level_5",
+			"counts": {
+				"damage": 1,
+				"dodge_requests": 7,
+				"dodged": 2,
+				"enemy_strikes": 3
+			},
+			"enemy": "moss_slime",
+			"hp": 27,
+			"max_hp": 28,
+			"policy": "spam_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 4.31666666666667,
+			"seed": 11,
+			"strength": 3,
+			"ticks": 259,
+			"won": true
+		},
+		{
+			"build": "health_level_5",
+			"counts": {
+				"damage": 1,
+				"dodge_requests": 7,
+				"dodged": 2,
+				"enemy_strikes": 3
+			},
+			"enemy": "moss_slime",
+			"hp": 27,
+			"max_hp": 28,
+			"policy": "spam_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 4.31666666666667,
+			"seed": 22,
+			"strength": 3,
+			"ticks": 259,
+			"won": true
+		},
+		{
+			"build": "health_level_5",
+			"counts": {
+				"damage": 1,
+				"dodge_requests": 7,
+				"dodged": 2,
+				"enemy_strikes": 3
+			},
+			"enemy": "moss_slime",
+			"hp": 27,
+			"max_hp": 28,
+			"policy": "spam_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 4.31666666666667,
+			"seed": 33,
+			"strength": 3,
+			"ticks": 259,
+			"won": true
+		},
+		{
+			"build": "health_level_5",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 3,
+				"dodged": 3,
+				"enemy_strikes": 3
+			},
+			"enemy": "moss_slime",
+			"hp": 28,
+			"max_hp": 28,
+			"policy": "react_6_ticks_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 4.31666666666667,
+			"seed": 11,
+			"strength": 3,
+			"ticks": 259,
+			"won": true
+		},
+		{
+			"build": "health_level_5",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 3,
+				"dodged": 3,
+				"enemy_strikes": 3
+			},
+			"enemy": "moss_slime",
+			"hp": 28,
+			"max_hp": 28,
+			"policy": "react_6_ticks_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 4.31666666666667,
+			"seed": 22,
+			"strength": 3,
+			"ticks": 259,
+			"won": true
+		},
+		{
+			"build": "health_level_5",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 3,
+				"dodged": 3,
+				"enemy_strikes": 3
+			},
+			"enemy": "moss_slime",
+			"hp": 28,
+			"max_hp": 28,
+			"policy": "react_6_ticks_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 4.31666666666667,
+			"seed": 33,
+			"strength": 3,
+			"ticks": 259,
+			"won": true
+		},
+		{
+			"build": "health_level_5",
+			"counts": {
+				"damage": 6,
+				"dodge_requests": 0,
+				"dodged": 0,
+				"enemy_strikes": 6
+			},
+			"enemy": "goblin_scout",
+			"hp": 22,
+			"max_hp": 28,
+			"policy": "idle_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 6.31666666666667,
+			"seed": 11,
+			"strength": 3,
+			"ticks": 379,
+			"won": true
+		},
+		{
+			"build": "health_level_5",
+			"counts": {
+				"damage": 6,
+				"dodge_requests": 0,
+				"dodged": 0,
+				"enemy_strikes": 6
+			},
+			"enemy": "goblin_scout",
+			"hp": 22,
+			"max_hp": 28,
+			"policy": "idle_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 6.31666666666667,
+			"seed": 22,
+			"strength": 3,
+			"ticks": 379,
+			"won": true
+		},
+		{
+			"build": "health_level_5",
+			"counts": {
+				"damage": 6,
+				"dodge_requests": 0,
+				"dodged": 0,
+				"enemy_strikes": 6
+			},
+			"enemy": "goblin_scout",
+			"hp": 22,
+			"max_hp": 28,
+			"policy": "idle_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 6.31666666666667,
+			"seed": 33,
+			"strength": 3,
+			"ticks": 379,
+			"won": true
+		},
+		{
+			"build": "health_level_5",
+			"counts": {
+				"damage": 2,
+				"dodge_requests": 10,
+				"dodged": 4,
+				"enemy_strikes": 6
+			},
+			"enemy": "goblin_scout",
+			"hp": 26,
+			"max_hp": 28,
+			"policy": "spam_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 6.31666666666667,
+			"seed": 11,
+			"strength": 3,
+			"ticks": 379,
+			"won": true
+		},
+		{
+			"build": "health_level_5",
+			"counts": {
+				"damage": 2,
+				"dodge_requests": 10,
+				"dodged": 4,
+				"enemy_strikes": 6
+			},
+			"enemy": "goblin_scout",
+			"hp": 26,
+			"max_hp": 28,
+			"policy": "spam_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 6.31666666666667,
+			"seed": 22,
+			"strength": 3,
+			"ticks": 379,
+			"won": true
+		},
+		{
+			"build": "health_level_5",
+			"counts": {
+				"damage": 2,
+				"dodge_requests": 10,
+				"dodged": 4,
+				"enemy_strikes": 6
+			},
+			"enemy": "goblin_scout",
+			"hp": 26,
+			"max_hp": 28,
+			"policy": "spam_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 6.31666666666667,
+			"seed": 33,
+			"strength": 3,
+			"ticks": 379,
+			"won": true
+		},
+		{
+			"build": "health_level_5",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 3,
+				"dodged": 6,
+				"enemy_strikes": 6
+			},
+			"enemy": "goblin_scout",
+			"hp": 28,
+			"max_hp": 28,
+			"policy": "react_6_ticks_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 6.31666666666667,
+			"seed": 11,
+			"strength": 3,
+			"ticks": 379,
+			"won": true
+		},
+		{
+			"build": "health_level_5",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 3,
+				"dodged": 6,
+				"enemy_strikes": 6
+			},
+			"enemy": "goblin_scout",
+			"hp": 28,
+			"max_hp": 28,
+			"policy": "react_6_ticks_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 6.31666666666667,
+			"seed": 22,
+			"strength": 3,
+			"ticks": 379,
+			"won": true
+		},
+		{
+			"build": "health_level_5",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 3,
+				"dodged": 6,
+				"enemy_strikes": 6
+			},
+			"enemy": "goblin_scout",
+			"hp": 28,
+			"max_hp": 28,
+			"policy": "react_6_ticks_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 6.31666666666667,
+			"seed": 33,
+			"strength": 3,
+			"ticks": 379,
+			"won": true
+		},
+		{
+			"build": "sword",
+			"counts": {
+				"damage": 1,
+				"dodge_requests": 0,
+				"dodged": 0,
+				"enemy_strikes": 1
+			},
+			"enemy": "moss_slime",
+			"hp": 11,
+			"max_hp": 12,
+			"policy": "idle_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 2.31666666666667,
+			"seed": 11,
+			"strength": 5,
+			"ticks": 139,
+			"won": true
+		},
+		{
+			"build": "sword",
+			"counts": {
+				"damage": 1,
+				"dodge_requests": 0,
+				"dodged": 0,
+				"enemy_strikes": 1
+			},
+			"enemy": "moss_slime",
+			"hp": 11,
+			"max_hp": 12,
+			"policy": "idle_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 2.31666666666667,
+			"seed": 22,
+			"strength": 5,
+			"ticks": 139,
+			"won": true
+		},
+		{
+			"build": "sword",
+			"counts": {
+				"damage": 1,
+				"dodge_requests": 0,
+				"dodged": 0,
+				"enemy_strikes": 1
+			},
+			"enemy": "moss_slime",
+			"hp": 11,
+			"max_hp": 12,
+			"policy": "idle_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 2.31666666666667,
+			"seed": 33,
+			"strength": 5,
+			"ticks": 139,
+			"won": true
+		},
+		{
+			"build": "sword",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 4,
+				"dodged": 1,
+				"enemy_strikes": 1
+			},
+			"enemy": "moss_slime",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "spam_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 2.31666666666667,
+			"seed": 11,
+			"strength": 5,
+			"ticks": 139,
+			"won": true
+		},
+		{
+			"build": "sword",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 4,
+				"dodged": 1,
+				"enemy_strikes": 1
+			},
+			"enemy": "moss_slime",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "spam_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 2.31666666666667,
+			"seed": 22,
+			"strength": 5,
+			"ticks": 139,
+			"won": true
+		},
+		{
+			"build": "sword",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 4,
+				"dodged": 1,
+				"enemy_strikes": 1
+			},
+			"enemy": "moss_slime",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "spam_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 2.31666666666667,
+			"seed": 33,
+			"strength": 5,
+			"ticks": 139,
+			"won": true
+		},
+		{
+			"build": "sword",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 1,
+				"dodged": 1,
+				"enemy_strikes": 1
+			},
+			"enemy": "moss_slime",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "react_6_ticks_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 2.31666666666667,
+			"seed": 11,
+			"strength": 5,
+			"ticks": 139,
+			"won": true
+		},
+		{
+			"build": "sword",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 1,
+				"dodged": 1,
+				"enemy_strikes": 1
+			},
+			"enemy": "moss_slime",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "react_6_ticks_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 2.31666666666667,
+			"seed": 22,
+			"strength": 5,
+			"ticks": 139,
+			"won": true
+		},
+		{
+			"build": "sword",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 1,
+				"dodged": 1,
+				"enemy_strikes": 1
+			},
+			"enemy": "moss_slime",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "react_6_ticks_v1",
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 2.31666666666667,
+			"seed": 33,
+			"strength": 5,
+			"ticks": 139,
+			"won": true
+		},
+		{
+			"build": "sword",
+			"counts": {
+				"damage": 4,
+				"dodge_requests": 0,
+				"dodged": 0,
+				"enemy_strikes": 4
+			},
+			"enemy": "goblin_scout",
+			"hp": 8,
+			"max_hp": 12,
+			"policy": "idle_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 3.31666666666667,
+			"seed": 11,
+			"strength": 5,
+			"ticks": 199,
+			"won": true
+		},
+		{
+			"build": "sword",
+			"counts": {
+				"damage": 4,
+				"dodge_requests": 0,
+				"dodged": 0,
+				"enemy_strikes": 4
+			},
+			"enemy": "goblin_scout",
+			"hp": 8,
+			"max_hp": 12,
+			"policy": "idle_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 3.31666666666667,
+			"seed": 22,
+			"strength": 5,
+			"ticks": 199,
+			"won": true
+		},
+		{
+			"build": "sword",
+			"counts": {
+				"damage": 4,
+				"dodge_requests": 0,
+				"dodged": 0,
+				"enemy_strikes": 4
+			},
+			"enemy": "goblin_scout",
+			"hp": 8,
+			"max_hp": 12,
+			"policy": "idle_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 3.31666666666667,
+			"seed": 33,
+			"strength": 5,
+			"ticks": 199,
+			"won": true
+		},
+		{
+			"build": "sword",
+			"counts": {
+				"damage": 1,
+				"dodge_requests": 5,
+				"dodged": 3,
+				"enemy_strikes": 4
+			},
+			"enemy": "goblin_scout",
+			"hp": 11,
+			"max_hp": 12,
+			"policy": "spam_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 3.31666666666667,
+			"seed": 11,
+			"strength": 5,
+			"ticks": 199,
+			"won": true
+		},
+		{
+			"build": "sword",
+			"counts": {
+				"damage": 1,
+				"dodge_requests": 5,
+				"dodged": 3,
+				"enemy_strikes": 4
+			},
+			"enemy": "goblin_scout",
+			"hp": 11,
+			"max_hp": 12,
+			"policy": "spam_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 3.31666666666667,
+			"seed": 22,
+			"strength": 5,
+			"ticks": 199,
+			"won": true
+		},
+		{
+			"build": "sword",
+			"counts": {
+				"damage": 1,
+				"dodge_requests": 5,
+				"dodged": 3,
+				"enemy_strikes": 4
+			},
+			"enemy": "goblin_scout",
+			"hp": 11,
+			"max_hp": 12,
+			"policy": "spam_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 3.31666666666667,
+			"seed": 33,
+			"strength": 5,
+			"ticks": 199,
+			"won": true
+		},
+		{
+			"build": "sword",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 2,
+				"dodged": 4,
+				"enemy_strikes": 4
+			},
+			"enemy": "goblin_scout",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "react_6_ticks_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 3.31666666666667,
+			"seed": 11,
+			"strength": 5,
+			"ticks": 199,
+			"won": true
+		},
+		{
+			"build": "sword",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 2,
+				"dodged": 4,
+				"enemy_strikes": 4
+			},
+			"enemy": "goblin_scout",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "react_6_ticks_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 3.31666666666667,
+			"seed": 22,
+			"strength": 5,
+			"ticks": 199,
+			"won": true
+		},
+		{
+			"build": "sword",
+			"counts": {
+				"damage": 0,
+				"dodge_requests": 2,
+				"dodged": 4,
+				"enemy_strikes": 4
+			},
+			"enemy": "goblin_scout",
+			"hp": 12,
+			"max_hp": 12,
+			"policy": "react_6_ticks_v1",
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"seconds": 3.31666666666667,
+			"seed": 33,
+			"strength": 5,
+			"ticks": 199,
+			"won": true
+		}
+	],
+	"guards": {
+		"invalid_route_completed": false,
+		"invalid_route_next": {},
+		"invalid_route_save_accepted": true,
+		"invalid_route_state": {
+			"completed": false,
+			"next_index": 99,
+			"route_id": "unknown_route"
+		},
+		"second_combat_accepted": true,
+		"shared_hero": true
+	},
+	"presentation": {
+		"enemy_clip_at_first_contact": "attack",
+		"enemy_frame_at_first_contact": 0,
+		"first_enemy_contact_tick": 48,
+		"hero_begin_connections": 0,
+		"hero_idle_at_strike_begin": true,
+		"loot_child_count": 3,
+		"loot_visible_at_victory": true,
+		"navigations_after_1_2s": [
+			"world"
+		],
+		"pause_animation_changed": true,
+		"pause_tick_unchanged": true,
+		"toast_still_visible_without_router": true
+	},
+	"save_observations": [
+		{
+			"beaten": {},
+			"echoes": 0,
+			"event": "inventory.changed",
+			"items": 1,
+			"level": 2,
+			"route": {
+				"completed": false,
+				"next_index": 0,
+				"route_id": "forest_edge_slice"
+			},
+			"settlement_run": "",
+			"valid": true
+		},
+		{
+			"beaten": {},
+			"echoes": 1,
+			"event": "profile_changed",
+			"items": 1,
+			"level": 2,
+			"route": {
+				"completed": false,
+				"next_index": 1,
+				"route_id": "forest_edge_slice"
+			},
+			"settlement_run": "run_000001",
+			"valid": true
+		}
+	]
+}
