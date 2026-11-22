@@ -41,6 +41,8 @@ const BACKGROUNDS := {
 	"title": "environments/white_threshold_background.png",
 	"world_forest_edge": "environments/first_breath_trail_background.png",
 	"world_lioren": "environments/lioren_south_gate_background.png",
+	"shop_cricket_twilight": "environments/cricket_twilight_interior_background.png",
+	"shop_appraisal": "environments/story/daijiro_crystal_appraisal_story.png",
 	"combat": "environments/first_breath_trail_background.png",
 }
 
@@ -91,6 +93,7 @@ const UI := {
 const EMPTY_SLOT_ICONS := {
 	"helmet": "ui/icons/slot_helmet_icon.png",
 	"armor": "ui/icons/slot_armor_icon.png",
+	"weapon": "ui/icons/slot_weapon_icon.png",
 	"boots": "ui/icons/slot_boots_icon.png",
 	"shoulders": "ui/icons/slot_shoulders_icon.png",
 	"familiar": "ui/icons/slot_familiar_icon.png",
@@ -104,6 +107,7 @@ const ITEM_ICONS := {
 	"broken_wanderer_branch": "equipment/broken_wanderer_branch_icon.png",
 	"training_sword": "equipment/novice_short_sword_icon.png",
 	"moss_charm": "equipment/moss_core_icon.png",
+	"wanderer_jacket": "equipment/wanderer_jacket_icon.png",
 	"echo_crystal": {
 		"moss": "equipment/echo_growth_cloudy_icon.png",
 		"goblin": "equipment/echo_dusk_clear_icon.png",
@@ -117,15 +121,22 @@ const ITEM_ICONS := {
 # от прозрачных краёв кадра.
 const HERO_EXILED := {
 	"idle": {"path": "characters/animations/haruto_exiled_idle_sheet.png", "count": 2, "frame": Vector2i(96, 128), "offset": Vector2(0, -48), "head": Vector2(0, -80)},
-	"attack": {"path": "characters/animations/haruto_exiled_branch_attack_sheet.png", "count": 4, "frame": Vector2i(112, 128), "offset": Vector2(0, -48), "head": Vector2(0, -80)},
+	"attack": {"path": "characters/animations/haruto_exiled_branch_attack_sheet.png", "count": 4, "frame": Vector2i(112, 128), "offset": Vector2(0, -48), "head": Vector2(0, -80), "contact_frame": 2},
 	"dodge": {"path": "characters/animations/haruto_exiled_dodge_sheet.png", "count": 4, "frame": Vector2i(96, 128), "offset": Vector2(0, -48), "head": Vector2(0, -80)},
 	"hit": {"path": "characters/animations/haruto_exiled_hit_sheet.png", "count": 2, "frame": Vector2i(96, 128), "offset": Vector2(0, -48), "head": Vector2(0, -80)},
 }
+const HERO_EXILED_SWORD := {
+	"idle": {"path": "characters/animations/haruto_exiled_sword_idle_sheet.png", "count": 2, "frame": Vector2i(96, 128), "offset": Vector2(0, -48)},
+	"attack": {"path": "characters/animations/haruto_exiled_sword_attack_sheet.png", "count": 5, "frame": Vector2i(112, 128), "offset": Vector2(0, -48), "contact_frame": 3},
+	"dodge": {"path": "characters/animations/haruto_exiled_sword_dodge_sheet.png", "count": 4, "frame": Vector2i(96, 128), "offset": Vector2(0, -48)},
+	"hit": {"path": "characters/animations/haruto_exiled_sword_hit_sheet.png", "count": 2, "frame": Vector2i(96, 128), "offset": Vector2(0, -48)},
+}
 const HERO_EXILED_STILL := "characters/haruto_exiled_idle.png"
 const MOSS_SLIME_STILL := "enemies/moss_slime_idle.png"
+const DAIJIRO_MERCHANT_STILL := "characters/daijiro_merchant_idle.png"
+const DAIJIRO_CART_PROP := "environments/props/daijiro_cart_overturned_prop.png"
 
-## Source-resolution stills (crop master-файлов без изменения пикселей;
-## измерения — art_working/visual_upgrade_2026_11_20/source_resolution_test/qa/source_audit.json).
+## Source-resolution stills. Источники и опорные точки записаны в assets/manifest.json.
 ## pivot — точка опоры в пикселях текстуры: середина solid bounds по X, нижняя
 ## граница по Y (alpha≥128). Это still-якорь, не контракт анимационных кадров.
 const SOURCE_STILLS := {
@@ -133,6 +144,18 @@ const SOURCE_STILLS := {
 		"path": HERO_EXILED_STILL,
 		"solid_height_px": 1275.0,
 		"pivot": Vector2(389, 1352),
+		"logical_height": SceneStaging.HERO_SOLID_HEIGHT,
+	},
+	"haruto_exiled_sword": {
+		"path": "characters/haruto_exiled_sword_idle.png",
+		"solid_height_px": 828.0,
+		"pivot": Vector2(235, 828),
+		"logical_height": SceneStaging.HERO_SOLID_HEIGHT,
+	},
+	"haruto_exiled_unarmed": {
+		"path": "characters/haruto_exiled_unarmed_idle.png",
+		"solid_height_px": 958.0,
+		"pivot": Vector2(271.5, 962),
 		"logical_height": SceneStaging.HERO_SOLID_HEIGHT,
 	},
 	"moss_slime": {
@@ -147,6 +170,16 @@ const SOURCE_STILLS := {
 static func still_scale(still_id: String) -> float:
 	var entry: Dictionary = SOURCE_STILLS[still_id]
 	return SceneStaging.still_scale(float(entry["solid_height_px"]), float(entry["logical_height"]))
+
+static func hero_still_id(inventory: InventoryService) -> String:
+	var weapon: ItemInstance = inventory.get_item(String(inventory.equipment_for().get("weapon", "")))
+	if weapon != null:
+		match weapon.definition_id:
+			"broken_wanderer_branch":
+				return "haruto_exiled"
+			"training_sword":
+				return "haruto_exiled_sword"
+	return "haruto_exiled_unarmed"
 
 const HERO_MODERN := {
 	"alarm": {"path": "characters/animations/haruto_modern_alarm_sheet.png", "count": 2, "frame": Vector2i(96, 128), "offset": Vector2(0, -48)},

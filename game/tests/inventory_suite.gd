@@ -109,14 +109,14 @@ func _test_first_route_reward(context: TestContext) -> void:
 	var weapons: Array[ItemInstance] = session.inventory.filter("weapon")
 	context.check(weapons.size() == 1 and weapons[0].definition_id == "broken_wanderer_branch", "The first clear grants no hidden sword and keeps the starting branch")
 	session.select_encounter("moss_slime")
-	var repeat := session.start_combat("moss_slime")
+	var repeat := session.start_combat("moss_slime", true)
 	repeat.enemy.current_hp = 1
 	repeat.advance_ticks(repeat.hero.definition.attack_startup_ticks + 1)
 	var control := GameSession.new()
 	control.route_state["next_index"] = 1
 	control.set_loot_seed("33")
 	control.loot_rng.state = int(loot_state_after_first)
-	var control_repeat := control.start_combat("moss_slime")
+	var control_repeat := control.start_combat("moss_slime", true)
 	control_repeat.enemy.current_hp = 1
 	control_repeat.advance_ticks(control_repeat.hero.definition.attack_startup_ticks + 1)
 	context.check(session.pending_battle_result.get("items", []) == control.pending_battle_result.get("items", []), "A repeat exactly matches the control random roll without a first-clear addition")
@@ -215,7 +215,7 @@ func _test_session_transition(context: TestContext) -> void:
 	var session := GameSession.new()
 	var swords: Array[ItemInstance] = session.inventory.add(session.get_item_definition("training_sword"), 1)
 	session.inventory.equip(swords[0].instance_id)
-	session.route_state["next_index"] = 1
+	session.route_state["next_index"] = 2
 	session.select_encounter("goblin_scout")
 	var combat := session.start_combat(session.current_enemy_id)
 	context.check(session.inventory.items.size() == 2 and session.inventory.equipment.get("weapon") == swords[0].instance_id, "Starting another encounter preserves inventory and equipment")
@@ -235,7 +235,7 @@ func _test_all_loot_sources(context: TestContext) -> void:
 			clear_crystals = clear_crystals and reward.get("item_id") == "echo_crystal"
 		context.check(clear_crystals, "%s first clear has no equipment or non-crystal reward" % node.get("node_id", ""))
 	var session := GameSession.new()
-	for encounter: String in ["moss_slime", "goblin_scout", "goblin_scout", GameSession.TRIAL_ENEMY_ID]:
+	for encounter: String in ["moss_slime", "moss_slime", "goblin_scout", "goblin_scout", GameSession.TRIAL_ENEMY_ID]:
 		context.check(session.select_encounter(encounter), "Encounter selection is legal: %s" % encounter)
 		var resolver: CombatResolver = session.start_combat(encounter)
 		resolver.enemy.current_hp = 1

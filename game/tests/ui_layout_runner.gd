@@ -43,6 +43,39 @@ func _bounds(screen: Control) -> void:
 		if control is Button or control is Label or control is ScrollContainer:
 			_check(bounds.grow(0.5).encloses(control.get_global_rect()), "%s %s outside %s: %s" % [screen.name, screen.get_path_to(control), bounds, control.get_global_rect()])
 
+func _test_prologue_hold(screen: Control) -> void:
+	var runner: DialogueRunner = screen.runner
+	for step: int in range(24):
+		runner.advance_ticks(60)
+		match runner.current_kind():
+			"hold":
+				break
+			"look":
+				runner.look()
+			_:
+				runner.tap()
+	await _settle()
+	var prompt: PanelContainer = screen.hold_area
+	var rect: Rect2 = prompt.get_global_rect()
+	_check(
+		prompt.visible and not screen.dialogue_panel.visible
+		and is_equal_approx(rect.get_center().x, _host.size.x * 0.5)
+		and rect.size.y == 24.0 and rect.size.x < 60.0
+		and Rect2(Vector2.ZERO, _host.size).encloses(rect),
+		"Rescue is a centered, content-sized action outside the dialogue panel: %s" % rect
+	)
+	_check(not screen.hold_progress_bar.visible, "Rescue hides the progress track until pressed")
+	var touch := InputEventScreenTouch.new()
+	touch.position = rect.get_center()
+	touch.pressed = true
+	root.push_input(touch, true)
+	runner.advance_ticks(10)
+	_check(runner.holding and screen.hold_progress_bar.visible and screen.hold_progress_bar.value > 0.0, "Holding the compact Rescue action shows progress")
+	touch = touch.duplicate()
+	touch.pressed = false
+	root.push_input(touch, true)
+	_check(not runner.holding and not screen.hold_progress_bar.visible, "Early release cancels Rescue and hides the track")
+
 func _run() -> void:
 	_host = Control.new()
 	_host.theme = AppTheme.build()
@@ -67,14 +100,13 @@ func _run() -> void:
 				_check(screen.story_text.is_visible_in_tree() and screen.story_text.get_parent() == screen.dialogue_panel.get_node("Margin/Column"), "Dialogue text uses one shared panel without a nested underlay")
 				_check(screen.page_cue.get_parent() == screen.dialogue_panel.get_node("Margin/Column/BottomRow"), "Dialogue continuation sits beside the reply inside the same panel")
 				var skip: Button = screen.skip_button
-				var skip_frame: StyleBoxFlat = skip.get_theme_stylebox("normal")
 				_check(
 					skip.icon_alignment == HORIZONTAL_ALIGNMENT_CENTER
-					and skip.size == Vector2(24, 24)
-					and skip_frame.expand_margin_left == -3.0
-					and skip_frame.expand_margin_right == -3.0,
-					"Skip centers its icon and draws a smaller frame inside the touch target"
+					and skip.size == Vector2(24, 24) and skip.icon != null,
+					"Skip centers its icon inside the 24 px touch target"
 				)
+				for state: String in ["normal", "hover", "pressed", "disabled"]:
+					_check(skip.get_theme_stylebox(state) is StyleBoxEmpty, "Skip draws no square in state %s" % state)
 				var previous_page: int = screen.runner.page_index
 				var previous_cue: int = screen.runner.index
 				var touch := InputEventScreenTouch.new()
@@ -88,12 +120,20 @@ func _run() -> void:
 					(screen.runner.index == previous_cue and screen.runner.page_index == previous_page + 1) or (screen.runner.index > previous_cue and screen.runner.page_index == 0),
 					"Touch inside dialogue panel advances one page or completes a one-page cue"
 				)
+				await _test_prologue_hold(screen)
 				var skip_navigations: Dictionary = {"count": 0}
 				screen.navigate_requested.connect(
 					func(_destination: String) -> void: skip_navigations["count"] = int(skip_navigations["count"]) + 1
 				)
 				var seen_before_skip: Array = session.seen_cue_ids.keys()
-				screen._on_skip_pressed()
+				var skip_click := InputEventMouseButton.new()
+				skip_click.button_index = MOUSE_BUTTON_LEFT
+				skip_click.position = skip.get_global_rect().get_center()
+				skip_click.pressed = true
+				root.push_input(skip_click, true)
+				skip_click = skip_click.duplicate()
+				skip_click.pressed = false
+				root.push_input(skip_click, true)
 				screen._on_skip_pressed()
 				_check(int(skip_navigations["count"]) == 1, "Skip navigates exactly once on double tap")
 				_check(
@@ -152,7 +192,7 @@ func _run() -> void:
 				screen._refresh()
 				_check(screen._inventory_badge.visible, "Inventory badge marks an available upgrade")
 				_check(screen.upgrade_button.visible and "Выбрать улучшение" in screen.upgrade_button.text, "World offers an explicit path to the first upgrade")
-				session.currency = 9223372036854775807
+				session.wallet[GameSession.COPPER] = 9223372036854775807
 				session.hero.take_damage(2)
 				screen._refresh()
 				await _settle()
@@ -160,10 +200,10 @@ func _run() -> void:
 				_check(not screen.location_label.get_global_rect().intersects(screen.balance_button.get_global_rect()), "World balance fits beside the location")
 				_check(screen.equipment_strip.get_global_rect().position.y > feet_y, "World equipment stays below the actor with upgrade and heal hint visible")
 				session.hero.pending_upgrade_choices = 0
-				session.currency = 0
+				session.wallet[GameSession.COPPER] = 0
 				screen._layout_scene()
 				_check(screen.hero_health.is_visible_in_tree(), "Hero HP returns after damage")
-				_check(screen.locked_label.visible and "восстановится" in screen.locked_label.text, "Damaged World state explains full healing before the next encounter")
+				_check(not screen.locked_label.visible, "Damaged World keeps the actor HP without a permanent healing hint")
 				_check(screen.hero_health.find_child("Fill", true, false).size.x > 0, "Damaged HP bar keeps a visible remainder")
 				session.hero.take_damage(999)
 				screen._refresh()
@@ -228,7 +268,7 @@ func _run() -> void:
 				_check(screen.find_child("HeroBar", true, false) == null, "Corner hero HP card removed")
 				_check(screen.resolver.tick_count == 0, "Resolver does not tick during intro")
 				_check(session.combat_format == GameSession.COMBAT_FORMAT_AUTO, "Full-auto is the default combat format")
-				_check(screen.claim_button.pressed.get_connections().size() > 0, "The explicit claim button is wired")
+				_check(screen.result_panel.claim_button.pressed.get_connections().size() > 0, "The explicit claim button is wired")
 				_check(not screen.dodge_button.is_visible_in_tree(), "Full-auto format hides the manual dodge button")
 				_check(screen.format_label.is_visible_in_tree(), "Combat names the active combat format")
 				screen._on_press_began()
@@ -295,8 +335,10 @@ func _run() -> void:
 				_check(not screen._pointer_down and screen._pointer_candidate.is_empty(), "The pre-victory press is invalidated when the result appears")
 				screen._on_press_ended()
 				_check(screen.result_panel.is_visible_in_tree(), "Result panel shows the pending reward after the reaction")
-				_check(screen.result_panel.get_global_rect().position.y >= 80.0 and is_equal_approx(screen.result_panel.get_global_rect().end.y, screen.size.y - 2.0), "Reward cards stay bottom-anchored at the lower edge")
-				_check(screen.result_panel.size.x >= 120.0, "Result panel spans the reward width")
+				_check(is_equal_approx(screen.result_panel.get_global_rect().end.y, screen.size.y - 8.0), "Reward cards stay bottom-anchored inside the safe area")
+				_check(screen.result_panel.size.x <= 132.0 and screen.result_panel.size.y < 80.0, "The battle summary is compact")
+				_check(screen.result_panel.summary_button.visible and not screen.result_panel.card.visible and not screen.result_panel.can_claim(), "HP and Echo are shown before loot and level")
+				_check(screen.get_node_or_null("ConfirmDialog") == null, "Loot help waits until the first item is visible")
 				_check(not session.pending_battle_result.is_empty(), "Terminal win creates exactly one pending result")
 				_check(session.last_settlement.is_empty(), "Settlement stays unapplied until the claim")
 				_check(session.inventory.items.size() == items_before, "Inventory is untouched before the claim")
@@ -305,20 +347,27 @@ func _run() -> void:
 					await process_frame
 				_check(int(combat_navigations["count"]) == 0, "Waiting on the result screen collects nothing")
 				_check(not session.pending_battle_result.is_empty(), "Pending reward survives reading time")
-				# Предмет: tap открывает детали, press/release и закрытие не собирают добычу.
+				screen.result_panel.summary_button.pressed.emit()
 				var pending_items: Array = session.pending_battle_result.get("items", [])
 				if not pending_items.is_empty():
-					var first_item: Dictionary = pending_items[0]
-					screen._open_details(String(first_item.get("item_id", "")), String(first_item.get("aspect_id", "")))
-					_check(screen.details_layer.is_visible_in_tree(), "Item tap opens the details sheet")
+					var help: ConfirmDialog = screen.get_node_or_null("ConfirmDialog")
+					if help != null:
+						help._confirm.pressed.emit()
+						await _settle()
+					screen.result_panel.detail_button.pressed.emit()
+					_check(screen.details_layer.is_visible_in_tree(), "The information button opens the details sheet")
 					screen._on_press_began()
 					screen._on_press_ended()
 					_check(int(combat_navigations["count"]) == 0 and not session.pending_battle_result.is_empty(), "Input inside details does not claim")
 					screen._close_details()
 					_check(int(combat_navigations["count"]) == 0 and not session.pending_battle_result.is_empty(), "Closing details does not claim")
-				# Явное действие текущей карточки сохраняет выбор и проводит один claim.
-				screen.result_panel.store_button.pressed.emit()
-				_check(int(combat_navigations["count"]) == 1, "One card action claims and navigates exactly once")
+				for _entry: Dictionary in pending_items:
+					screen.result_panel._choose("store")
+				_check(screen.result_panel.can_claim() and not screen.result_panel.card.visible, "The level card follows all loot")
+				_check(int(combat_navigations["count"]) == 0 and session.hero.level == 1, "Picking the last item waits for the level confirmation")
+				_check(_result_text(screen.result_panel).contains("8 XP") and _result_text(screen.result_panel).contains("Точный удар"), "The level card shows the correct XP remaining and new ability")
+				screen.result_panel.claim_button.pressed.emit()
+				_check(int(combat_navigations["count"]) == 1, "Confirming the level claims and navigates exactly once")
 				_check(session.pending_battle_result.is_empty(), "Claim closes the pending result")
 				_check(session.inventory.items.size() > items_before, "Claim adds the loot to the inventory")
 				_check(not session.last_settlement.is_empty(), "Claim records the settlement on the session")
@@ -354,6 +403,7 @@ func _run() -> void:
 	await _test_checkpoint_presentation()
 	await _test_result_gestures()
 	await _test_combat_mode_is_fixed_at_start()
+	await _test_battle_result_without_loot()
 	await _test_equipment_surfaces()
 	print("UI_RESULT: checks=%d failed=%d" % [_checks, _failed])
 	quit(1 if _failed > 0 else 0)
@@ -391,7 +441,11 @@ func _test_claim_commit_failure() -> void:
 	var restored_prepare_retry := GameSession.new()
 	_check(SaveService.new().load_into(restored_prepare_retry, game.save_path) and JSON.stringify(restored_prepare_retry.pending_battle_result) == pending_before, "A01 prepare retry persists the identical pending")
 	DirAccess.make_dir_recursive_absolute(blocker)
-	screen.result_panel.store_button.pressed.emit()
+	screen.result_panel.summary_button.pressed.emit()
+	ConfirmDialog.dismiss_from(screen)
+	for _entry: Dictionary in game.session.pending_battle_result["items"]:
+		screen.result_panel._choose("store")
+	screen.result_panel.claim_button.pressed.emit()
 	await _settle()
 	pending_before = JSON.stringify(game.session.pending_battle_result)
 	_check(game.router.current_screen == screen and screen.is_inside_tree(), "A01 failed claim commit keeps the result screen")
@@ -402,7 +456,7 @@ func _test_claim_commit_failure() -> void:
 	_check(SaveService.new().load_into(restored_failed_claim, game.save_path) and restored_failed_claim.pending_battle_result.get("result_id", "") == result_id and restored_failed_claim.pending_battle_result.get("items", []) == game.session.pending_battle_result.get("items", []), "A01 restart after failed claim restores the same durable cards; an unconfirmed choice may be repeated")
 	DirAccess.remove_absolute(blocker)
 	if is_instance_valid(screen) and screen.is_inside_tree():
-		screen._on_claim_pressed()
+		screen.result_panel.claim_button.pressed.emit()
 		await _settle()
 		_check(game.router.current_screen.name == "World" and not game.session.has_pending_battle_result(), "A01 retry commits once and only then enters World")
 		var restored := GameSession.new()
@@ -587,6 +641,8 @@ func _test_result_gestures() -> void:
 	screen.claim_requested.connect(func(result_id: String) -> void:
 		if session.claim_battle_result(result_id):
 			screen.navigate_requested.emit("world"))
+	screen.result_panel.summary_button.pressed.emit()
+	ConfirmDialog.dismiss_from(screen)
 	var press := InputEventScreenTouch.new()
 	press.index = 0
 	press.position = Vector2(70, 180)
@@ -602,7 +658,9 @@ func _test_result_gestures() -> void:
 	drag.relative = Vector2(-30, 0)
 	screen.result_panel._on_card_input(drag)
 	screen.result_panel._on_card_input(release)
-	_check(int(navigations["count"]) == 1 and not session.has_pending_battle_result(), "A04 a completed left swipe stores a crystal and claims once")
+	_check(int(navigations["count"]) == 0 and session.reward_choices_complete() and screen.result_panel.can_claim(), "A04 a completed left swipe queues the crystal and opens the level card")
+	screen.result_panel.claim_button.pressed.emit()
+	_check(int(navigations["count"]) == 1 and not session.has_pending_battle_result(), "A04 confirming the level after the swipe claims once")
 	_host.remove_child(screen)
 	screen.free()
 
@@ -613,6 +671,8 @@ func _test_result_gestures() -> void:
 	canceled_screen.resolver.advance_ticks(600)
 	await create_timer(canceled_screen.VICTORY_REACTION_SECONDS + 0.1).timeout
 	var result: CombatResultView = canceled_screen.result_panel
+	result.summary_button.pressed.emit()
+	ConfirmDialog.dismiss_from(canceled_screen)
 	var canceled_navigations := {"count": 0}
 	canceled_screen.navigate_requested.connect(func(_destination: String) -> void: canceled_navigations["count"] = int(canceled_navigations["count"]) + 1)
 	result._on_card_input(press)
@@ -654,6 +714,35 @@ func _test_result_gestures() -> void:
 	_host.remove_child(canceled_screen)
 	canceled_screen.free()
 
+func _result_text(view: CombatResultView) -> String:
+	var text: PackedStringArray = []
+	for row: Label in view.rows.get_children():
+		text.append(row.text)
+	return "\n".join(text)
+
+func _test_battle_result_without_loot() -> void:
+	for capped: bool in [false, true]:
+		var session := GameSession.new()
+		session.hero.gain_xp(42 if capped else 4)
+		session.select_encounter("moss_slime")
+		var resolver: CombatResolver = session.start_combat("moss_slime")
+		resolver.advance_ticks(600)
+		session.pending_battle_result["items"] = []
+		session.pending_battle_result["echo_gained"] = false
+		var saved_hp: int = session.hero.current_hp
+		var restored := GameSession.new()
+		restored.apply_state_dto(SaveService.new().capture(session))
+		var screen: Control = await _screen("combat", restored)
+		var result: CombatResultView = screen.result_panel
+		_check(result.summary_button.visible and not result.card.visible and not result.can_claim(), "Restoring an empty result starts at the summary")
+		_check(_result_text(result).contains("HP %d/" % saved_hp) and _result_text(result).contains("+0 Эхо"), "Summary reads the saved HP and actual Echo reward")
+		result.summary_button.pressed.emit()
+		_check(result.can_claim() and not result.card.visible and screen.get_node_or_null("ConfirmDialog") == null, "With no loot, OK goes straight to level without the gesture tutorial")
+		var expected: String = "Максимальный уровень" if capped else "До ур. 3 ост. 4 XP"
+		_check(_result_text(result).contains(expected) and not _result_text(result).contains("Выбор ×"), "Level card handles cap and XP without a level gain")
+		_host.remove_child(screen)
+		screen.free()
+
 func _test_combat_mode_is_fixed_at_start() -> void:
 	for initial: String in [GameSession.COMBAT_FORMAT_AUTO, GameSession.COMBAT_FORMAT_ACTIVE]:
 		var session := GameSession.new()
@@ -688,11 +777,12 @@ func _test_equipment_surfaces() -> void:
 	var inventory: Control = await _screen("inventory", session)
 	_check(inventory.equipment_strip.is_visible_in_tree() and not _in_scroll(inventory.equipment_strip), "A12 equipped block is pinned above the scrollable backpack")
 	_check("Надето" in inventory.equipment_strip.slot_buttons["weapon"].accessibility_name and "Пусто" in inventory.equipment_strip.slot_buttons["helmet"].tooltip_text and "Пусто" in inventory.equipment_strip.slot_buttons["charm"].tooltip_text, "A12 equipped and empty slots are explicit")
+	var branch_id: String = session.inventory.equipment_for("haruto")["weapon"]
+	session.unequip_item("weapon")
+	await _settle()
 	for slot_id: String in ArtMap.EMPTY_SLOT_ICONS:
 		var slot_button: Button = inventory.equipment_strip.slot_buttons[slot_id]
 		_check(slot_button.text.is_empty() and slot_button.icon.resource_path.ends_with(ArtMap.EMPTY_SLOT_ICONS[slot_id]), "Empty %s slot uses its own raster icon" % slot_id)
-	session.unequip_item("weapon")
-	await _settle()
 	inventory.equipment_strip.slot_buttons["weapon"].pressed.emit()
 	_check(inventory.filter_id == "weapon", "A12 empty weapon slot filters the existing backpack")
 	inventory._on_filter_selected(0)
@@ -716,13 +806,19 @@ func _test_equipment_surfaces() -> void:
 
 	var world: Control = await _screen("world", session)
 	_check(world.equipment_strip.is_visible_in_tree(), "A12 World shows occupied equipment thumbnails")
-	_check(world.weapon_icon.visible and world.weapon_icon.texture == ArtMap.item_icon("training_sword"), "A12 World uses the consistent weapon-icon fallback at the hero")
+	_check(world.hero_sprite.texture.resource_path.ends_with("/haruto_exiled_sword_idle.png"), "World uses the in-hand sword pose for the equipped sword")
+	_check(world.get_node_or_null("EquippedWeaponFallback") == null, "World does not overlay the equipment icon on the hero")
 	_check(world.equipment_strip.get_global_rect().end.y <= world.inventory_button.get_global_rect().position.y, "A12 World equipment stays above the navigation rail")
 	_check(not world.equipment_strip.get_global_rect().intersects(world.checkpoint_button.get_global_rect()), "A12 World equipment does not overlap the Checkpoint control")
 	world.equipment_strip.slot_buttons["charm"].pressed.emit()
 	await _settle()
 	_check(world.details_layer.visible and world.details_view.model["instance_id"] == charms[0].instance_id and not world.details_view.action_button.visible, "A12 World thumbnail opens read-only details for its own slot")
 	_check(world.handle_back() and not world.details_layer.visible, "A12 Back closes World item details")
+	session.unequip_item("weapon")
+	_check(world.hero_sprite.texture.resource_path.ends_with("/haruto_exiled_unarmed_idle.png"), "World updates to the empty-handed pose on unequip")
+	session.equip_item(branch_id)
+	_check(world.hero_sprite.texture.resource_path.ends_with("/haruto_exiled_idle.png"), "World restores the in-hand branch pose when the branch is equipped")
+	session.equip_item(swords[0].instance_id)
 	_bounds(world)
 	_host.remove_child(world)
 	world.free()
@@ -731,15 +827,23 @@ func _test_equipment_surfaces() -> void:
 	var combat: Control = await _screen("combat", session)
 	combat._finish_intro()
 	_check(combat.equipment_strip.is_visible_in_tree(), "A12 combat shows occupied equipment thumbnails")
-	_check(combat.weapon_sprite.visible and combat.weapon_sprite.texture == ArtMap.item_icon("training_sword"), "A12 combat uses the same weapon-icon fallback at the hero")
+	var sword_idle: AtlasTexture = combat.hero_sprite.sprite_frames.get_frame_texture(&"default", 0)
+	_check(sword_idle.atlas.resource_path.ends_with("haruto_exiled_sword_idle_sheet.png"), "Combat shows the equipped sword in Haruto's pose")
+	_check(combat.arena.get_node_or_null("EquippedWeaponFallback") == null and combat.equipment_strip.slot_buttons["weapon"].icon == ArtMap.item_icon("training_sword"), "Combat weapon icon is confined to the equipment strip")
 	_check(not combat.actions.is_visible_in_tree(), "A12 auto combat leaves the manual action row hidden")
 	_check(combat.equipment_strip.get_global_rect().position.y > SceneStaging.floor_y(combat.size.y), "A12 combat equipment stays below the actors")
 	combat.resolver.advance_ticks(600)
 	await create_timer(combat.VICTORY_REACTION_SECONDS + 0.1).timeout
 	_check(combat.resolver.is_finished and combat.resolver.won, "A12 equipped fixture reaches victory")
 	_check(not combat.equipment_strip.is_visible_in_tree(), "A12 combat equipment strip is hidden on victory")
+	combat.result_panel.summary_button.pressed.emit()
+	var loot_help: ConfirmDialog = combat.get_node_or_null("ConfirmDialog")
+	_check(loot_help != null and combat.result_panel.card.focus_mode == Control.FOCUS_NONE, "Loot tutorial appears once and traps focus")
+	if loot_help != null:
+		loot_help._confirm.pressed.emit()
+		await _settle()
 	var equipped_before: Dictionary = session.inventory.equipment.duplicate()
-	combat._open_details("training_sword", "", 1)
+	combat._open_details({"item_id": "training_sword", "aspect_id": "", "quantity": 1})
 	_check(combat.details_view.model["current_instance_id"] == swords[0].instance_id and not combat.details_view.action_button.visible, "A12 loot comparison names the current item and stays read-only")
 	combat._close_details()
 	_check(session.inventory.equipment == equipped_before and session.has_pending_battle_result(), "A12 preview neither equips nor collects loot")
@@ -747,12 +851,24 @@ func _test_equipment_surfaces() -> void:
 	long_result["items"] = []
 	long_result["choices"] = {}
 	for index: int in range(12):
-		long_result["items"].append({"entry_id": "long_%02d" % index, "item_id": "training_sword", "quantity": 1, "aspect_id": "", "level": 1, "sale_price_copper": 0, "sellable": false})
+		long_result["items"].append({"entry_id": "long_%02d" % index, "item_id": "training_sword", "quantity": 1, "aspect_id": "", "slot_id": "weapon", "level": 1, "sale_price_copper": 0, "sellable": false})
+	session.pending_battle_result = long_result
 	combat._show_result_panel(long_result)
+	_check(not _in_scroll(combat.result_panel.rows.get_child(0)), "Victory summary is fixed without a scrollbar")
+	combat.result_panel.summary_button.pressed.emit()
 	await _settle()
-	_check(combat.result_panel._entry.get("entry_id", "") == "long_00" and "осталось 12" in combat.result_panel.find_child("SwipeHints", true, false).text, "A12 multiple rewards are sequential cards with stable entry IDs")
+	_check(combat.result_panel._entry.get("entry_id", "") == "long_00", "A12 multiple rewards are sequential cards with stable entry IDs")
+	var reward_rect: Rect2 = combat.result_panel.card.get_global_rect()
+	var info_rect: Rect2 = combat.result_panel.detail_button.get_global_rect()
+	_check(reward_rect.encloses(info_rect) and info_rect.get_center().x > reward_rect.get_center().x and info_rect.position.y - reward_rect.position.y < 8, "Reward details stay in the top right corner of the card")
+	_check(info_rect.size == Vector2(24, 24) and combat.result_panel.detail_button.get_theme_stylebox("normal") is StyleBoxEmpty, "The outlined info icon keeps a transparent 24 px touch target")
+	_check(combat.get_node_or_null("ConfirmDialog") == null, "Loot tutorial stays dismissed across reward views")
 	_check(combat.result_panel.card.focus_mode == Control.FOCUS_ALL and combat.result_panel.detail_button.focus_mode == Control.FOCUS_ALL, "A12 the compact reward card and details action have keyboard and controller focus")
 	_bounds(combat)
+	for index: int in range(12):
+		_check(combat.result_panel._entry.get("entry_id", "") == "long_%02d" % index and not combat.result_panel.can_claim(), "Loot %d is shown in roll order before the level" % index)
+		combat.result_panel._choose("store")
+	_check(combat.result_panel.can_claim() and session.reward_choices_complete(), "The final card follows the last item in a long result")
 	_host.remove_child(combat)
 	combat.free()
 

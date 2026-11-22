@@ -1,0 +1,974 @@
+{
+	"captures": [
+		{
+			"error": 0,
+			"label": "20_gates",
+			"size": [
+				360,
+				640
+			]
+		},
+		{
+			"error": 0,
+			"label": "21_shop_intro",
+			"size": [
+				360,
+				640
+			]
+		},
+		{
+			"error": 0,
+			"label": "22_shop_appraisal",
+			"size": [
+				360,
+				640
+			]
+		},
+		{
+			"error": 0,
+			"label": "23_deal_sell",
+			"size": [
+				360,
+				640
+			]
+		},
+		{
+			"error": 0,
+			"label": "24_deal_buy",
+			"size": [
+				360,
+				640
+			]
+		},
+		{
+			"error": 0,
+			"label": "25_bag_jacket",
+			"size": [
+				360,
+				640
+			]
+		},
+		{
+			"error": 0,
+			"label": "26_shop_welcome",
+			"size": [
+				360,
+				640
+			]
+		}
+	],
+	"checks": [
+		{
+			"message": "Merchant fixture enters its first combat",
+			"ok": true
+		},
+		{
+			"message": "Every visible reward card participates in one atomic claim",
+			"ok": true
+		},
+		{
+			"message": "First slime grants an echo crystal for the future sale",
+			"ok": true
+		},
+		{
+			"message": "Free-area tap leads to Daijiro before the scout",
+			"ok": true
+		},
+		{
+			"message": "Daijiro's intervention leads to the story scout encounter",
+			"ok": true
+		},
+		{
+			"message": "Every visible reward card participates in one atomic claim",
+			"ok": true
+		},
+		{
+			"message": "The story win returns to Daijiro before granting the sword",
+			"ok": true
+		},
+		{
+			"message": "Gratitude opens the gift card before its claim",
+			"ok": true
+		},
+		{
+			"message": "Daijiro grants exactly one sword after the completed introduction",
+			"ok": true
+		},
+		{
+			"message": "The old branch stays in the backpack beside the single new sword",
+			"ok": true
+		},
+		{
+			"message": "Travel action appears after the gift",
+			"ok": true
+		},
+		{
+			"message": "Travel applies the Lioren location",
+			"ok": true
+		},
+		{
+			"message": "First arrival opens the gates scene",
+			"ok": true
+		},
+		{
+			"message": "gates uses the real (360, 640) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "gates has no visible out-of-window controls at (360, 640)",
+			"ok": true
+		},
+		{
+			"message": "gates uses the real (360, 800) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "gates has no visible out-of-window controls at (360, 800)",
+			"ok": true
+		},
+		{
+			"message": "gates uses the real (390, 844) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "gates has no visible out-of-window controls at (390, 844)",
+			"ok": true
+		},
+		{
+			"message": "gates uses the real (412, 915) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "gates has no visible out-of-window controls at (412, 915)",
+			"ok": true
+		},
+		{
+			"message": "Capture 20_gates",
+			"ok": true
+		},
+		{
+			"message": "Gates finish opens the shop",
+			"ok": true
+		},
+		{
+			"message": "First shop entry starts the appraisal",
+			"ok": true
+		},
+		{
+			"message": "Capture 21_shop_intro",
+			"ok": true
+		},
+		{
+			"message": "Appraisal completes back in the catalog",
+			"ok": true
+		},
+		{
+			"message": "Appraisal records its story flag",
+			"ok": true
+		},
+		{
+			"message": "Capture 22_shop_appraisal",
+			"ok": true
+		},
+		{
+			"message": "Sell row opens the deal card",
+			"ok": true
+		},
+		{
+			"message": "Deal card shows the live crystal revenue in silver",
+			"ok": true
+		},
+		{
+			"message": "deal uses the real (360, 640) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "deal has no visible out-of-window controls at (360, 640)",
+			"ok": true
+		},
+		{
+			"message": "deal uses the real (360, 800) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "deal has no visible out-of-window controls at (360, 800)",
+			"ok": true
+		},
+		{
+			"message": "deal uses the real (390, 844) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "deal has no visible out-of-window controls at (390, 844)",
+			"ok": true
+		},
+		{
+			"message": "deal uses the real (412, 915) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "deal has no visible out-of-window controls at (412, 915)",
+			"ok": true
+		},
+		{
+			"message": "Capture 23_deal_sell",
+			"ok": true
+		},
+		{
+			"message": "Selling one crystal credits 2000 copper",
+			"ok": true
+		},
+		{
+			"message": "The first sale records its milestone",
+			"ok": true
+		},
+		{
+			"message": "Jacket card shows the cost and the resulting balance",
+			"ok": true
+		},
+		{
+			"message": "Capture 24_deal_buy",
+			"ok": true
+		},
+		{
+			"message": "Jacket purchase leaves 800 copper",
+			"ok": true
+		},
+		{
+			"message": "Bought jacket lands in the inventory",
+			"ok": true
+		},
+		{
+			"message": "First purchase opens the guild briefing",
+			"ok": true
+		},
+		{
+			"message": "Briefing offers the bag shortcut for the jacket",
+			"ok": true
+		},
+		{
+			"message": "Bag opens with the jacket card",
+			"ok": true
+		},
+		{
+			"message": "Capture 25_bag_jacket",
+			"ok": true
+		},
+		{
+			"message": "Jacket equips from the bag and adds one defense",
+			"ok": true
+		},
+		{
+			"message": "inventory uses the real (360, 640) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "inventory has no visible out-of-window controls at (360, 640)",
+			"ok": true
+		},
+		{
+			"message": "inventory uses the real (360, 800) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "inventory has no visible out-of-window controls at (360, 800)",
+			"ok": true
+		},
+		{
+			"message": "inventory uses the real (390, 844) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "inventory has no visible out-of-window controls at (390, 844)",
+			"ok": true
+		},
+		{
+			"message": "inventory uses the real (412, 915) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "inventory has no visible out-of-window controls at (412, 915)",
+			"ok": true
+		},
+		{
+			"message": "Bag returns to the Lioren city mode",
+			"ok": true
+		},
+		{
+			"message": "The city keeps the hidden combat action",
+			"ok": true
+		},
+		{
+			"message": "Repeat entry greets with one line and trade is open",
+			"ok": true
+		},
+		{
+			"message": "Optional conversation is available after the introduction",
+			"ok": true
+		},
+		{
+			"message": "shop uses the real (360, 640) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "shop has no visible out-of-window controls at (360, 640)",
+			"ok": true
+		},
+		{
+			"message": "shop uses the real (360, 800) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "shop has no visible out-of-window controls at (360, 800)",
+			"ok": true
+		},
+		{
+			"message": "shop uses the real (390, 844) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "shop has no visible out-of-window controls at (390, 844)",
+			"ok": true
+		},
+		{
+			"message": "shop uses the real (412, 915) window within integer-scale bounds",
+			"ok": true
+		},
+		{
+			"message": "shop has no visible out-of-window controls at (412, 915)",
+			"ok": true
+		},
+		{
+			"message": "Capture 26_shop_welcome",
+			"ok": true
+		}
+	],
+	"checks_count": 71,
+	"failed": 0,
+	"windows": [
+		{
+			"gameplay_area_ratio": 1.0,
+			"gameplay_pixels": [
+				360.0,
+				640.0
+			],
+			"image": [
+				720,
+				1280
+			],
+			"logical_viewport": [
+				180.0,
+				320.0
+			],
+			"offset": [
+				0.0,
+				0.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				320.0
+			],
+			"screen_state": "gates",
+			"window": [
+				360,
+				640
+			]
+		},
+		{
+			"gameplay_area_ratio": 1.0,
+			"gameplay_pixels": [
+				360.0,
+				800.0
+			],
+			"image": [
+				720,
+				1600
+			],
+			"logical_viewport": [
+				180.0,
+				400.0
+			],
+			"offset": [
+				0.0,
+				0.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				400.0
+			],
+			"screen_state": "gates",
+			"window": [
+				360,
+				800
+			]
+		},
+		{
+			"gameplay_area_ratio": 0.851,
+			"gameplay_pixels": [
+				360.0,
+				778.0
+			],
+			"image": [
+				720,
+				1556
+			],
+			"logical_viewport": [
+				180.0,
+				389.0
+			],
+			"offset": [
+				15.0,
+				33.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				389.0
+			],
+			"screen_state": "gates",
+			"window": [
+				390,
+				844
+			]
+		},
+		{
+			"gameplay_area_ratio": 0.762,
+			"gameplay_pixels": [
+				360.0,
+				798.0
+			],
+			"image": [
+				720,
+				1596
+			],
+			"logical_viewport": [
+				180.0,
+				399.0
+			],
+			"offset": [
+				26.0,
+				59.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				399.0
+			],
+			"screen_state": "gates",
+			"window": [
+				412,
+				915
+			]
+		},
+		{
+			"gameplay_area_ratio": 1.0,
+			"gameplay_pixels": [
+				360.0,
+				640.0
+			],
+			"image": [
+				720,
+				1280
+			],
+			"logical_viewport": [
+				180.0,
+				320.0
+			],
+			"offset": [
+				0.0,
+				0.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				320.0
+			],
+			"screen_state": "deal",
+			"window": [
+				360,
+				640
+			]
+		},
+		{
+			"gameplay_area_ratio": 1.0,
+			"gameplay_pixels": [
+				360.0,
+				800.0
+			],
+			"image": [
+				720,
+				1600
+			],
+			"logical_viewport": [
+				180.0,
+				400.0
+			],
+			"offset": [
+				0.0,
+				0.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				400.0
+			],
+			"screen_state": "deal",
+			"window": [
+				360,
+				800
+			]
+		},
+		{
+			"gameplay_area_ratio": 0.851,
+			"gameplay_pixels": [
+				360.0,
+				778.0
+			],
+			"image": [
+				720,
+				1556
+			],
+			"logical_viewport": [
+				180.0,
+				389.0
+			],
+			"offset": [
+				15.0,
+				33.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				389.0
+			],
+			"screen_state": "deal",
+			"window": [
+				390,
+				844
+			]
+		},
+		{
+			"gameplay_area_ratio": 0.762,
+			"gameplay_pixels": [
+				360.0,
+				798.0
+			],
+			"image": [
+				720,
+				1596
+			],
+			"logical_viewport": [
+				180.0,
+				399.0
+			],
+			"offset": [
+				26.0,
+				59.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				399.0
+			],
+			"screen_state": "deal",
+			"window": [
+				412,
+				915
+			]
+		},
+		{
+			"gameplay_area_ratio": 1.0,
+			"gameplay_pixels": [
+				360.0,
+				640.0
+			],
+			"image": [
+				720,
+				1280
+			],
+			"logical_viewport": [
+				180.0,
+				320.0
+			],
+			"offset": [
+				0.0,
+				0.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				320.0
+			],
+			"screen_state": "inventory",
+			"window": [
+				360,
+				640
+			]
+		},
+		{
+			"gameplay_area_ratio": 1.0,
+			"gameplay_pixels": [
+				360.0,
+				800.0
+			],
+			"image": [
+				720,
+				1600
+			],
+			"logical_viewport": [
+				180.0,
+				400.0
+			],
+			"offset": [
+				0.0,
+				0.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				400.0
+			],
+			"screen_state": "inventory",
+			"window": [
+				360,
+				800
+			]
+		},
+		{
+			"gameplay_area_ratio": 0.851,
+			"gameplay_pixels": [
+				360.0,
+				778.0
+			],
+			"image": [
+				720,
+				1556
+			],
+			"logical_viewport": [
+				180.0,
+				389.0
+			],
+			"offset": [
+				15.0,
+				33.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				389.0
+			],
+			"screen_state": "inventory",
+			"window": [
+				390,
+				844
+			]
+		},
+		{
+			"gameplay_area_ratio": 0.762,
+			"gameplay_pixels": [
+				360.0,
+				798.0
+			],
+			"image": [
+				720,
+				1596
+			],
+			"logical_viewport": [
+				180.0,
+				399.0
+			],
+			"offset": [
+				26.0,
+				59.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				399.0
+			],
+			"screen_state": "inventory",
+			"window": [
+				412,
+				915
+			]
+		},
+		{
+			"gameplay_area_ratio": 1.0,
+			"gameplay_pixels": [
+				360.0,
+				640.0
+			],
+			"image": [
+				720,
+				1280
+			],
+			"logical_viewport": [
+				180.0,
+				320.0
+			],
+			"offset": [
+				0.0,
+				0.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				320.0
+			],
+			"screen_state": "shop",
+			"window": [
+				360,
+				640
+			]
+		},
+		{
+			"gameplay_area_ratio": 1.0,
+			"gameplay_pixels": [
+				360.0,
+				800.0
+			],
+			"image": [
+				720,
+				1600
+			],
+			"logical_viewport": [
+				180.0,
+				400.0
+			],
+			"offset": [
+				0.0,
+				0.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				400.0
+			],
+			"screen_state": "shop",
+			"window": [
+				360,
+				800
+			]
+		},
+		{
+			"gameplay_area_ratio": 0.851,
+			"gameplay_pixels": [
+				360.0,
+				778.0
+			],
+			"image": [
+				720,
+				1556
+			],
+			"logical_viewport": [
+				180.0,
+				389.0
+			],
+			"offset": [
+				15.0,
+				33.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				389.0
+			],
+			"screen_state": "shop",
+			"window": [
+				390,
+				844
+			]
+		},
+		{
+			"gameplay_area_ratio": 0.762,
+			"gameplay_pixels": [
+				360.0,
+				798.0
+			],
+			"image": [
+				720,
+				1596
+			],
+			"logical_viewport": [
+				180.0,
+				399.0
+			],
+			"offset": [
+				26.0,
+				59.0
+			],
+			"safe_area": "[P: (0, 0), S: (2560, 1400)]",
+			"safe_margins": [
+				0,
+				0,
+				0,
+				0
+			],
+			"scale": [
+				2.0,
+				2.0
+			],
+			"screen_host": [
+				180.0,
+				399.0
+			],
+			"screen_state": "shop",
+			"window": [
+				412,
+				915
+			]
+		}
+	]
+}

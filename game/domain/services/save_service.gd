@@ -1,7 +1,7 @@
 class_name SaveService
 extends RefCounted
 
-const CURRENT_VERSION: int = 5
+const CURRENT_VERSION: int = 7
 const DEFAULT_PATH: String = "user://profile.json"
 
 var last_error: String = ""
@@ -192,11 +192,100 @@ func migrate(source: Dictionary) -> Dictionary:
 			4:
 				if not _migrate_v4_to_v5(dto):
 					return {}
+			5:
+				if not _migrate_v5_to_v6(dto):
+					return {}
+			6:
+				if not _migrate_v6_to_v7(dto):
+					return {}
 			_:
 				return {}
 		version += 1
 		dto["schema_version"] = version
 	return dto
+
+func _migrate_v6_to_v7(dto: Dictionary) -> bool:
+	if not _migrate_copper_wallet(dto.get("profile")):
+		return false
+	if typeof(dto.get("pending_battle_result")) != TYPE_DICTIONARY or typeof(dto.get("checkpoints")) != TYPE_DICTIONARY:
+		return false
+	var pending_items: Variant = dto["pending_battle_result"].get("items", [])
+	if typeof(pending_items) != TYPE_ARRAY:
+		return false
+	_reprice_echo_crystals(pending_items, "item_id")
+	var checkpoints: Dictionary = dto["checkpoints"]
+	if typeof(checkpoints.get("manual_snapshots")) != TYPE_ARRAY or typeof(checkpoints.get("pending_completion", {})) != TYPE_DICTIONARY:
+		return false
+	var snapshots: Array = [checkpoints.get("first_trace_snapshot")]
+	snapshots.append_array(checkpoints["manual_snapshots"])
+	var pending_completion: Dictionary = checkpoints.get("pending_completion", {})
+	if not pending_completion.is_empty():
+		snapshots.append(pending_completion)
+	for snapshot: Variant in snapshots:
+		if typeof(snapshot) != TYPE_DICTIONARY or not _migrate_copper_wallet(snapshot.get("profile")):
+			return false
+	return true
+
+func _migrate_copper_wallet(profile: Variant) -> bool:
+	if typeof(profile) != TYPE_DICTIONARY or typeof(profile.get("inventory")) != TYPE_DICTIONARY:
+		return false
+	var copper: Variant = profile.get("currency")
+	if not _nonnegative(copper) or float(copper) > float(GameSession.MAX_ASTRAS):
+		return false
+	# В старом числовом формате JSON округлял верхнюю границу до 2^63.
+	var at_legacy_limit: bool = typeof(copper) == TYPE_FLOAT and copper == float(GameSession.MAX_ASTRAS)
+	var amount: int = GameSession.MAX_ASTRAS if at_legacy_limit else int(copper)
+	profile["wallet"] = {GameSession.COPPER: str(amount), GameSession.SILVER: "0", GameSession.GOLD: "0"}
+	profile.erase("currency")
+	var items: Variant = profile["inventory"].get("items")
+	if typeof(items) != TYPE_ARRAY:
+		return false
+	_reprice_echo_crystals(items, "definition_id")
+	return true
+
+func _reprice_echo_crystals(items: Array, id_key: String) -> void:
+	for item: Variant in items:
+		if typeof(item) == TYPE_DICTIONARY and item.get(id_key) == "echo_crystal" and item.get("sale_price_copper") == 2000:
+			item["sale_price_copper"] = 20
+
+## The new slime sits between the two old nodes. Keep profiles and Checkpoint
+## snapshots already at the cart on the goblin node, including pending victories.
+func _migrate_v5_to_v6(dto: Dictionary) -> bool:
+	if typeof(dto.get("checkpoints")) != TYPE_DICTIONARY or typeof(dto.get("pending_battle_result")) != TYPE_DICTIONARY:
+		return false
+	var pending: Dictionary = dto["pending_battle_result"]
+	var at_cart: bool = pending.get("route_node_id", "") == "forest_edge_goblin"
+	if not _migrate_forest_route(dto.get("profile"), at_cart):
+		return false
+	var checkpoints: Dictionary = dto["checkpoints"]
+	if typeof(checkpoints.get("manual_snapshots")) != TYPE_ARRAY or typeof(checkpoints.get("pending_completion", {})) != TYPE_DICTIONARY:
+		return false
+	var snapshots: Array = [checkpoints.get("first_trace_snapshot")]
+	snapshots.append_array(checkpoints["manual_snapshots"])
+	var pending_completion: Dictionary = checkpoints.get("pending_completion", {})
+	if not pending_completion.is_empty():
+		snapshots.append(pending_completion)
+	for snapshot: Variant in snapshots:
+		if typeof(snapshot) != TYPE_DICTIONARY or not _migrate_forest_route(snapshot.get("profile")):
+			return false
+	return true
+
+func _migrate_forest_route(profile: Variant, pending_goblin: bool = false) -> bool:
+	if typeof(profile) != TYPE_DICTIONARY or typeof(profile.get("route_state")) != TYPE_DICTIONARY or typeof(profile.get("world_flags")) != TYPE_DICTIONARY:
+		return false
+	var route: Dictionary = profile["route_state"]
+	if route.is_empty():
+		if pending_goblin:
+			profile["route_state"] = {"route_id": "forest_edge_slice", "next_index": 2, "completed": false}
+		return true
+	var index: Variant = route.get("next_index")
+	if route.get("route_id", "") != "forest_edge_slice" or not _is_intlike(index) or int(index) not in [0, 1, 2] or route.get("completed") != (int(index) == 2):
+		return false
+	if int(index) == 2:
+		route["next_index"] = 3
+	elif int(index) == 1 and (pending_goblin or profile["world_flags"].get("daijiro_intervened", false)):
+		route["next_index"] = 2
+	return true
 
 func _migrate_v3_to_v4(dto: Dictionary) -> bool:
 	if typeof(dto.get("profile")) != TYPE_DICTIONARY or typeof(dto.get("meta")) != TYPE_DICTIONARY or typeof(dto.get("checkpoints")) != TYPE_DICTIONARY:
@@ -378,9 +467,9 @@ func _read_dto(path: String) -> Dictionary:
 	return {"ok": true, "data": _normalize_numbers(dto)}
 
 func _valid_profile(dto: Variant) -> bool:
-	if typeof(dto) != TYPE_DICTIONARY or not _has_keys(dto, ["hero", "inventory", "currency", "quest_flags", "npc_flags", "world_flags", "completed_encounter_ids", "play_tick", "characters", "familiars", "story_rewards"]):
+	if typeof(dto) != TYPE_DICTIONARY or not _has_keys(dto, ["hero", "inventory", "wallet", "quest_flags", "npc_flags", "world_flags", "completed_encounter_ids", "play_tick", "characters", "familiars", "story_rewards"]):
 		return false
-	if not _nonnegative(dto["currency"]) or not _nonnegative(dto["play_tick"]):
+	if not _valid_wallet(dto["wallet"]) or not _nonnegative(dto["play_tick"]):
 		return false
 	if dto.has("run_sequence") and not _nonnegative(dto["run_sequence"]):
 		return false
@@ -409,6 +498,15 @@ func _valid_profile(dto: Variant) -> bool:
 		if not dto["characters"].has(character_id):
 			return false
 	return _valid_hero(dto["hero"]) and _valid_inventory(dto["inventory"])
+
+func _valid_wallet(value: Variant) -> bool:
+	if typeof(value) != TYPE_DICTIONARY or value.size() != GameSession.COIN_TYPES.size():
+		return false
+	for coin: String in GameSession.COIN_TYPES:
+		var amount: Variant = value.get(coin)
+		if typeof(amount) != TYPE_STRING or not amount.is_valid_int() or int(amount) < 0 or str(int(amount)) != amount:
+			return false
+	return true
 
 func _valid_familiars(dto: Variant) -> bool:
 	if typeof(dto) != TYPE_DICTIONARY or not _has_keys(dto, ["owned", "assignments"]):

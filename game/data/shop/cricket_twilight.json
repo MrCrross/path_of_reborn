@@ -1,0 +1,12 @@
+{
+  "shop_id": "cricket_twilight",
+  "offers": [
+    {
+      "offer_id": "wanderer_jacket",
+      "item_id": "wanderer_jacket",
+      "price_copper": 12,
+      "purchase_limit": 1,
+      "once_flag": "wanderer_jacket_purchased"
+    }
+  ]
+}

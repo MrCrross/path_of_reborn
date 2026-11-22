@@ -90,6 +90,784 @@
       "integration_note": "source-resolution still: alpha-bbox crop only, pixels preserved; solid height 1275 -> 82 logical px"
     },
     {
+      "id": "CHR-03-SWORD",
+      "path": "characters/haruto_exiled_sword_idle.png",
+      "kind": "texture",
+      "status": "approved",
+      "size": [
+        470,
+        828
+      ],
+      "sha256": "761a1354c09fdcd490e22fb46c6097019a22a3ea393a91301bc5ea55a7a0670c",
+      "rgba_sha256": "b85f582416a3e300c7f15ff760d322deb9f5a9912eceb8296b763bde60c2d2aa",
+      "priority": "P1",
+      "source": {
+        "export": "art_working/battle_art_polish_2026_11_20/normalized/haruto_exiled_sword_still_v01.png",
+        "export_sha256": "761a1354c09fdcd490e22fb46c6097019a22a3ea393a91301bc5ea55a7a0670c",
+        "original": "art_working/battle_art_polish_2026_11_20/source/haruto_exiled_sword_idle_v01_master.png",
+        "original_sha256": "319869a7615600556e795c29109d36b409ea90ea6d03c4bd348830663dda67a8",
+        "prompt": "art_working/battle_art_polish_2026_11_20/prompts/haruto_exiled_sword_idle_v01.txt",
+        "prompt_sha256": "55983391b813f2cf760589c1af89693ad207163c5e729bf14411407c0624df22"
+      },
+      "pivot": [
+        235,
+        828
+      ],
+      "integration_note": "world still from sword idle frame 1; solid height 828 -> 82 logical px"
+    },
+    {
+      "id": "CHR-03-UNARMED",
+      "path": "characters/haruto_exiled_unarmed_idle.png",
+      "kind": "texture",
+      "status": "approved",
+      "size": [
+        543,
+        966
+      ],
+      "sha256": "357cf1ff83faff9cca0bd49ee2ea1b78333ee70eceea0612e5ec64d8d9f93633",
+      "rgba_sha256": "98847f491341f3c60bcff36cedaf5a8d9d3059305a0714b00d113eb7ed56e3a6",
+      "priority": "P1",
+      "source": {
+        "original": "art_working/weapon_props_p0_p1_2026_11_19/chr_03_body/source/haruto_exiled_idle_body_v01.png",
+        "original_sha256": "399b316cce0543d2a688c72aed101306e08af9efaa623f69d9254bc64d1dced6",
+        "prompt": "art_working/weapon_props_p0_p1_2026_11_19/chr_03_body/prompt_v01.txt",
+        "prompt_sha256": "da4c70c22032d3d4778d271178c0a424bb6450cfc969d70c5e62dd8d3dd91002"
+      },
+      "pivot": [
+        271.5,
+        962
+      ],
+      "integration_note": "world still cropped to solid alpha bounds plus 4 px; solid height 958 -> 82 logical px"
+    },
+    {
+      "id": "CHR-03-SWORD-IDLE",
+      "path": "characters/animations/haruto_exiled_sword_idle_sheet.png",
+      "kind": "spritesheet",
+      "status": "approved",
+      "size": [
+        966,
+        837
+      ],
+      "sha256": "31b53fcdaa8d542c60b8c205c2e444187af777114a90d10b0e3d7c652ac16cec",
+      "rgba_sha256": "be5178554b8928f943c31f71b537901c6325baf595fe49580930334eb64c8b30",
+      "priority": "P1",
+      "pivot": [
+        485,
+        1131
+      ],
+      "runtime": {
+        "frame": [
+          970,
+          1293
+        ],
+        "count": 2,
+        "scale": 0.09903381642512077,
+        "offset": [
+          0.0,
+          -484.5
+        ],
+        "regions": [
+          {
+            "region": [
+              2,
+              2,
+              470,
+              828
+            ],
+            "margin": [
+              220,
+              303,
+              500,
+              465
+            ]
+          },
+          {
+            "region": [
+              485,
+              2,
+              479,
+              833
+            ],
+            "margin": [
+              210,
+              298,
+              491,
+              460
+            ]
+          }
+        ]
+      },
+      "frames": [
+        {
+          "region": [
+            2,
+            2,
+            470,
+            828
+          ],
+          "margin": [
+            220,
+            303,
+            500,
+            465
+          ],
+          "rgba_sha256": "b85f582416a3e300c7f15ff760d322deb9f5a9912eceb8296b763bde60c2d2aa",
+          "registration": {
+            "source_anchor": [
+              265.5,
+              828.0
+            ],
+            "forward_shift_logical": 0
+          },
+          "source": {
+            "export": "art_working/battle_art_polish_2026_11_20/normalized/haruto_exiled_sword_idle_v01_01.png",
+            "export_sha256": "761a1354c09fdcd490e22fb46c6097019a22a3ea393a91301bc5ea55a7a0670c"
+          }
+        },
+        {
+          "region": [
+            485,
+            2,
+            479,
+            833
+          ],
+          "margin": [
+            210,
+            298,
+            491,
+            460
+          ],
+          "rgba_sha256": "b52ae8b80efb07beb4138bb337fb191fdc96187d87f7ed025257f7d0334a41a2",
+          "registration": {
+            "source_anchor": [
+              275.0,
+              833.0
+            ],
+            "forward_shift_logical": 0
+          },
+          "source": {
+            "export": "art_working/battle_art_polish_2026_11_20/normalized/haruto_exiled_sword_idle_v01_02.png",
+            "export_sha256": "dd4b0337db1c93004ad213c9dba7bf18afdf065196d97a2026d5dc7fb7df8025"
+          }
+        }
+      ],
+      "source": {
+        "kind": "ai_generated_reused_original",
+        "tool": "image_gen built-in",
+        "export": "art_working/battle_art_polish_2026_11_20/integration/characters/animations/haruto_exiled_sword_idle_sheet.png",
+        "export_sha256": "31b53fcdaa8d542c60b8c205c2e444187af777114a90d10b0e3d7c652ac16cec",
+        "original": "art_working/battle_art_polish_2026_11_20/source/haruto_exiled_sword_idle_v01_master.png",
+        "original_sha256": "319869a7615600556e795c29109d36b409ea90ea6d03c4bd348830663dda67a8",
+        "prompt": "art_working/battle_art_polish_2026_11_20/prompts/haruto_exiled_sword_idle_v01.txt",
+        "prompt_sha256": "55983391b813f2cf760589c1af89693ad207163c5e729bf14411407c0624df22",
+        "rights": "Project AI-generated content; platform terms apply",
+        "processing": "Native RGBA in reviewed frame crops; atlas packing and foot registration only"
+      },
+      "technical_checks_passed": true,
+      "review": {
+        "date": "2026-11-22",
+        "by": "Codex",
+        "status": "integrated after Windows portrait and native frame checks",
+        "per_frame_resampling": false
+      }
+    },
+    {
+      "id": "CHR-03-SWORD-ATTACK",
+      "path": "characters/animations/haruto_exiled_sword_attack_sheet.png",
+      "kind": "spritesheet",
+      "status": "approved",
+      "size": [
+        1341,
+        956
+      ],
+      "sha256": "3b1af65154e227cd4647bc6fad3b15743cc7ac02fd056d90bb8bb52ca84a9117",
+      "rgba_sha256": "ecb36819df4dbca1f7ecfcef823cc32045273809f94d6694d684368d9e622cf0",
+      "priority": "P1",
+      "pivot": [
+        324,
+        647
+      ],
+      "runtime": {
+        "frame": [
+          739,
+          740
+        ],
+        "count": 5,
+        "scale": 0.1729957805907173,
+        "offset": [
+          45.5,
+          -277.0
+        ],
+        "regions": [
+          {
+            "region": [
+              2,
+              2,
+              273,
+              474
+            ],
+            "margin": [
+              172,
+              173,
+              466,
+              266
+            ]
+          },
+          {
+            "region": [
+              449,
+              2,
+              313,
+              449
+            ],
+            "margin": [
+              142,
+              198,
+              426,
+              291
+            ]
+          },
+          {
+            "region": [
+              896,
+              2,
+              382,
+              447
+            ],
+            "margin": [
+              243,
+              200,
+              357,
+              293
+            ]
+          },
+          {
+            "region": [
+              2,
+              480,
+              443,
+              419
+            ],
+            "margin": [
+              296,
+              228,
+              296,
+              321
+            ]
+          },
+          {
+            "region": [
+              449,
+              480,
+              309,
+              463
+            ],
+            "margin": [
+              156,
+              184,
+              430,
+              277
+            ]
+          }
+        ]
+      },
+      "frames": [
+        {
+          "region": [
+            2,
+            2,
+            273,
+            474
+          ],
+          "margin": [
+            172,
+            173,
+            466,
+            266
+          ],
+          "rgba_sha256": "a82160f8f5e14f575d1a620e9a653b4416364214368bb70ec69386510fe3d285",
+          "registration": {
+            "source_anchor": [
+              152.0,
+              474.0
+            ],
+            "forward_shift_logical": 0
+          },
+          "source": {
+            "export": "art_working/battle_art_polish_2026_11_20/normalized/haruto_exiled_sword_attack_v02_01.png",
+            "export_sha256": "d788677bcf0c17b17cc2d46a8257a67d1d92cf24b4e856380652ae61e6c68259"
+          }
+        },
+        {
+          "region": [
+            449,
+            2,
+            313,
+            449
+          ],
+          "margin": [
+            142,
+            198,
+            426,
+            291
+          ],
+          "rgba_sha256": "19dfdbf66d288bdba6089a29b8585c6b0b25dd6321664ce84ed4d0ef3ccca9de",
+          "registration": {
+            "source_anchor": [
+              182.0,
+              449.0
+            ],
+            "forward_shift_logical": 0
+          },
+          "source": {
+            "export": "art_working/battle_art_polish_2026_11_20/normalized/haruto_exiled_sword_attack_v02_02.png",
+            "export_sha256": "94a6a2f685b744c9b90df74f14d3aa93d861c56be04196f9d14d7e85a5e4e7c3"
+          }
+        },
+        {
+          "region": [
+            896,
+            2,
+            382,
+            447
+          ],
+          "margin": [
+            243,
+            200,
+            357,
+            293
+          ],
+          "rgba_sha256": "909b7351b24516d4f997887057b6c627e89b4cec834ebf5040ecd1577c61b471",
+          "registration": {
+            "source_anchor": [
+              156.5,
+              447.0
+            ],
+            "forward_shift_logical": 13
+          },
+          "source": {
+            "export": "art_working/battle_art_polish_2026_11_20/normalized/haruto_exiled_sword_attack_v02_03.png",
+            "export_sha256": "43656f0cca2c5f29636afd360318ffc5270b91ed18850b6cb6022b6d2151a439"
+          }
+        },
+        {
+          "region": [
+            2,
+            480,
+            443,
+            419
+          ],
+          "margin": [
+            296,
+            228,
+            296,
+            321
+          ],
+          "rgba_sha256": "d8527710e438ec815a3fc29dcee890ce9cae53ecc7ed5dcce8fc574e4652096d",
+          "registration": {
+            "source_anchor": [
+              184.5,
+              419.0
+            ],
+            "forward_shift_logical": 27
+          },
+          "source": {
+            "export": "art_working/battle_art_polish_2026_11_20/normalized/haruto_exiled_sword_attack_v02_04.png",
+            "export_sha256": "23f6b7ec74ebb05256c52c8e1862abb384dd43c25d106903ddbdfecbaacbc663"
+          }
+        },
+        {
+          "region": [
+            449,
+            480,
+            309,
+            463
+          ],
+          "margin": [
+            156,
+            184,
+            430,
+            277
+          ],
+          "rgba_sha256": "22e5224c013613f1899cd7d20282e05c60372e770ecdb326dd4d4b7093420fb5",
+          "registration": {
+            "source_anchor": [
+              168.5,
+              463.0
+            ],
+            "forward_shift_logical": 0
+          },
+          "source": {
+            "export": "art_working/battle_art_polish_2026_11_20/normalized/haruto_exiled_sword_attack_v02_05.png",
+            "export_sha256": "e7d2e4448ec2a98e4526900af3b6a383b1ceda8658bf3e53f97bc22eacbff8a2"
+          }
+        }
+      ],
+      "source": {
+        "kind": "ai_generated_reused_original",
+        "tool": "image_gen built-in",
+        "export": "art_working/battle_art_polish_2026_11_20/integration/characters/animations/haruto_exiled_sword_attack_sheet.png",
+        "export_sha256": "3b1af65154e227cd4647bc6fad3b15743cc7ac02fd056d90bb8bb52ca84a9117",
+        "original": "art_working/battle_art_polish_2026_11_20/source/haruto_exiled_sword_attack_v02_master.png",
+        "original_sha256": "e3ccaf41eaf0f0475653c31a129c54e6ae596874378c166676b7e9d36df6d2c3",
+        "prompt": "art_working/battle_art_polish_2026_11_20/prompts/haruto_exiled_sword_attack_v02.txt",
+        "prompt_sha256": "a44c1c6d77641d96c1e58e38984f918ecaf722da7858e6ec09e718fe90275f22",
+        "rights": "Project AI-generated content; platform terms apply",
+        "processing": "Native RGBA in reviewed frame crops; atlas packing and foot registration only"
+      },
+      "technical_checks_passed": true,
+      "review": {
+        "date": "2026-11-22",
+        "by": "Codex",
+        "status": "integrated after Windows portrait and native frame checks",
+        "per_frame_resampling": false
+      }
+    },
+    {
+      "id": "CHR-03-SWORD-DODGE",
+      "path": "characters/animations/haruto_exiled_sword_dodge_sheet.png",
+      "kind": "spritesheet",
+      "status": "approved",
+      "size": [
+        884,
+        1158
+      ],
+      "sha256": "ddd9b11aa112c11e09a4546eefa24bdfdba2897edd1fe7e46b7cb9014444d182",
+      "rgba_sha256": "0c1e05cee5a08bd223c83cee17c132760cce0b92b590d2346488b7c9d0e1e5e0",
+      "priority": "P1",
+      "pivot": [
+        337,
+        785
+      ],
+      "runtime": {
+        "frame": [
+          674,
+          898
+        ],
+        "count": 4,
+        "scale": 0.14260869565217393,
+        "offset": [
+          0.0,
+          -336.0
+        ],
+        "regions": [
+          {
+            "region": [
+              2,
+              2,
+              343,
+              575
+            ],
+            "margin": [
+              146,
+              210,
+              331,
+              323
+            ]
+          },
+          {
+            "region": [
+              444,
+              2,
+              389,
+              515
+            ],
+            "margin": [
+              111,
+              270,
+              285,
+              383
+            ]
+          },
+          {
+            "region": [
+              2,
+              581,
+              438,
+              531
+            ],
+            "margin": [
+              64,
+              254,
+              236,
+              367
+            ]
+          },
+          {
+            "region": [
+              444,
+              581,
+              350,
+              572
+            ],
+            "margin": [
+              144,
+              213,
+              324,
+              326
+            ]
+          }
+        ]
+      },
+      "frames": [
+        {
+          "region": [
+            2,
+            2,
+            343,
+            575
+          ],
+          "margin": [
+            146,
+            210,
+            331,
+            323
+          ],
+          "rgba_sha256": "e538f634ee12d0b9bcc7ba7a87ed18ace5c2261adbdff7a9e7f09c55198120d2",
+          "registration": {
+            "source_anchor": [
+              191.0,
+              575.0
+            ],
+            "forward_shift_logical": 0
+          },
+          "source": {
+            "export": "art_working/battle_art_polish_2026_11_20/normalized/haruto_exiled_sword_dodge_v01_01.png",
+            "export_sha256": "b99a54504a18f40530a5d60f4089f0652a8f3f1829fc002667fcd57be95b2d97"
+          }
+        },
+        {
+          "region": [
+            444,
+            2,
+            389,
+            515
+          ],
+          "margin": [
+            111,
+            270,
+            285,
+            383
+          ],
+          "rgba_sha256": "cb6114651043a1ff422e46a244489f44b4a82e0a0d954eed8126aef66b3b046f",
+          "registration": {
+            "source_anchor": [
+              226.0,
+              515.0
+            ],
+            "forward_shift_logical": 0
+          },
+          "source": {
+            "export": "art_working/battle_art_polish_2026_11_20/normalized/haruto_exiled_sword_dodge_v01_02.png",
+            "export_sha256": "517f8eadac3f418f6853a3dda068f2bf2415fde4616f42f8991db2000ff43a7a"
+          }
+        },
+        {
+          "region": [
+            2,
+            581,
+            438,
+            531
+          ],
+          "margin": [
+            64,
+            254,
+            236,
+            367
+          ],
+          "rgba_sha256": "82509f4846c67a8d5fae1ae707aed903f3261792b6a18c2ed9d20844e01b38bf",
+          "registration": {
+            "source_anchor": [
+              272.5,
+              531.0
+            ],
+            "forward_shift_logical": 0
+          },
+          "source": {
+            "export": "art_working/battle_art_polish_2026_11_20/normalized/haruto_exiled_sword_dodge_v01_03.png",
+            "export_sha256": "a5433eb153619b645f241cf7bd4578a6745373492ca8fb28ae9eb853f990b482"
+          }
+        },
+        {
+          "region": [
+            444,
+            581,
+            350,
+            572
+          ],
+          "margin": [
+            144,
+            213,
+            324,
+            326
+          ],
+          "rgba_sha256": "f3bb8bf883983a4520ef38f12b6b4d7749455d3b81faaa6faa50236b56df91da",
+          "registration": {
+            "source_anchor": [
+              193.5,
+              572.0
+            ],
+            "forward_shift_logical": 0
+          },
+          "source": {
+            "export": "art_working/battle_art_polish_2026_11_20/normalized/haruto_exiled_sword_dodge_v01_04.png",
+            "export_sha256": "a99011442cf5055c343cfb01a6ebd7aeb079ee4d9277eb5bfa7fea300bfedfc4"
+          }
+        }
+      ],
+      "source": {
+        "kind": "ai_generated_reused_original",
+        "tool": "image_gen built-in",
+        "export": "art_working/battle_art_polish_2026_11_20/integration/characters/animations/haruto_exiled_sword_dodge_sheet.png",
+        "export_sha256": "ddd9b11aa112c11e09a4546eefa24bdfdba2897edd1fe7e46b7cb9014444d182",
+        "original": "art_working/battle_art_polish_2026_11_20/source/haruto_exiled_sword_dodge_v01_master.png",
+        "original_sha256": "4faac71d678574951702207b39bac181ee037d9faac915991e3b9ebe852decfc",
+        "prompt": "art_working/battle_art_polish_2026_11_20/prompts/haruto_exiled_sword_dodge_v01.txt",
+        "prompt_sha256": "7825746811f267d3f76e6e6892665407ad2bdb49afbbccba79f9036db84004a6",
+        "rights": "Project AI-generated content; platform terms apply",
+        "processing": "Native RGBA in reviewed frame crops; atlas packing and foot registration only"
+      },
+      "technical_checks_passed": true,
+      "review": {
+        "date": "2026-11-22",
+        "by": "Codex",
+        "status": "integrated after Windows portrait and native frame checks",
+        "per_frame_resampling": false
+      }
+    },
+    {
+      "id": "CHR-03-SWORD-HIT",
+      "path": "characters/animations/haruto_exiled_sword_hit_sheet.png",
+      "kind": "spritesheet",
+      "status": "approved",
+      "size": [
+        1116,
+        825
+      ],
+      "sha256": "cc0ea5dbc091dcadcbd75b1615814bdeca3182f242ac42bd3eb533aedb68f675",
+      "rgba_sha256": "d101a15a286cb7c926285b169604572598e929c4b6153561c8fe1421bd011a64",
+      "priority": "P1",
+      "pivot": [
+        481,
+        1121
+      ],
+      "runtime": {
+        "frame": [
+          962,
+          1282
+        ],
+        "count": 2,
+        "scale": 0.09987819732034105,
+        "offset": [
+          0.0,
+          -480.0
+        ],
+        "regions": [
+          {
+            "region": [
+              2,
+              2,
+              554,
+              821
+            ],
+            "margin": [
+              125,
+              300,
+              408,
+              461
+            ]
+          },
+          {
+            "region": [
+              560,
+              2,
+              503,
+              821
+            ],
+            "margin": [
+              186,
+              300,
+              459,
+              461
+            ]
+          }
+        ]
+      },
+      "frames": [
+        {
+          "region": [
+            2,
+            2,
+            554,
+            821
+          ],
+          "margin": [
+            125,
+            300,
+            408,
+            461
+          ],
+          "rgba_sha256": "412e0a29fba871c1c7a1ace11f7f3f6b05b3a85d85eccd6da37e3a43603fb0ff",
+          "registration": {
+            "source_anchor": [
+              356.0,
+              821.0
+            ],
+            "forward_shift_logical": 0
+          },
+          "source": {
+            "export": "art_working/battle_art_polish_2026_11_20/normalized/haruto_exiled_sword_hit_v01_01.png",
+            "export_sha256": "964ccb1c2ccc694107610c5bc3c398253fb90d3b4c2792afc4e55d33a9e2aa6a"
+          }
+        },
+        {
+          "region": [
+            560,
+            2,
+            503,
+            821
+          ],
+          "margin": [
+            186,
+            300,
+            459,
+            461
+          ],
+          "rgba_sha256": "17b9b6a93e51de4deec0890aaddb76bc0d5de466126ed4ae167885e04c161af7",
+          "registration": {
+            "source_anchor": [
+              294.5,
+              821.0
+            ],
+            "forward_shift_logical": 0
+          },
+          "source": {
+            "export": "art_working/battle_art_polish_2026_11_20/normalized/haruto_exiled_sword_hit_v01_02.png",
+            "export_sha256": "4bbce21301e804f951b4605aa510dec7bb2c4db8d5cdabc3e0cd55c87df04535"
+          }
+        }
+      ],
+      "source": {
+        "kind": "ai_generated_reused_original",
+        "tool": "image_gen built-in",
+        "export": "art_working/battle_art_polish_2026_11_20/integration/characters/animations/haruto_exiled_sword_hit_sheet.png",
+        "export_sha256": "cc0ea5dbc091dcadcbd75b1615814bdeca3182f242ac42bd3eb533aedb68f675",
+        "original": "art_working/battle_art_polish_2026_11_20/source/haruto_exiled_sword_hit_v01_master.png",
+        "original_sha256": "97f9e2b08894be6f636b26ea5c662acd4be3de67fa3223de8e3a05ff1cee3143",
+        "prompt": "art_working/battle_art_polish_2026_11_20/prompts/haruto_exiled_sword_hit_v01.txt",
+        "prompt_sha256": "036c67d9e0beb4a073d8d157b430109ad5c37290acc55a31f630cc29db3a3fc0",
+        "rights": "Project AI-generated content; platform terms apply",
+        "processing": "Native RGBA in reviewed frame crops; atlas packing and foot registration only"
+      },
+      "technical_checks_passed": true,
+      "review": {
+        "date": "2026-11-22",
+        "by": "Codex",
+        "status": "integrated after Windows portrait and native frame checks",
+        "per_frame_resampling": false
+      }
+    },
+    {
       "id": "CHR-04",
       "path": "characters/mitsuki_threshold_portrait.png",
       "kind": "texture",
@@ -169,14 +947,14 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        96,
-        128
+        288,
+        384
       ],
-      "sha256": "3d3fc901c03a16a48a0c730a0ccfd0fdc4b2528fb7c660628adab38466112650",
-      "rgba_sha256": "14f1c2effb53f77164f662ce608ec4863c7cf71cea5260751816fd454e6a1a20",
+      "sha256": "ce4912d66411f7a740dec8bd23da8745cf887b115b48d6861c2ab9fdc6b2d6b6",
+      "rgba_sha256": "550db290e7ddc7194890274e65a475ce059fefaaf802035550c81d0f6b43e6be",
       "priority": "P0",
       "source": {
-        "export": "art_working/exile_and_road_p0_p1_2026_11_18/chr_07/normalized/daijiro_merchant_idle_v01.png",
+        "export": "art_working/merchant_stage_2026_11_22/exports/daijiro_merchant_idle.png",
         "export_sha256": "3d3fc901c03a16a48a0c730a0ccfd0fdc4b2528fb7c660628adab38466112650",
         "manifest": "art_working/exile_and_road_p0_p1_2026_11_18/manifest.json",
         "original": "art_working/exile_and_road_p0_p1_2026_11_18/chr_07/source/daijiro_merchant_idle_v01.png",
@@ -185,8 +963,8 @@
         "prompt_sha256": "97d373990d091b5f7c8bfb880070d2ff1fcda1ab2b13c6b56d89f35425a1d1e2"
       },
       "pivot": [
-        48,
-        112
+        144,
+        371
       ]
     },
     {
@@ -857,14 +1635,14 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        180,
-        320
+        540,
+        960
       ],
-      "sha256": "08a3b8e2fd7dc146bae9938f8cc55c7c06c89d12041f765156effdf3a6c3182a",
-      "rgba_sha256": "8ee7bb9787af8d3311a1989273f8be95756332494043418f9f3828d0046ad7b8",
+      "sha256": "049ac95479c8914bffdcbd30383d63a7865ec9814738cbc46c5ff62e882ee023",
+      "rgba_sha256": "2184f321e575908e42be5e7b928b110c2b4c8d3d1f359ff64c066149079ef3d2",
       "priority": "P1",
       "source": {
-        "export": "art_working/lioren_gate_and_guild_p1_2026_11_18/env_07/normalized/lioren_south_gate_background_v01.png",
+        "export": "art_working/merchant_stage_2026_11_22/exports/lioren_south_gate_background.png",
         "export_sha256": "08a3b8e2fd7dc146bae9938f8cc55c7c06c89d12041f765156effdf3a6c3182a",
         "manifest": "art_working/lioren_gate_and_guild_p1_2026_11_18/manifest.json",
         "original": "art_working/lioren_gate_and_guild_p1_2026_11_18/env_07/source/lioren_south_gate_background_v01.png",
@@ -945,14 +1723,14 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        180,
-        320
+        540,
+        960
       ],
-      "sha256": "3b77101953bc94c64cac2c524aa9a1b79db4f6e7b06235ba8ab86d7e6bf33459",
-      "rgba_sha256": "69387c7f1b11b3582fa55a9bc006fd7c4e8252081f8a0c343dc7f674f9fcf230",
+      "sha256": "5929102121f27bce62d926e311bfc572d9492adffdc9e7df40ff0c990d80143e",
+      "rgba_sha256": "3d2aa9059c5b37d833556777379a0d1f9646a4ed6d9b91678c872688fc5d50a0",
       "priority": "P0",
       "source": {
-        "export": "art_working/social_scene_p0_2026_11_18/env_11/normalized/cricket_twilight_interior_background_v01.png",
+        "export": "art_working/merchant_stage_2026_11_22/exports/cricket_twilight_interior_background.png",
         "export_sha256": "3b77101953bc94c64cac2c524aa9a1b79db4f6e7b06235ba8ab86d7e6bf33459",
         "manifest": "art_working/social_scene_p0_2026_11_18/manifest.json",
         "original": "art_working/social_scene_p0_2026_11_18/env_11/source/cricket_twilight_interior_background_v01.png",
@@ -1199,14 +1977,14 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        48,
-        48
+        144,
+        144
       ],
-      "sha256": "25d7c86ffc641f82cd07e0dfa6b25a2d6fe35c1c51b5dbec222e9a84033d9407",
-      "rgba_sha256": "215088eac2ba5daff99af7de4ed94014b5f2d73c93e78e7c33fe570361a0e280",
+      "sha256": "227857302d1ebb649628093d1dfdb419ef6f7ebf299ff34b749364423309e988",
+      "rgba_sha256": "4a26adabf4c0284742fa23a1092d59335b6289fb387e5cf7585de4dae1321e32",
       "priority": "P0",
       "source": {
-        "export": "art_working/winds_edge_and_rewards_p0_2026_11_18/itm_04/normalized/wanderer_jacket_icon_v01.png",
+        "export": "art_working/merchant_stage_2026_11_22/exports/wanderer_jacket_icon.png",
         "export_sha256": "25d7c86ffc641f82cd07e0dfa6b25a2d6fe35c1c51b5dbec222e9a84033d9407",
         "manifest": "art_working/winds_edge_and_rewards_p0_2026_11_18/manifest.json",
         "original": "art_working/winds_edge_and_rewards_p0_2026_11_18/itm_04/source/wanderer_jacket_icon_v01.png",
@@ -2119,15 +2897,15 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        144,
-        96
+        360,
+        240
       ],
-      "sha256": "9af0232cd32d0e1592e4a11b6afc3f4b0aa19f2d6d78214bb6c502b09962be3c",
-      "rgba_sha256": "2592a6eb2491832ff550b3c601dbbb4476ebe3cffbf925bfce46d6f1fa1e5850",
+      "sha256": "00b256e2259fdc91f0d26d0493d146efba8a90ab739a449c2131d996c7d4b45c",
+      "rgba_sha256": "1b6e11c4d5ab77d91a952c419b34474253bfcdd6dbdb30b190a5a7530c3d722b",
       "priority": "P1",
       "source": {
-        "export": "art_working/copper_compass_road_p1_2026_11_18/obj_02_cart/normalized/daijiro_cart_overturned_prop_v01.png",
-        "export_sha256": "9af0232cd32d0e1592e4a11b6afc3f4b0aa19f2d6d78214bb6c502b09962be3c",
+        "export": "art_working/merchant_stage_2026_11_22/exports/daijiro_cart_overturned_prop.png",
+        "export_sha256": "00b256e2259fdc91f0d26d0493d146efba8a90ab739a449c2131d996c7d4b45c",
         "manifest": "art_working/copper_compass_road_p1_2026_11_18/manifest.json",
         "original": "art_working/copper_compass_road_p1_2026_11_18/obj_02_cart/source/daijiro_cart_overturned_prop_v01.png",
         "original_sha256": "5a862edc8c6ee3145ad113b396869767127b8cc53077583903a75f71bda26461",
@@ -2135,8 +2913,8 @@
         "prompt_sha256": "32f77a6b2bc5a6c174b9ba0fcaf33355af6b8330f55610807aa05b4b363f580c"
       },
       "pivot": [
-        72,
-        84
+        180,
+        215
       ]
     },
     {
@@ -2863,14 +3641,14 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        180,
-        320
+        540,
+        960
       ],
-      "sha256": "9e612ac8f82e190d2208b7a59995faf37ac061e11d55913b4d7b0d62d80367bd",
-      "rgba_sha256": "03e0c55050ab9cc88f50bd016dcb059f560aca7975f2a2fd869a98cf2360b153",
+      "sha256": "b41b49a35c854e87b1e0f3db475bd89a7f4627c22453de77e85cb95054a652ee",
+      "rgba_sha256": "eb177143f68eab50eede62b8ef38c23759adf4d6d50c053754fae5cf9bf7ad21",
       "priority": "P1",
       "source": {
-        "export": "art_working/nar_threshold_to_shop_p1_2026_11_18/nar_10/normalized/daijiro_cart_rescue_story_v01.png",
+        "export": "art_working/merchant_stage_2026_11_22/exports/daijiro_cart_rescue_story.png",
         "export_sha256": "9e612ac8f82e190d2208b7a59995faf37ac061e11d55913b4d7b0d62d80367bd",
         "manifest": "art_working/nar_threshold_to_shop_p1_2026_11_18/manifest.json",
         "original": "art_working/nar_threshold_to_shop_p1_2026_11_18/nar_10/source/daijiro_cart_rescue_story_v01.png",
@@ -2885,14 +3663,14 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        180,
-        320
+        540,
+        960
       ],
-      "sha256": "69aa2ba295d058fdb7328931f5472d33e2273f9adcd921b5498575d54d47c8a4",
-      "rgba_sha256": "ad1e231ce35e01fa7df0ab58ff44f5224ec8395cd76907afb52a1c6f5f69bff3",
+      "sha256": "8bcd7d358cf5be907c499df37363913b4eab85c403744ba9d9857743d520aeea",
+      "rgba_sha256": "a55558bb09e10cafabb7a0f71f9f61727c628f6cbb63e133955af92f7fcb4374",
       "priority": "P1",
       "source": {
-        "export": "art_working/nar_threshold_to_shop_p1_2026_11_18/nar_11/normalized/daijiro_crystal_appraisal_story_v01.png",
+        "export": "art_working/merchant_stage_2026_11_22/exports/daijiro_crystal_appraisal_story.png",
         "export_sha256": "69aa2ba295d058fdb7328931f5472d33e2273f9adcd921b5498575d54d47c8a4",
         "manifest": "art_working/nar_threshold_to_shop_p1_2026_11_18/manifest.json",
         "original": "art_working/nar_threshold_to_shop_p1_2026_11_18/nar_11/source/daijiro_crystal_appraisal_story_v01.png",
@@ -9918,16 +10696,17 @@
         20,
         20
       ],
-      "sha256": "de8add22ffb7bfa6e56b495902e5a6ba0101680a251852056ad47463366b5be2",
-      "rgba_sha256": "d2995181a2847d8645513357f9bed3a644c8bd2147ea35ba61c5a4e0d5d3b4c3",
+      "sha256": "4d36ce9b1b6a58df5e1a57ed895fcacbb5179a6376be43382902c37bbfb5feae",
+      "rgba_sha256": "b98ffb664cc68501c3a8509e3e3c97b966f2d478e00c18aaa8ca5c303ef646d4",
       "priority": "P1",
       "source": {
-        "export": "art_working/ui_gameplay_icons_2026_11_21/normalized/slot_helmet_icon.png",
-        "export_sha256": "de8add22ffb7bfa6e56b495902e5a6ba0101680a251852056ad47463366b5be2",
-        "original": "art_working/ui_gameplay_icons_2026_11_21/masters/slot_helmet_icon.svg",
-        "original_sha256": "8bb224000d216f32d1c057f32081bcbb5b4bc8703fab7c213f26b9b935c3a314",
-        "prompt": "art_working/ui_gameplay_icons_2026_11_21/brief.md",
-        "prompt_sha256": "3471d94034debcb91f0415bee624115ed2e41dc468c46d2830c860e7e9d70dc5"
+        "export": "art_working/trail_inventory_2026_11_22/slot_helmet_icon.png",
+        "export_sha256": "4d36ce9b1b6a58df5e1a57ed895fcacbb5179a6376be43382902c37bbfb5feae",
+        "original": "art_working/trail_inventory_2026_11_22/draw_icons.py",
+        "original_sha256": "aebd94647711137699348127bbbb36416338790762b1dfcc13a32414217d0514",
+        "brief": "art_working/trail_inventory_2026_11_22/brief.md",
+        "brief_sha256": "bd7467065f21563f1840721c2c9d7314724b99a080cbaa216ef58a11c799dd9e",
+        "method": "Original pixel art drawn for Path of Reborn with Pillow"
       },
       "pivot": [
         10,
@@ -9943,16 +10722,43 @@
         20,
         20
       ],
-      "sha256": "391ecbec11dd316c2a1bf5f1aa562eb5d31c882a755e939265820df6f15c55b8",
-      "rgba_sha256": "aa7c890c4acc93ed1b78b875a78c80f79e7137cdac0a581eb3d5606cbe699156",
+      "sha256": "85ffbc685e447402ea98eebe7394247ebceb01e7a734bb33dfea01901f953bd7",
+      "rgba_sha256": "8a9f438dcdd2afeed9cd203db94a9cb781bd16e68a18073ade85ae87fe931d8c",
       "priority": "P1",
       "source": {
-        "export": "art_working/ui_gameplay_icons_2026_11_21/normalized/slot_armor_icon.png",
-        "export_sha256": "391ecbec11dd316c2a1bf5f1aa562eb5d31c882a755e939265820df6f15c55b8",
-        "original": "art_working/ui_gameplay_icons_2026_11_21/masters/slot_armor_icon.svg",
-        "original_sha256": "358c7702752d61373d4afad43758d88be4f80a7220ae9af176ea8c34865d5cec",
-        "prompt": "art_working/ui_gameplay_icons_2026_11_21/brief.md",
-        "prompt_sha256": "3471d94034debcb91f0415bee624115ed2e41dc468c46d2830c860e7e9d70dc5"
+        "export": "art_working/trail_inventory_2026_11_22/slot_armor_icon.png",
+        "export_sha256": "85ffbc685e447402ea98eebe7394247ebceb01e7a734bb33dfea01901f953bd7",
+        "original": "art_working/trail_inventory_2026_11_22/draw_icons.py",
+        "original_sha256": "aebd94647711137699348127bbbb36416338790762b1dfcc13a32414217d0514",
+        "brief": "art_working/trail_inventory_2026_11_22/brief.md",
+        "brief_sha256": "bd7467065f21563f1840721c2c9d7314724b99a080cbaa216ef58a11c799dd9e",
+        "method": "Original pixel art drawn for Path of Reborn with Pillow"
+      },
+      "pivot": [
+        10,
+        10
+      ]
+    },
+    {
+      "id": "UI-SLOT-WEAPON",
+      "path": "ui/icons/slot_weapon_icon.png",
+      "kind": "texture",
+      "status": "approved",
+      "size": [
+        20,
+        20
+      ],
+      "sha256": "6f9201e1ed0360f477c5faa47a455ddf21aa50f78553aaebdb3b7694ce3c8d0a",
+      "rgba_sha256": "f59fdf25d97a924f89accc735ccbffbc44c30eb4268d6487864ef8441755e34d",
+      "priority": "P1",
+      "source": {
+        "export": "art_working/trail_inventory_2026_11_22/slot_weapon_icon.png",
+        "export_sha256": "6f9201e1ed0360f477c5faa47a455ddf21aa50f78553aaebdb3b7694ce3c8d0a",
+        "original": "art_working/trail_inventory_2026_11_22/draw_icons.py",
+        "original_sha256": "aebd94647711137699348127bbbb36416338790762b1dfcc13a32414217d0514",
+        "brief": "art_working/trail_inventory_2026_11_22/brief.md",
+        "brief_sha256": "bd7467065f21563f1840721c2c9d7314724b99a080cbaa216ef58a11c799dd9e",
+        "method": "Original pixel art drawn for Path of Reborn with Pillow"
       },
       "pivot": [
         10,
@@ -9968,16 +10774,17 @@
         20,
         20
       ],
-      "sha256": "0ff7d6d58eb35eb4a03999a88268525bff818d1a9b5e13999cf93ab4c42a8be6",
-      "rgba_sha256": "b168e2343217a1d080c32398c58a6afcedb52488c816e0f62d7f60d4bead06e2",
+      "sha256": "d2eada68f503c6ce5b9ab5199713faaea2e55095a35f5f74a7fbfb3973a20bf3",
+      "rgba_sha256": "b0e427399556e4015f1d7d1878b87eb0974c42900e16f17d21cf0abee403965c",
       "priority": "P1",
       "source": {
-        "export": "art_working/ui_gameplay_icons_2026_11_21/normalized/slot_boots_icon.png",
-        "export_sha256": "0ff7d6d58eb35eb4a03999a88268525bff818d1a9b5e13999cf93ab4c42a8be6",
-        "original": "art_working/ui_gameplay_icons_2026_11_21/masters/slot_boots_icon.svg",
-        "original_sha256": "354b9bc244ef06cb43bba47105a9e6ae69eedf7a5d943334f0a7e41b13a50b5e",
-        "prompt": "art_working/ui_gameplay_icons_2026_11_21/brief.md",
-        "prompt_sha256": "3471d94034debcb91f0415bee624115ed2e41dc468c46d2830c860e7e9d70dc5"
+        "export": "art_working/trail_inventory_2026_11_22/slot_boots_icon.png",
+        "export_sha256": "d2eada68f503c6ce5b9ab5199713faaea2e55095a35f5f74a7fbfb3973a20bf3",
+        "original": "art_working/trail_inventory_2026_11_22/draw_icons.py",
+        "original_sha256": "aebd94647711137699348127bbbb36416338790762b1dfcc13a32414217d0514",
+        "brief": "art_working/trail_inventory_2026_11_22/brief.md",
+        "brief_sha256": "bd7467065f21563f1840721c2c9d7314724b99a080cbaa216ef58a11c799dd9e",
+        "method": "Original pixel art drawn for Path of Reborn with Pillow"
       },
       "pivot": [
         10,
@@ -9993,16 +10800,17 @@
         20,
         20
       ],
-      "sha256": "ffe42dee9cd1db277fa0e893b9b23e4d3a6dc402b7dd8f42b542308734fface3",
-      "rgba_sha256": "9659e6a4f45ea17aec2a0e7429c17c197efad39e944a71ff81e19db62538cf79",
+      "sha256": "cb130315c40954ab592d163066cbf67160a184272c11657bc9528f02b99fd0d2",
+      "rgba_sha256": "36fc5e5ab21769c929b56148ffb5d2a0253f48ff41c39836eeff9392c10e9b32",
       "priority": "P1",
       "source": {
-        "export": "art_working/ui_gameplay_icons_2026_11_21/normalized/slot_shoulders_icon.png",
-        "export_sha256": "ffe42dee9cd1db277fa0e893b9b23e4d3a6dc402b7dd8f42b542308734fface3",
-        "original": "art_working/ui_gameplay_icons_2026_11_21/masters/slot_shoulders_icon.svg",
-        "original_sha256": "c35b47b7b7153c6188651cc377b22106bbc50dae4027aa9014fd7bf7838e03c6",
-        "prompt": "art_working/ui_gameplay_icons_2026_11_21/brief.md",
-        "prompt_sha256": "3471d94034debcb91f0415bee624115ed2e41dc468c46d2830c860e7e9d70dc5"
+        "export": "art_working/trail_inventory_2026_11_22/slot_shoulders_icon.png",
+        "export_sha256": "cb130315c40954ab592d163066cbf67160a184272c11657bc9528f02b99fd0d2",
+        "original": "art_working/trail_inventory_2026_11_22/draw_icons.py",
+        "original_sha256": "aebd94647711137699348127bbbb36416338790762b1dfcc13a32414217d0514",
+        "brief": "art_working/trail_inventory_2026_11_22/brief.md",
+        "brief_sha256": "bd7467065f21563f1840721c2c9d7314724b99a080cbaa216ef58a11c799dd9e",
+        "method": "Original pixel art drawn for Path of Reborn with Pillow"
       },
       "pivot": [
         10,
@@ -10018,16 +10826,17 @@
         20,
         20
       ],
-      "sha256": "d2cf3820a16eb923e8f664ced664dfb189722683caa55a441a702671edfe260c",
-      "rgba_sha256": "4dc094d4a48541c7fb49b95d5ee8c88d4fcd9c82ecacb477a6bb7f2525d3df2e",
+      "sha256": "857417ca716f2f991a36d6d75d38376bda08be2ee923656754d218e4abfb7a0f",
+      "rgba_sha256": "262785741691a757374c4ca173a21d0481a291aa11fffe6e15ac10278433619b",
       "priority": "P1",
       "source": {
-        "export": "art_working/ui_gameplay_icons_2026_11_21/normalized/slot_familiar_icon.png",
-        "export_sha256": "d2cf3820a16eb923e8f664ced664dfb189722683caa55a441a702671edfe260c",
-        "original": "art_working/ui_gameplay_icons_2026_11_21/masters/slot_familiar_icon.svg",
-        "original_sha256": "a3a44bcfa51ed893df93193438910b19d3f19b842e7f8b24b83b67b7cfcf9d9b",
-        "prompt": "art_working/ui_gameplay_icons_2026_11_21/brief.md",
-        "prompt_sha256": "3471d94034debcb91f0415bee624115ed2e41dc468c46d2830c860e7e9d70dc5"
+        "export": "art_working/trail_inventory_2026_11_22/slot_familiar_icon.png",
+        "export_sha256": "857417ca716f2f991a36d6d75d38376bda08be2ee923656754d218e4abfb7a0f",
+        "original": "art_working/trail_inventory_2026_11_22/draw_icons.py",
+        "original_sha256": "aebd94647711137699348127bbbb36416338790762b1dfcc13a32414217d0514",
+        "brief": "art_working/trail_inventory_2026_11_22/brief.md",
+        "brief_sha256": "bd7467065f21563f1840721c2c9d7314724b99a080cbaa216ef58a11c799dd9e",
+        "method": "Original pixel art drawn for Path of Reborn with Pillow"
       },
       "pivot": [
         10,
@@ -10043,16 +10852,17 @@
         20,
         20
       ],
-      "sha256": "52cf17f134f11fa6d869254f099b24477121ce63641d813c00570a73d8eadab1",
-      "rgba_sha256": "5516fe7fbeee40f39b47bb65a4889e12d785ccd3438d780d0f3ee7fe6da03f1a",
+      "sha256": "b2e43c63b666d6ee8dcb7fb6c1c8f3d7efe506faa1def0bf3b7455d34c354095",
+      "rgba_sha256": "a8b1f2e7f68d35073f519c9d777433e2692406f6ee6b4b267cae8fc181a367df",
       "priority": "P1",
       "source": {
-        "export": "art_working/ui_gameplay_icons_2026_11_21/normalized/slot_amulet_icon.png",
-        "export_sha256": "52cf17f134f11fa6d869254f099b24477121ce63641d813c00570a73d8eadab1",
-        "original": "art_working/ui_gameplay_icons_2026_11_21/masters/slot_amulet_icon.svg",
-        "original_sha256": "f077e3cd4584423bbd3e463db06c256f9bc472c25a9720e8fa8b579b02abe728",
-        "prompt": "art_working/ui_gameplay_icons_2026_11_21/brief.md",
-        "prompt_sha256": "3471d94034debcb91f0415bee624115ed2e41dc468c46d2830c860e7e9d70dc5"
+        "export": "art_working/trail_inventory_2026_11_22/slot_amulet_icon.png",
+        "export_sha256": "b2e43c63b666d6ee8dcb7fb6c1c8f3d7efe506faa1def0bf3b7455d34c354095",
+        "original": "art_working/trail_inventory_2026_11_22/draw_icons.py",
+        "original_sha256": "aebd94647711137699348127bbbb36416338790762b1dfcc13a32414217d0514",
+        "brief": "art_working/trail_inventory_2026_11_22/brief.md",
+        "brief_sha256": "bd7467065f21563f1840721c2c9d7314724b99a080cbaa216ef58a11c799dd9e",
+        "method": "Original pixel art drawn for Path of Reborn with Pillow"
       },
       "pivot": [
         10,
@@ -10068,16 +10878,17 @@
         20,
         20
       ],
-      "sha256": "06429ddcb3c75c49c3c50c0acb44453e05f6d63897dc16fcc1d47a99f8b8b0d4",
-      "rgba_sha256": "725113af8be01a614005f7b2594417b408d15946719a3480e8b608932c3f7849",
+      "sha256": "bf2f9219105808515f5449830f6703da367d016ab5eb8de1fcb8af0c50b18bc9",
+      "rgba_sha256": "9e396c77db1627ff5959378470a47b62b4e7b7918b289845cc6172b6154d5696",
       "priority": "P1",
       "source": {
-        "export": "art_working/ui_gameplay_icons_2026_11_21/normalized/slot_ring_icon.png",
-        "export_sha256": "06429ddcb3c75c49c3c50c0acb44453e05f6d63897dc16fcc1d47a99f8b8b0d4",
-        "original": "art_working/ui_gameplay_icons_2026_11_21/masters/slot_ring_icon.svg",
-        "original_sha256": "ace5e04233c190f06f87069f155fe25da0cf294d0af4103ecc900da71a965bfe",
-        "prompt": "art_working/ui_gameplay_icons_2026_11_21/brief.md",
-        "prompt_sha256": "3471d94034debcb91f0415bee624115ed2e41dc468c46d2830c860e7e9d70dc5"
+        "export": "art_working/trail_inventory_2026_11_22/slot_ring_icon.png",
+        "export_sha256": "bf2f9219105808515f5449830f6703da367d016ab5eb8de1fcb8af0c50b18bc9",
+        "original": "art_working/trail_inventory_2026_11_22/draw_icons.py",
+        "original_sha256": "aebd94647711137699348127bbbb36416338790762b1dfcc13a32414217d0514",
+        "brief": "art_working/trail_inventory_2026_11_22/brief.md",
+        "brief_sha256": "bd7467065f21563f1840721c2c9d7314724b99a080cbaa216ef58a11c799dd9e",
+        "method": "Original pixel art drawn for Path of Reborn with Pillow"
       },
       "pivot": [
         10,

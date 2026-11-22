@@ -56,6 +56,7 @@ func _failed_claim_save() -> Dictionary:
 	var suffix := str(Time.get_ticks_usec())
 	game.save_path = "user://por_acceptance_probe_%s.json" % suffix
 	root.add_child(game)
+	current_scene = game
 	game.session.world_flags["prologue_completed"] = true
 	game.save_service.save(game.session, game.save_path)
 	game.session.select_encounter("moss_slime")
@@ -69,7 +70,11 @@ func _failed_claim_save() -> Dictionary:
 		await process_frame
 	var blocked_tmp := ProjectSettings.globalize_path(game.save_path + ".tmp")
 	var blocker := DirAccess.make_dir_absolute(blocked_tmp)
-	screen.result_panel.store_button.pressed.emit()
+	screen.result_panel.summary_button.pressed.emit()
+	ConfirmDialog.dismiss_from(screen)
+	for _item: Dictionary in game.session.pending_battle_result["items"]:
+		screen.result_panel._choose("store")
+	screen.result_panel.claim_button.pressed.emit()
 	await process_frame
 	var restored := GameSession.new()
 	var loaded := SaveService.new().load_into(restored, game.save_path)
@@ -94,7 +99,7 @@ func _failed_claim_save() -> Dictionary:
 
 func _goblin_contacts() -> Array[Dictionary]:
 	var session := GameSession.new()
-	session.route_state["next_index"] = 1
+	session.route_state["next_index"] = 2
 	session.set_combat_format(GameSession.COMBAT_FORMAT_ACTIVE)
 	session.select_encounter("goblin_scout")
 	var screen: Control = load("res://scenes/combat.tscn").instantiate()
@@ -120,6 +125,9 @@ func _legacy_snapshot() -> Dictionary:
 	var dto := service.capture(GameSession.new())
 	dto["schema_version"] = 2
 	var legacy_profile: Dictionary = dto["checkpoints"]["first_trace_snapshot"]["profile"]
+	for profile: Dictionary in [dto["profile"], legacy_profile]:
+		profile["currency"] = 0
+		profile.erase("wallet")
 	for key: String in ["pending_battle_result", "last_claimed_result_id", "trial_echo_claimed"]:
 		legacy_profile.erase(key)
 		dto["profile"].erase(key)
@@ -134,7 +142,7 @@ func _legacy_snapshot() -> Dictionary:
 
 func _trial_echo_after_rollback() -> Dictionary:
 	var session := GameSession.new()
-	for enemy: String in ["moss_slime", "goblin_scout"]:
+	for enemy: String in ["moss_slime", "moss_slime", "goblin_scout"]:
 		_win_and_claim(session, enemy)
 		session.choose_upgrade("strength")
 	var began := session.checkpoints.begin()
@@ -170,7 +178,7 @@ func _route_balance() -> Array[Dictionary]:
 			var session := GameSession.new()
 			session.set_loot_seed(seed)
 			var stages: Array[Dictionary] = []
-			for enemy: String in ["moss_slime", "goblin_scout", "goblin_trial"]:
+			for enemy: String in ["moss_slime", "moss_slime", "goblin_scout", "goblin_trial"]:
 				var combat := session.start_combat(enemy)
 				combat.advance_ticks(6000)
 				var stage := {"enemy": enemy, "won": combat.won, "ticks": combat.tick_count, "hp": session.hero.current_hp, "hp_max": session.hero.max_hp, "strength": session.hero.strength}

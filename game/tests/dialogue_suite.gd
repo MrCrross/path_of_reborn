@@ -19,6 +19,7 @@ func run() -> Array[Dictionary]:
 	results.append(_run_case("full_prologue_reaches_world_with_bounded_input", _test_full_prologue))
 	results.append(_run_case("first_pass_preserves_canonical_ids_and_continue", _test_first_pass))
 	results.append(_run_case("skip_sequence_finishes_with_postconditions_once", _test_skip))
+	results.append(_run_case("lioren_gates_and_shop_files_validate_with_postconditions", _test_lioren_and_shop_data))
 	return results
 
 func _run_case(case_name: String, test: Callable) -> Dictionary:
@@ -260,3 +261,48 @@ func _tap_through(runner: DialogueRunner) -> void:
 
 func _normalized(text: String) -> String:
 	return " ".join(text.split(" ", false))
+
+func _test_lioren_and_shop_data(context: TestContext) -> void:
+	var files: Dictionary = {
+		"res://data/narrative/lioren_gates.json": {"last_destination": "shop", "flag": "lioren_shop_unlocked"},
+		"res://data/narrative/shop_intro.json": {"last_destination": "shop", "flag": "shop_intro_done"},
+		"res://data/narrative/shop_talk.json": {"last_destination": "shop", "flag": ""},
+		"res://data/narrative/shop_purchase.json": {"last_destination": "shop", "flag": "shop_purchase_briefing_done"},
+	}
+	for path: String in files:
+		var runner := DialogueRunner.new()
+		context.check(runner.load_file(path), "Production JSON parses and validates: %s" % path)
+		context.check(runner.entries.size() >= 3, "%s keeps a real scene, not a stub" % path)
+		context.check(runner.entries.back().get("destination", "") == files[path]["last_destination"], "%s exits to the shop route" % path)
+		var flag: String = files[path]["flag"]
+		if not flag.is_empty():
+			var commands: Array = runner.entries.back().get("commands", [])
+			var has_flag_command: bool = commands.any(func(command: Variant) -> bool:
+				return typeof(command) == TYPE_DICTIONARY and command.get("type", "") == "set_world_flag" and command.get("key", "") == flag and command.get("value") == true)
+			context.check(has_flag_command, "%s records its story-line flag %s on the last cue" % [path, flag])
+	var intro := DialogueRunner.new()
+	intro.load_file("res://data/narrative/shop_intro.json")
+	var appraisal_hidden: bool = true
+	for cue: Dictionary in intro.entries:
+		if String(cue.get("text", "")).to_lower().contains("сумрачн"):
+			appraisal_hidden = false
+	context.check(appraisal_hidden, "Pure twilight crystal appraisal stays hidden until the story item exists")
+	# Полный проход ворот с постусловием, как у пролога.
+	var session := GameSession.new()
+	var gates := DialogueRunner.new()
+	gates.configure(session)
+	gates.command_requested.connect(func(command: Dictionary) -> void: session.world_flags[command["key"]] = command.get("value"))
+	context.check(gates.load_file("res://data/narrative/lioren_gates.json") and gates.start(), "Gates scene starts from production data")
+	var guard: int = 0
+	while not gates.is_finished and guard < 100:
+		gates.tap()
+		guard += 1
+	context.check(gates.is_finished and gates.destination == "shop", "Gates reach the shop route within the bounded loop")
+	context.check(session.world_flags.get(GameSession.WORLD_FLAG_LIOREN_SHOP_UNLOCKED) == true, "Gates open the shop access flag")
+	session.world_flags.erase(GameSession.WORLD_FLAG_LIOREN_SHOP_UNLOCKED)
+	gates.replay_seen_commands = true
+	gates.start()
+	context.check(gates.current_cue().get("id") == "DIA_CITY_006", "Reopening after a rollback restores the missing completion cue without replaying read lines")
+	while not gates.is_finished:
+		gates.tap()
+	context.check(session.shop_access_unlocked(), "The restored cue can open the shop again after a rollback")

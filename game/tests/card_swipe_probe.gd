@@ -34,45 +34,46 @@ func _run() -> void:
 	_view.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	_view.offset_left = 6
 	_view.offset_right = -6
-	_view.fit_to_view(320)
+	_view.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	_view.choice_requested.connect(func(entry_id: String, action: String) -> void: _choices.append({"entry_id": entry_id, "action": action}))
 	_view.present(_session, _result)
+	_view.present_next(_result)
 	await _frames(4)
 
-	_check(not _view.store_button.is_visible_in_tree() and not _view.equip_button.is_visible_in_tree(), "В карточке нет видимых кнопок действий")
+	_check(_view.card.is_visible_in_tree() and not _view.summary_button.is_visible_in_tree() and not _view.claim_button.is_visible_in_tree(), "Находка показана отдельной карточкой")
 	_shot("01_card_equipment")
 
 	await _gesture(Vector2(-26, 0), "")
 	_check(_choices == [{"entry_id": "entry_000901", "action": "store"}], "Свайп влево по мечу отправляет «Взять»")
 
 	_choices.clear()
-	_view.present(_session, _result)
+	_view.present_next(_result)
 	await _frames(3)
 	await _gesture(Vector2(26, 0), "02_card_drag_right")
 	_check(_choices == [{"entry_id": "entry_000901", "action": "equip"}], "Свайп вправо по мечу отправляет «Надеть»")
 
 	_choices.clear()
-	_view.present(_session, _result)
+	_view.present_next(_result)
 	await _frames(3)
 	await _gesture(Vector2(2, 1), "")
 	_check(_choices == [{"entry_id": "entry_000901", "action": "store"}], "Короткое касание карточки берёт предмет")
 
 	_choices.clear()
-	_view.present(_session, _result)
+	_view.present_next(_result)
 	await _frames(3)
 	await _gesture(Vector2(8, 0), "")
 	_check(_choices.is_empty() and _view.card.position.x == 0, "Жест короче порога не подтверждается, карточка возвращается")
 
 	_choices.clear()
-	_view.present(_session, _result)
+	_view.present_next(_result)
 	await _frames(3)
 	await _gesture(Vector2(2, 30), "")
 	_check(_choices.is_empty() and _view.card.position.x == 0, "Вертикальный жест не считается свайпом, карточка возвращается")
 
 	var crystal_result: Dictionary = _session.pending_battle_result.duplicate(true)
-	_view.present(_session, crystal_result)
+	_view.present_next(crystal_result)
 	await _frames(3)
-	_check(not _view.equip_button.visible, "Карточка кристалла не предлагает «Надеть»")
+	_check(not _view._can_equip, "Карточка кристалла не предлагает «Надеть»")
 	_shot("03_card_crystal")
 	_choices.clear()
 	await _gesture(Vector2(-26, 0), "")

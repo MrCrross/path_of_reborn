@@ -8,6 +8,7 @@ func run(task: String, argument: String = "") -> Dictionary:
 		"goblin_fixture":
 			root.session.in_combat = false
 			root.session.awaiting_return = false
+			root.session.route_state["next_index"] = 2
 			root.session.select_encounter("goblin_scout")
 			root.router.go_to("combat")
 			var goblin_screen: Control = root.router.current_screen
@@ -91,6 +92,7 @@ func run(task: String, argument: String = "") -> Dictionary:
 			root.session.in_combat = false
 			root.session.awaiting_return = false
 			root.session.traces = 0
+			root.session.route_state["next_index"] = 2
 			root.session.select_encounter("goblin_scout")
 			root.router.go_to("combat")
 			var goblin_screen: Control = root.router.current_screen

@@ -80,7 +80,12 @@ func xp_to_next_level() -> int:
 ## Честный прогноз начисления опыта для экрана результата: до claim игрок
 ## видит, какой уровень и остаток опыта даст получение награды.
 func preview_level_gain(amount: int) -> Dictionary:
-	return calculate_level_gain(level, experience, _xp_thresholds, amount)
+	var preview: Dictionary = calculate_level_gain(level, experience, _xp_thresholds, amount)
+	var next_level: int = int(preview["level"])
+	preview["xp_remaining"] = 0
+	if next_level <= _xp_thresholds.size():
+		preview["xp_remaining"] = maxi(1, _xp_thresholds[next_level - 1]) - int(preview["experience"])
+	return preview
 
 static func calculate_level_gain(start_level: int, start_experience: int, thresholds: Array[int], amount: int) -> Dictionary:
 	var next_level: int = start_level

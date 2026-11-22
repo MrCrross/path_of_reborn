@@ -6,9 +6,7 @@ signal navigate_requested(destination: String)
 ## текст живёт в одной защищённой нижней панели. Служебные данные (shot ID,
 ## cue N/44, ticks) показываются только при явном флаге --debug-ui.
 
-const MAX_TEXT_LINES := 3
 const SWIPE_DISTANCE := 24.0
-const SKIP_FRAME_INSET := 3.0
 
 var session: GameSession
 var runner: DialogueRunner
@@ -29,7 +27,6 @@ var runner: DialogueRunner
 @onready var hint_text: Label = %HintText
 @onready var page_cue: Label = %PageCue
 @onready var hold_area: PanelContainer = %HoldArea
-@onready var hold_label: Label = %HoldLabel
 @onready var hold_progress_bar: ProgressBar = %HoldProgressBar
 @onready var skip_button: Button = %SkipButton
 @onready var debug_panel: VBoxContainer = %DebugPanel
@@ -45,7 +42,7 @@ var _art_signature: String = ""
 var _measured_width: float = -1.0
 var _skipping: bool = false
 var _hold_pointer: Dictionary = {}
-var _hold_style := AppTheme.flat(Color("1c2522"), AppTheme.COLOR_ACCENT, 1, 0)
+var _hold_style := AppTheme.flat(AppTheme.COLOR_ACCENT, AppTheme.COLOR_ACCENT.lightened(0.15))
 var _hold_pulse: Tween
 ## Последний план, под который собран стиль панели (повторно не пересобираем).
 var _style_shot: String = "__init__"
@@ -68,11 +65,28 @@ func _ready() -> void:
 	dialogue_panel.get_parent().add_child(overlay)
 	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for node: Control in [plan_caption, skip_button, dialogue_panel]:
+	for node: Control in [plan_caption, skip_button, dialogue_panel, hold_area]:
 		node.reparent(overlay)
 	skip_button.text = ""
 	skip_button.icon = ArtMap.texture(ArtMap.UI["skip_cutscene"])
+	var transparent := StyleBoxEmpty.new()
+	for state: String in ["normal", "hover", "pressed", "disabled"]:
+		skip_button.add_theme_stylebox_override(state, transparent)
+	var skip_focus: StyleBoxFlat = AppTheme.focus_box()
+	skip_focus.set_expand_margin_all(-3.0)
+	skip_button.add_theme_stylebox_override("focus", skip_focus)
+	skip_button.add_theme_color_override("icon_hover_color", AppTheme.COLOR_ACCENT)
+	skip_button.add_theme_color_override("icon_pressed_color", AppTheme.COLOR_ACCENT_PRESSED)
+	# Draw a shorter button inside the full 24 px touch target.
+	_hold_style.content_margin_left = 8.0
+	_hold_style.content_margin_right = 8.0
+	_hold_style.content_margin_bottom = 3.0
+	_hold_style.expand_margin_top = -3.0
+	_hold_style.expand_margin_bottom = -3.0
 	hold_area.add_theme_stylebox_override("panel", _hold_style)
+	var progress_color := AppTheme.COLOR_ACCENT_TEXT
+	hold_progress_bar.add_theme_stylebox_override("background", AppTheme.flat(Color(progress_color, 0.35), Color.TRANSPARENT, 0, 0))
+	hold_progress_bar.add_theme_stylebox_override("fill", AppTheme.flat(progress_color, Color.TRANSPARENT, 0, 0))
 	var hotspot_box := AppTheme.flat(Color(0.85, 0.71, 0.36, 0.14), AppTheme.COLOR_ACCENT, 1, 3)
 	hotspot_marker.add_theme_stylebox_override("panel", hotspot_box)
 	_yui_wait = ArtMap.sprite_frames(ArtMap.YUI["wait"], 2.0)
@@ -301,7 +315,7 @@ func _measure_page_policy() -> void:
 	_measured_width = text_width
 	var font_size: int = story_text.get_theme_font_size("font_size")
 	runner.page_policy = func(text: String) -> Array[String]:
-		return DialoguePaginator.paginate(text, font, font_size, text_width, MAX_TEXT_LINES)
+		return DialoguePaginator.paginate(text, font, font_size, text_width, AppTheme.DIALOGUE_TEXT_LINES)
 	runner.repaginate_current()
 
 func _refresh() -> void:
@@ -321,7 +335,9 @@ func _refresh() -> void:
 	hint_text.text = _hint_for(kind)
 	hint_text.visible = not hint_text.text.is_empty()
 	hint_text.get_parent().visible = hint_text.visible or page_cue.visible
+	dialogue_panel.visible = kind != "hold"
 	hold_area.visible = kind == "hold"
+	hold_progress_bar.visible = runner.holding
 	_refresh_hold_pulse()
 	if kind != "hold":
 		_hold_pointer = {}
@@ -349,30 +365,22 @@ func _refresh() -> void:
 	_fit_dialogue_panel()
 
 ## Единый визуальный язык панели: одна подложка и один контур для всех планов.
-## Акцент спикера, «Пропустить» и зона удержания сохраняют контраст при смене фона.
 func _apply_dialogue_style(shot: String) -> void:
 	if shot == _style_shot:
 		return
 	_style_shot = shot
-	var bg := Color("111a24e8")
-	var border := Color("8fa3c0")
+	var bg := AppTheme.COLOR_DIALOGUE_BG
+	var border := AppTheme.COLOR_DIALOGUE_BORDER
 	dialogue_panel.add_theme_stylebox_override("panel", AppTheme.flat(bg, border, 1, 0))
 	page_cue.add_theme_color_override("font_color", AppTheme.COLOR_ACCENT)
-	story_text.add_theme_color_override("font_color", Color("e9e4d8"))
+	story_text.add_theme_color_override("font_color", AppTheme.COLOR_DIALOGUE_TEXT)
 	speaker_tag.add_theme_color_override("font_color", AppTheme.COLOR_TEXT_DIM)
 	hint_text.add_theme_color_override("font_color", AppTheme.COLOR_TEXT_DIM)
-	hold_label.add_theme_color_override("font_color", AppTheme.COLOR_ACCENT)
-	var skip_styles: Dictionary = flat_states(bg, border)
-	for state: String in skip_styles:
-		var box: StyleBoxFlat = skip_styles[state]
-		box.set_expand_margin_all(-SKIP_FRAME_INSET)
-		skip_button.add_theme_stylebox_override(state, box)
-	skip_button.add_theme_color_override("font_color", AppTheme.COLOR_TEXT)
 
 
 func _refresh_hold_pulse() -> void:
-	var idle := Color("1c2522")
-	var highlighted := Color("574329")
+	var idle := AppTheme.COLOR_ACCENT
+	var highlighted := idle.lightened(0.25)
 	if hold_area.visible and not runner.holding and runner.transition_ticks == 0:
 		if _hold_pulse == null:
 			_hold_style.bg_color = idle
@@ -383,30 +391,16 @@ func _refresh_hold_pulse() -> void:
 	if _hold_pulse != null:
 		_hold_pulse.kill()
 		_hold_pulse = null
-	_hold_style.bg_color = highlighted if runner.holding else idle
-
-
-## Состояния кнопки: normal/hover/pressed/focus/disabled.
-func flat_states(bg: Color, border: Color) -> Dictionary:
-	return {
-		"normal": AppTheme.flat(bg, border, 1, 0),
-		"hover": AppTheme.flat(bg.lightened(0.08), border.lightened(0.1), 1, 0),
-		"pressed": AppTheme.flat(bg.darkened(0.12), border.darkened(0.1), 1, 0),
-		"focus": AppTheme.focus_box(),
-		"disabled": AppTheme.flat(bg.darkened(0.25), border.darkened(0.25), 1, 0),
-	}
+	_hold_style.bg_color = AppTheme.COLOR_ACCENT_PRESSED if runner.holding else idle
 
 func _fit_dialogue_panel() -> void:
 	var font: Font = story_text.get_theme_font("font")
 	if font == null:
 		return
 	var font_size: int = story_text.get_theme_font_size("font_size")
-	var text_height: float = ceilf(font.get_height(font_size) * MAX_TEXT_LINES)
+	var text_height: float = ceilf(font.get_height(font_size) * AppTheme.DIALOGUE_TEXT_LINES)
 	story_text.custom_minimum_size.y = text_height
-	hold_area.custom_minimum_size.y = maxf(text_height, 42.0)
 	var height: float = 3.0 + 18.0 + maxf(text_height, 42.0) + 16.0 + 6.0
-	if hold_area.visible:
-		height = hold_area.custom_minimum_size.y + 5.0
 	dialogue_panel.offset_top = -7.0 - height
 	dialogue_panel.offset_bottom = -7.0
 
@@ -419,7 +413,7 @@ func _update_speaker(raw: String) -> void:
 		speaker_tag.text = ""
 		return
 	speaker_name.text = parts[0]
-	var accent: Color = AppTheme.COLOR_ACCENT if parts[0] == "Харуто" else AppTheme.COLOR_MAGIC
+	var accent: Color = AppTheme.dialogue_speaker_color(parts[0])
 	speaker_name.add_theme_color_override("font_color", accent)
 	speaker_accent.color = accent
 	speaker_tag.text = parts[1] if parts.size() > 1 else ""

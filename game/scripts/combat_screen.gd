@@ -32,8 +32,6 @@ var resolver: CombatResolver
 @onready var speed_switch: Button = %SpeedSwitch
 @onready var format_label: Label = %FormatLabel
 @onready var result_panel: CombatResultView = %ResultPanel
-@onready var result_rows: VBoxContainer = result_panel.rows
-@onready var claim_button: Button = result_panel.claim_button
 @onready var details_layer: Control = %DetailsLayer
 @onready var details_view: ItemDetailsView = %DetailsView
 @onready var detail_close: Button = details_view.close_button
@@ -41,7 +39,6 @@ var resolver: CombatResolver
 
 var hero_health: ActorHealthDisplay
 var enemy_health: ActorHealthDisplay
-var weapon_sprite: Sprite2D
 var arena_presenter: CombatArenaPresenter
 
 var _intro_active: bool = false
@@ -55,6 +52,7 @@ var _pointer_candidate: Dictionary = {}
 var _pointer_down: bool = false
 var _pointer_down_began_at_result: bool = false
 var _details_open: bool = false
+var _loot_tutorial: ConfirmDialog
 var _focus_guard := ModalFocus.new()
 
 func configure(game_session: GameSession) -> void:
@@ -84,10 +82,10 @@ func _ready() -> void:
 	arena_presenter.intro_finished.connect(_finish_intro)
 	hero_health = arena_presenter.hero_health
 	enemy_health = arena_presenter.enemy_health
-	weapon_sprite = arena_presenter.weapon_sprite
 	details_view.configure(session)
 	details_view.close_requested.connect(_close_details)
 	result_panel.claim_requested.connect(_claim_result)
+	result_panel.summary_acknowledged.connect(_show_next_reward)
 	result_panel.choice_requested.connect(_on_reward_choice)
 	result_panel.item_requested.connect(_open_details)
 	equipment_strip.configure(session, "combat")
@@ -106,7 +104,7 @@ func _ready() -> void:
 		# resolver'а, вступления и боя; RNG не перебрасывается.
 		_show_restored_result()
 		return
-	var next_resolver: CombatResolver = session.start_combat(session.current_enemy_id)
+	var next_resolver: CombatResolver = session.start_selected_combat()
 	if next_resolver == null:
 		_show_start_failure()
 		return
@@ -452,17 +450,15 @@ func _show_result_panel(result: Dictionary) -> void:
 	actions.hide()
 	equipment_strip.set_suppressed(true)
 	result_panel.present(session, result)
-	result_panel.fit_to_view.call_deferred(size.y)
 	_result_visible = true
 
-func _open_details(item_id: String, aspect_id: String, quantity: int = 1) -> void:
+func _show_next_reward() -> void:
+	if result_panel.present_next(session.pending_battle_result) and not is_instance_valid(_loot_tutorial):
+		_loot_tutorial = ConfirmDialog.tutorial(self, session, "tutorial_loot_gestures", "Добыча", "Коснитесь карточки или смахните влево, чтобы забрать. Экипировку можно надеть свайпом вправо. Значок i открывает описание.")
+
+func _open_details(reward: Dictionary) -> void:
 	_cancel_pointer()
-	var reward: Dictionary = {}
-	for entry: Dictionary in session.pending_battle_result.get("items", []):
-		if String(entry.get("item_id", "")) == item_id and String(entry.get("aspect_id", "")) == aspect_id and int(entry.get("quantity", 1)) == quantity:
-			reward = entry
-			break
-	if not details_view.present_reward(item_id, aspect_id, quantity, reward):
+	if not details_view.present_reward(String(reward["item_id"]), String(reward["aspect_id"]), int(reward["quantity"]), reward):
 		return
 	details_layer.show()
 	_details_open = true
@@ -474,8 +470,6 @@ func _close_details() -> void:
 	details_layer.hide()
 	_details_open = false
 	_focus_guard.restore()
-	if _result_visible:
-		claim_button.grab_focus()
 
 func _on_detail_close_pressed() -> void:
 	_close_details()
@@ -485,20 +479,14 @@ func _on_details_dismiss(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		_close_details()
 
-func _on_claim_pressed() -> void:
-	_claim_result()
-
 func _on_reward_choice(entry_id: String, action: String) -> void:
-	if _navigating or not session.choose_battle_reward(entry_id, action):
-		result_panel.present(session, session.pending_battle_result)
+	if _navigating:
 		return
-	if session.reward_choices_complete():
-		_claim_result()
-	else:
-		result_panel.present(session, session.pending_battle_result)
+	session.choose_battle_reward(entry_id, action)
+	_show_next_reward()
 
 func _claim_result() -> void:
-	if _navigating or not session.reward_choices_complete():
+	if _navigating or not result_panel.can_claim() or not session.reward_choices_complete():
 		return
 	var result_id: String = String(session.pending_battle_result.get("result_id", ""))
 	if result_id.is_empty():
@@ -507,9 +495,9 @@ func _claim_result() -> void:
 	claim_requested.emit(result_id)
 
 func show_claim_error() -> void:
-	result_panel.show_write_error()
-	_result_visible = true
 	_navigating = false
+	if result_panel.can_claim():
+		result_panel.show_write_error()
 
 func _refresh() -> void:
 	if resolver == null:

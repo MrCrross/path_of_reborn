@@ -37,7 +37,25 @@ const ITEM_PATHS: Dictionary = {
 	"moss_charm": "res://data/items/moss_charm.tres",
 	"echo_crystal": "res://data/items/echo_crystal.tres",
 	"slime_residue": "res://data/items/slime_residue.tres",
+	"wanderer_jacket": "res://data/items/wanderer_jacket.tres",
 }
+const LOCATION_FOREST_EDGE: String = "forest_edge"
+const LOCATION_LIOREN: String = "lioren"
+const SHOP_CATALOG_PATH: String = "res://data/shop/cricket_twilight.json"
+## Доступ к лавке открывает сцена ворот Лиорена; живёт в world_flags профиля,
+## поэтому откатывается Печатью вместе с кошельком и инвентарём.
+const WORLD_FLAG_LIOREN_SHOP_UNLOCKED: String = "lioren_shop_unlocked"
+const MAX_ASTRAS := 9223372036854775807
+const COPPER := "copper"
+const SILVER := "silver"
+const GOLD := "gold"
+const COIN_TYPES: Array[String] = [COPPER, SILVER, GOLD]
+const EXCHANGE_RATE: int = 100
+const WORLD_FLAG_SHOP_INTRO_DONE: String = "shop_intro_done"
+const WORLD_FLAG_SHOP_FIRST_SALE_DONE: String = "shop_first_sale_done"
+const WORLD_FLAG_SHOP_FIRST_PURCHASE_DONE: String = "shop_first_purchase_done"
+const WORLD_FLAG_SHOP_PURCHASE_BRIEFING_DONE: String = "shop_purchase_briefing_done"
+const WORLD_FLAG_WANDERER_JACKET_PURCHASED: String = "wanderer_jacket_purchased"
 const LOOT_PATHS: Dictionary = {
 	"moss_slime": "res://data/loot/moss_slime.tres",
 	"goblin_scout": "res://data/loot/goblin_scout.tres",
@@ -70,6 +88,8 @@ var last_claimed_result_id: String = ""
 var pending_receive_fx: bool = false
 ## Итог последнего claim'а для presentation; не сериализуется.
 var last_settlement: Dictionary = {}
+## Итог последней сделки лавки (kind/quantity/total/balance_after); не сериализуется.
+var last_deal: Dictionary = {}
 ## Формат боя: полный auto (по умолчанию) или active (ручные атака и уклонение).
 ## Живёт вне откатываемого Checkpoint-профиля: переживает relaunch, новую игру и возвраты.
 var combat_format: String = COMBAT_FORMAT_AUTO
@@ -78,7 +98,7 @@ var item_definitions: Dictionary = {}
 var loot_generator: LootGenerator
 var loot_rng: RandomNumberGenerator
 var loot_seed: String = "path_of_reborn_blockout"
-var currency: int = 0
+var wallet: Dictionary[String, int] = {COPPER: 0, SILVER: 0, GOLD: 0}
 var echoes: int = 0
 var claimed_echo_enemy_ids: Dictionary = {}
 ## Разовая meta-награда испытания; живёт вне откатываемого профиля Checkpoint,
@@ -101,6 +121,7 @@ var location_id: String = "forest_edge"
 var in_combat: bool = false
 var active_resolver: CombatResolver
 var active_encounter_context: Dictionary = {}
+var _selected_repeat: bool = false
 var _run_token_sequence: int = 0
 var _claim_in_progress: bool = false
 var is_pursued: bool = false
@@ -129,6 +150,7 @@ func _init() -> void:
 
 func new_game() -> void:
 	_invalidate_active_resolver()
+	_selected_repeat = false
 	var hero_definition: ActorDefinition = load(ACTOR_PATHS["haruto"])
 	hero = CharacterState.new(hero_definition)
 	inventory = InventoryService.new(hero, item_definitions)
@@ -146,7 +168,8 @@ func new_game() -> void:
 	last_claimed_result_id = ""
 	pending_receive_fx = false
 	last_settlement = {}
-	currency = 0
+	last_deal = {}
+	wallet = {COPPER: 0, SILVER: 0, GOLD: 0}
 	echoes = 0
 	claimed_echo_enemy_ids.clear()
 	trial_echo_claimed = false
@@ -188,23 +211,28 @@ func set_loot_seed(seed_value: String) -> void:
 
 ## Публичная команда выбора встречи. Легальна только вне боя и без ожидающего
 ## результата; UI не может «выбрать» врага посреди боя или поверх pending.
-func select_encounter(enemy_id: String) -> bool:
+func select_encounter(enemy_id: String, repeat: bool = false) -> bool:
 	if in_combat or has_pending_reward() or awaiting_return or _claim_in_progress:
 		return false
-	if _encounter_context_for(enemy_id).is_empty():
+	if _encounter_context_for(enemy_id, repeat).is_empty():
 		return false
 	current_enemy_id = enemy_id
+	_selected_repeat = repeat
 	return true
+
+func start_selected_combat() -> CombatResolver:
+	return start_combat(current_enemy_id, _selected_repeat)
 
 ## Полное лечение перед боем — осознанная семантика slice (фиксация в доке);
 ## менять её отдельной задачей с балансом.
-func start_combat(enemy_id: String) -> CombatResolver:
+func start_combat(enemy_id: String, repeat: bool = false) -> CombatResolver:
 	if in_combat or active_resolver != null or has_pending_reward() or awaiting_return or _claim_in_progress:
 		return null
-	var context: Dictionary = _encounter_context_for(enemy_id)
+	var context: Dictionary = _encounter_context_for(enemy_id, repeat)
 	if traces == 3 or context.is_empty():
 		return null
 	_invalidate_active_resolver()
+	_selected_repeat = false
 	current_enemy_id = enemy_id
 	in_combat = true
 	checkpoints.cancel()
@@ -231,9 +259,10 @@ func retry_combat() -> CombatResolver:
 	if not in_combat or active_resolver == null or not pending_battle_result.is_empty() or awaiting_return:
 		return null
 	var enemy_id: String = String(active_encounter_context.get("enemy_id", current_enemy_id))
+	var repeat: bool = active_encounter_context.get("encounter_mode", "") == ENCOUNTER_REPEAT
 	_invalidate_active_resolver()
 	in_combat = false
-	return start_combat(enemy_id)
+	return start_combat(enemy_id, repeat)
 
 ## --- Формат боя ---
 
@@ -398,6 +427,18 @@ func next_route_node() -> Dictionary:
 func route_completed() -> bool:
 	return bool(route_state.get("completed", false))
 
+func next_route_approach() -> String:
+	if location_id != LOCATION_FOREST_EDGE or traces == 3 or awaiting_return or has_pending_reward():
+		return ""
+	match next_route_node().get("approach", ""):
+		"first_slime":
+			if not world_flags.get("first_slime_spotted", false):
+				return "first_slime"
+		"daijiro":
+			if not world_flags.get("daijiro_intervened", false):
+				return "daijiro_cart" if world_flags.get("daijiro_spotted", false) else "daijiro_lookout"
+	return ""
+
 func route_completion_label() -> String:
 	return String(route_definition().get("completion_label", "Участок пройден"))
 
@@ -412,19 +453,19 @@ func route_repeat_enemy_ids() -> Array[String]:
 			result.append(enemy_id)
 	return result
 
-func _encounter_context_for(enemy_id: String) -> Dictionary:
+func _encounter_context_for(enemy_id: String, repeat: bool) -> Dictionary:
 	if not _is_known_enemy(enemy_id):
 		return {}
 	var route_id: String = String(route_definition().get("route_id", ""))
 	var node: Dictionary = next_route_node()
-	if not node.is_empty() and String(node.get("enemy_id", "")) == enemy_id:
+	if not repeat and not node.is_empty() and String(node.get("enemy_id", "")) == enemy_id:
 		return {
 			"enemy_id": enemy_id,
 			"encounter_mode": ENCOUNTER_ROUTE,
 			"route_id": route_id,
 			"route_node_id": String(node.get("node_id", "")),
 		}
-	if enemy_id == TRIAL_ENEMY_ID:
+	if not repeat and enemy_id == TRIAL_ENEMY_ID:
 		if not trial_available():
 			return {}
 		return {"enemy_id": enemy_id, "encounter_mode": ENCOUNTER_TRIAL, "route_id": route_id, "route_node_id": ""}
@@ -562,6 +603,7 @@ func claim_battle_result(result_id: String) -> bool:
 		"run_id": String(pending_battle_result.get("run_id", "")),
 		"enemy_id": enemy_id,
 		"encounter_mode": String(pending_battle_result.get("encounter_mode", "")),
+		"route_node_id": String(pending_battle_result.get("route_node_id", "")),
 		"won": true,
 		"xp": int(pending_battle_result.get("xp", 0)),
 		"levels_gained": hero.level - level_before,
@@ -718,18 +760,199 @@ func abandon_combat() -> void:
 	awaiting_return = true
 	profile_changed.emit()
 
-func sell_item(instance_id: String, quantity: int = 1) -> bool:
+static func trade_total(unit_price: int, quantity: int) -> int:
+	@warning_ignore("integer_division")
+	if unit_price <= 0 or quantity <= 0 or unit_price > MAX_ASTRAS / quantity:
+		return 0
+	return unit_price * quantity
+
+func sell_item(instance_id: String, quantity: int = 1, expected_price: int = -1, expected_stock: int = -1) -> bool:
 	if in_combat or awaiting_return or has_pending_reward() or _claim_in_progress or quantity <= 0:
 		return false
 	var item: ItemInstance = inventory.get_item(instance_id)
 	if item == null or not item.sellable or item.quantity < quantity:
 		return false
-	var total: int = item.sale_price_copper * quantity
-	if total <= 0 or currency > 9223372036854775807 - total:
+	if inventory.is_equipped(instance_id):
+		return false
+	if (expected_price >= 0 and item.sale_price_copper != expected_price) or (expected_stock >= 0 and item.quantity != expected_stock):
+		return false
+	var total: int = trade_total(item.sale_price_copper, quantity)
+	if total <= 0 or wallet[COPPER] > MAX_ASTRAS - total:
 		return false
 	if not inventory.remove(instance_id, quantity):
 		return false
-	currency += total
+	wallet[COPPER] += total
+	if not bool(world_flags.get(WORLD_FLAG_SHOP_FIRST_SALE_DONE, false)):
+		world_flags[WORLD_FLAG_SHOP_FIRST_SALE_DONE] = true
+	var sold_definition: ItemDefinition = get_item_definition(item.definition_id)
+	last_deal = {
+		"kind": "sell",
+		"instance_id": instance_id,
+		"item_id": item.definition_id,
+		"display_name": sold_definition.display_name if sold_definition != null else item.definition_id,
+		"quantity": quantity,
+		"unit_price_copper": item.sale_price_copper,
+		"total_copper": total,
+		"balance_after": wallet[COPPER],
+	}
+	profile_changed.emit()
+	return true
+
+## --- Лавка «Сверчок и Сумрак» ---
+
+## Переход между открытыми точками маршрута. Не отменяет канал Печати и не
+## лечит: это перемещение, а не возврат. Доступность точек решает UI по флагам.
+func travel_to(location_id: String) -> bool:
+	if in_combat or has_pending_reward() or awaiting_return or _claim_in_progress:
+		return false
+	if location_id != LOCATION_FOREST_EDGE and location_id != LOCATION_LIOREN:
+		return false
+	if location_id == self.location_id:
+		return true
+	if location_id == LOCATION_FOREST_EDGE and traces == 3:
+		return false
+	self.location_id = location_id
+	profile_changed.emit()
+	return true
+
+func shop_access_unlocked() -> bool:
+	return bool(world_flags.get(WORLD_FLAG_LIOREN_SHOP_UNLOCKED, false))
+
+func can_trade() -> bool:
+	return location_id == LOCATION_LIOREN and shop_access_unlocked() and not in_combat and not awaiting_return and not has_pending_reward()
+
+func coin_exchange_quote(from_coin: String, to_coin: String) -> Dictionary:
+	var from_index: int = COIN_TYPES.find(from_coin)
+	var to_index: int = COIN_TYPES.find(to_coin)
+	if from_index < 0 or to_index < 0 or absi(from_index - to_index) != 1:
+		return {}
+	var spend: int = EXCHANGE_RATE if from_index < to_index else 1
+	var receive: int = 1 if from_index < to_index else EXCHANGE_RATE
+	var from_balance: int = wallet[from_coin]
+	var to_balance: int = wallet[to_coin]
+	@warning_ignore("integer_division")
+	var max_quantity: int = mini(from_balance / spend, (MAX_ASTRAS - to_balance) / receive)
+	return {
+		"spend": spend,
+		"receive": receive,
+		"from_balance": from_balance,
+		"to_balance": to_balance,
+		"max_quantity": max_quantity,
+	}
+
+func exchange_coins(from_coin: String, to_coin: String, quantity: int, expected_quote: Dictionary) -> bool:
+	if not can_trade() or _claim_in_progress or checkpoints.channel_active or quantity < 1:
+		return false
+	var quote: Dictionary = coin_exchange_quote(from_coin, to_coin)
+	if quote.is_empty() or quote != expected_quote or quantity > int(quote["max_quantity"]):
+		return false
+	var spent: int = int(quote["spend"]) * quantity
+	var received: int = int(quote["receive"]) * quantity
+	wallet[from_coin] -= spent
+	wallet[to_coin] += received
+	last_deal = {
+		"kind": "exchange",
+		"from_coin": from_coin,
+		"to_coin": to_coin,
+		"spent": spent,
+		"received": received,
+	}
+	profile_changed.emit()
+	return true
+
+static var _shop_catalog_cache: Dictionary = {}
+
+static func shop_catalog() -> Dictionary:
+	if _shop_catalog_cache.is_empty():
+		var file: FileAccess = FileAccess.open(SHOP_CATALOG_PATH, FileAccess.READ)
+		if file == null:
+			return {"shop_id": "cricket_twilight", "offers": []}
+		var parser := JSON.new()
+		if parser.parse(file.get_as_text()) != OK or typeof(parser.data) != TYPE_DICTIONARY:
+			_shop_catalog_cache = {"shop_id": "cricket_twilight", "offers": []}
+		else:
+			_shop_catalog_cache = parser.data
+	return _shop_catalog_cache
+
+## Живой список предложений: статика каталога + состояние из флагов профиля.
+## remaining == -1 — без лимита; sold_out пересчитывается из once_flag, поэтому
+## откат Печатью восстанавливает одноразовое предложение сам.
+func shop_offers() -> Array[Dictionary]:
+	var offers: Array[Dictionary] = []
+	for offer: Variant in shop_catalog().get("offers", []):
+		if typeof(offer) != TYPE_DICTIONARY:
+			continue
+		var offer_id: String = String(offer.get("offer_id", ""))
+		var definition: ItemDefinition = get_item_definition(String(offer.get("item_id", "")))
+		if offer_id.is_empty() or definition == null:
+			continue
+		var once_flag: String = String(offer.get("once_flag", ""))
+		var limit: int = maxi(0, int(offer.get("purchase_limit", 0)))
+		var remaining: int = -1
+		if limit > 0:
+			remaining = limit - (1 if not once_flag.is_empty() and bool(world_flags.get(once_flag, false)) else 0)
+		offers.append({
+			"offer_id": offer_id,
+			"item_id": definition.id,
+			"display_name": definition.display_name,
+			"price_copper": maxi(0, int(offer.get("price_copper", definition.sale_price_copper))),
+			"purchase_limit": limit,
+			"remaining": remaining,
+			"sold_out": remaining == 0,
+			"once_flag": once_flag,
+		})
+	return offers
+
+## Покупка по предложению каталога. Одна сделка — один проход: проверки,
+## списание и выдача идут внутри транзакции, вехи пишутся вместе со сделкой.
+func buy_item(offer_id: String, quantity: int = 1, expected_price: int = -1) -> bool:
+	if in_combat or awaiting_return or has_pending_reward() or _claim_in_progress or quantity <= 0:
+		return false
+	if not shop_access_unlocked():
+		return false
+	var offer: Dictionary = {}
+	for candidate: Dictionary in shop_offers():
+		if String(candidate.get("offer_id", "")) == offer_id:
+			offer = candidate
+			break
+	if offer.is_empty() or bool(offer.get("sold_out", false)):
+		return false
+	if int(offer.get("remaining", -1)) >= 0 and quantity > int(offer["remaining"]):
+		return false
+	var definition: ItemDefinition = get_item_definition(String(offer.get("item_id", "")))
+	if definition == null:
+		return false
+	var price: int = int(offer.get("price_copper", 0))
+	if expected_price >= 0 and price != expected_price:
+		return false
+	var total: int = trade_total(price, quantity)
+	if total <= 0 or wallet[COPPER] < total:
+		return false
+	_claim_in_progress = true
+	_transaction_depth += 1
+	wallet[COPPER] -= total
+	var affected: Array[ItemInstance] = inventory.add(definition, quantity)
+	var instance_ids: Array[String] = []
+	for item: ItemInstance in affected:
+		instance_ids.append(item.instance_id)
+	var once_flag: String = String(offer.get("once_flag", ""))
+	if not once_flag.is_empty():
+		world_flags[once_flag] = true
+	if not bool(world_flags.get(WORLD_FLAG_SHOP_FIRST_PURCHASE_DONE, false)):
+		world_flags[WORLD_FLAG_SHOP_FIRST_PURCHASE_DONE] = true
+	last_deal = {
+		"kind": "buy",
+		"offer_id": offer_id,
+		"item_id": definition.id,
+		"display_name": definition.display_name,
+		"quantity": quantity,
+		"unit_price_copper": price,
+		"total_copper": total,
+		"instance_ids": instance_ids,
+		"balance_after": wallet[COPPER],
+	}
+	_transaction_depth -= 1
+	_claim_in_progress = false
 	profile_changed.emit()
 	return true
 
@@ -784,7 +1007,8 @@ func capture_profile_dto() -> Dictionary:
 	return {
 		"hero": hero.capture_dto(),
 		"inventory": inventory.capture_dto(),
-		"currency": currency,
+		# JSON parses numbers as floats. Strings keep every coin at int64 precision.
+		"wallet": {COPPER: str(wallet[COPPER]), SILVER: str(wallet[SILVER]), GOLD: str(wallet[GOLD])},
 		"quest_flags": quest_flags.duplicate(true),
 		"npc_flags": npc_flags.duplicate(true),
 		"world_flags": world_flags.duplicate(true),
@@ -806,13 +1030,16 @@ func _capture_characters() -> Dictionary:
 
 func apply_profile_dto(dto: Dictionary) -> void:
 	_invalidate_active_resolver()
+	_selected_repeat = false
 	in_combat = false
 	hero = CharacterState.new(load(ACTOR_PATHS["haruto"]))
 	inventory = InventoryService.new(hero, item_definitions)
 	characters = {}
 	familiars = dto.get("familiars", {"owned": {}, "assignments": {}}).duplicate(true)
 	story_rewards = dto.get("story_rewards", {}).duplicate(true)
-	currency = maxi(0, int(dto.get("currency", 0)))
+	var saved_wallet: Dictionary = dto.get("wallet", {})
+	for coin: String in COIN_TYPES:
+		wallet[coin] = maxi(0, int(saved_wallet.get(coin, "0")))
 	quest_flags = dto.get("quest_flags", {}).duplicate(true)
 	npc_flags = dto.get("npc_flags", {}).duplicate(true)
 	world_flags = dto.get("world_flags", {}).duplicate(true)
@@ -838,6 +1065,7 @@ func apply_profile_dto(dto: Dictionary) -> void:
 	play_tick = maxi(0, int(dto.get("play_tick", 0)))
 	pending_reward.clear()
 	last_settlement = {}
+	last_deal = {}
 	last_claimed_result_id = String(dto.get("last_claimed_result_id", ""))
 	_settled_run_ids.clear()
 	_finished_run_contexts.clear()
@@ -985,12 +1213,15 @@ static func _is_intlike_number(value: Variant) -> bool:
 ## Честная производная для сейвов v1: сколько узлов маршрута уже пройдено.
 func _derive_route_state(beaten: Dictionary) -> Dictionary:
 	var state: Dictionary = _initial_route_state()
-	var nodes: Array = route_nodes()
 	var index: int = 0
-	while index < nodes.size() and beaten.has(String(nodes[index].get("enemy_id", ""))):
-		index += 1
+	if beaten.has("goblin_scout"):
+		index = route_nodes().size()
+	elif world_flags.get("daijiro_intervened", false):
+		index = 2
+	elif beaten.has("moss_slime"):
+		index = 1
 	state["next_index"] = index
-	state["completed"] = index >= nodes.size()
+	state["completed"] = index >= route_nodes().size()
 	return state
 
 func _initial_route_state() -> Dictionary:

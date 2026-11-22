@@ -120,20 +120,30 @@ func _test_ui_text_coverage(context: TestContext) -> void:
 
 
 func _test_currency_format(context: TestContext) -> void:
-	var compact_cases: Dictionary = {
-		0: "0",
-		999: "999",
-		1000: "1K",
-		999999: "999.9K",
-		1000000: "1M",
-		1000000000: "1B",
-		1000000000000: "1T",
-		9223372036854775807: "9223.3Q",
+	var exact_cases: Dictionary[int, String] = {
+		0: "0 мед.",
+		12: "12 мед.",
+		20: "20 мед.",
+		28: "28 мед.",
+		40: "40 мед.",
+		99: "99 мед.",
+		100: "100 мед.",
+		999: "999 мед.",
+	}
+	for value: int in exact_cases:
+		context.check(UiText.astra(value) == exact_cases[value], "Exact amount for %d copper is %s" % [value, exact_cases[value]])
+		context.check(UiText.astra_compact(value) == exact_cases[value], "Wallet uses the same format as the price for %d copper" % value)
+	var compact_cases: Dictionary[int, String] = {
+		1000: "1 000 сер.",
+		9999: "9 999 сер.",
+		10000: "10K сер.",
+		999999: "999,9K сер.",
+		1000000: "1M сер.",
+		1000000000: "1B сер.",
+		9223372036854775807: "9,2E сер.",
 	}
 	for value: int in compact_cases:
-		context.check(UiText.currency_compact(value) == compact_cases[value], "Compact currency boundary %d: expected %s, got %s" % [value, compact_cases[value], UiText.currency_compact(value)])
-	context.check(UiText.currency_exact(0) == "0 мед. астры", "Zero exact balance is explicit")
-	context.check(UiText.currency_exact(999999) == "999 999 мед. астры", "Exact balance keeps all digits below one million")
-	context.check(UiText.currency_exact(1000000) == "1 000 000 мед. астры", "Exact balance keeps all digits at one million")
-	context.check(UiText.currency_exact(9223372036854775807) == "9 223 372 036 854 775 807 мед. астры", "The maximum supported int64 balance remains exactly readable")
-	context.check(UiText.astra(2000) == "20 сер." and UiText.astra(2001) == "2 001 мед.", "The canonical 20-silver crystal uses one integer copper unit without ambiguous pricing")
+		context.check(UiText.astra_compact(value, GameSession.SILVER) == compact_cases[value], "Large silver amount retains its denomination")
+	context.check(UiText.astra(9223372036854775807, GameSession.GOLD) == "9 223 372 036 854 775 807 зол.", "Exact balance preserves every coin at the int64 limit")
+	var wallet: Dictionary[String, int] = {GameSession.COPPER: 2800, GameSession.SILVER: 100, GameSession.GOLD: 1}
+	context.check(UiText.wallet(wallet) == "2 800 мед. · 100 сер. · 1 зол.", "Wallet shows all balances without exchanging coins")

@@ -1,0 +1,5 @@
+[
+  {"id":"DIA_SHOP_P01","speaker":"Дайдзиро","text":"Куртка — не броня из баллад, но на дороге держит удар лучше молитвы. Надень, когда выйдешь за ворота.","shot":"shop_interior","once":true},
+  {"id":"DIA_SHOP_P02","speaker":"Дайдзиро","text":"И ещё. На воротах ты назвал цель визита «не умереть». Пора уточнить: зарегистрируйся в Гильдии. Тогда город перестанет считать тебя случайностью.","shot":"shop_interior","once":true},
+  {"id":"DIA_SHOP_P03","speaker":"Харуто","text":"Гильдия. Записываю сразу после того, как надену куртку.","shot":"shop_interior","once":true,"destination":"shop","commands":[{"type":"set_world_flag","key":"shop_purchase_briefing_done","value":true}]}
+]

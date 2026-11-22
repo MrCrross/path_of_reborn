@@ -1,0 +1,8 @@
+[
+  {"id":"DIA_CITY_001","speaker":"Масато","text":"Имя, город, цель визита.","shot":"lioren_gates","once":true},
+  {"id":"DIA_CITY_002","speaker":"Харуто","text":"Харуто Куросава. Город… очень далеко. Цель — пока не умереть.","shot":"lioren_gates","once":true},
+  {"id":"DIA_CITY_003","speaker":"Масато","text":"Цель разумная. Город уточните к закату.","shot":"lioren_gates","once":true},
+  {"id":"DIA_CITY_004","speaker":"Дайдзиро","text":"Поручусь за него. Медаль Компаса, временный пропуск до регистрации.","shot":"lioren_gates","once":true},
+  {"id":"DIA_CITY_005","speaker":"Масато","text":"Тогда вы отвечаете за первые сутки, Дайдзиро. А вы, Харуто, за то, чтобы эти сутки не стали для города слишком запоминающимися.","shot":"lioren_gates","once":true},
+  {"id":"DIA_CITY_006","speaker":"Харуто","text":"Поручительство. Даже после смерти — никуда без согласования. Ладно. Куда дальше?","shot":"lioren_gates","once":true,"destination":"shop","commands":[{"type":"set_world_flag","key":"lioren_shop_unlocked","value":true}]}
+]

@@ -103,7 +103,7 @@ func _build_portrait_layout() -> void:
 		_add_slot(right, slot_id, Vector2(28, 27))
 
 func _add_slot(parent: Container, slot_id: String, extent: Vector2) -> void:
-	_empty_icons[slot_id] = UiIcons.texture("attack") if slot_id == "weapon" else ArtMap.texture(ArtMap.EMPTY_SLOT_ICONS[slot_id])
+	_empty_icons[slot_id] = ArtMap.texture(ArtMap.EMPTY_SLOT_ICONS[slot_id])
 	var button := Button.new()
 	button.name = "Slot_" + slot_id
 	button.custom_minimum_size = extent
@@ -194,7 +194,7 @@ func _refresh_familiar(button: Button, badge: Label) -> void:
 
 func _set_slot_icon(button: Button, slot_id: String, item_icon: Texture2D = null) -> void:
 	button.icon = item_icon if item_icon != null else _empty_icons[slot_id]
-	UiIcons.tint(button, Color.WHITE if item_icon != null else AppTheme.COLOR_TEXT_DIM)
+	UiIcons.tint(button, Color.WHITE if item_icon != null else Color(1.0, 1.0, 1.0, 0.86))
 
 func _on_slot_pressed(slot_id: String) -> void:
 	if slot_id == "familiar":

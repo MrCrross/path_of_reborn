@@ -7,10 +7,12 @@ const SCENES: Dictionary = {
 	"title": "res://scenes/title.tscn",
 	"prologue": "res://scenes/prologue.tscn",
 	"world": "res://scenes/world.tscn",
+	"trail_dialogue": "res://scenes/trail_dialogue.tscn",
 	"combat": "res://scenes/combat.tscn",
 	"inventory": "res://scenes/inventory.tscn",
 	"checkpoint": "res://scenes/checkpoint.tscn",
 	"merchant": "res://scenes/merchant.tscn",
+	"shop": "res://scenes/shop.tscn",
 	"characters": "res://scenes/characters.tscn",
 	"settings": "res://scenes/settings.tscn",
 }

@@ -5,7 +5,8 @@ signal intro_finished
 
 const INTRO_SECONDS := 0.55
 const CLIP_PRIORITY: Dictionary = {"idle": 0, "attack": 1, "hit": 2, "dodge": 2}
-const HERO_CONTACT_FRAME: int = 3
+const UNARMED_CONTACT_FRAME: int = 3
+const UNARMED_MOTION := {"idle": [0], "attack": [0, -2, 4, 12, 3], "hit": [-4, 0], "dodge": [0, -3, -8, -2]}
 const GOBLIN_PREPARE_FRAMES: Array[int] = [0, 3]
 const GOBLIN_CONTACT_FRAMES: Array[int] = [1, 4]
 const GOBLIN_RECOVER_FRAME: int = 5
@@ -15,7 +16,6 @@ var telegraph: Sprite2D
 var phase_cue: Label
 var hero_sprite: AnimatedSprite2D
 var enemy_sprite: AnimatedSprite2D
-var weapon_sprite: Sprite2D
 var hero_health: ActorHealthDisplay
 var enemy_health: ActorHealthDisplay
 var resolver: CombatResolver
@@ -28,6 +28,8 @@ var _enemy_frames: Dictionary = {}
 var _enemy_head: Vector2 = Vector2(0, -54)
 var _hero_clip_priority: int = 0
 var _hero_clip_name: String = "idle"
+var _hero_unarmed: bool = false
+var _hero_contact_frame: int = UNARMED_CONTACT_FRAME
 var _enemy_busy: bool = false
 var _last_phase: int = -1
 var _battle_tweens: Array[Tween] = []
@@ -40,10 +42,6 @@ func configure(target_session: GameSession, arena_node: Control, hero: AnimatedS
 	telegraph = telegraph_node
 	phase_cue = cue
 	_setup_art()
-	weapon_sprite = Sprite2D.new()
-	weapon_sprite.name = "EquippedWeaponFallback"
-	weapon_sprite.scale = Vector2.ONE * 0.45
-	arena.add_child(weapon_sprite)
 	hero_health = ActorHealthDisplay.new()
 	hero_health.name = "HeroHealth"
 	hero_health.setup("hero", true)
@@ -52,7 +50,6 @@ func configure(target_session: GameSession, arena_node: Control, hero: AnimatedS
 	enemy_health.name = "EnemyHealth"
 	enemy_health.setup("enemy", true)
 	arena.add_child(enemy_health)
-	_refresh_weapon_visual()
 	if not arena.resized.is_connected(layout):
 		arena.resized.connect(layout)
 	layout()
@@ -68,15 +65,6 @@ func bind_resolver(next_resolver: CombatResolver) -> void:
 	refresh()
 
 func update_positions() -> void:
-	if weapon_sprite != null:
-		var weapon_offset := Vector2(13, -43)
-		if _hero_clip_name == "attack":
-			weapon_offset = Vector2(20, -39)
-		elif _hero_clip_name == "hit":
-			weapon_offset = Vector2(8, -44)
-		elif _hero_clip_name == "dodge":
-			weapon_offset = Vector2(13, -38)
-		weapon_sprite.position = (hero_sprite.position + weapon_offset).round()
 	telegraph.position = enemy_sprite.position + Vector2(0, 1)
 	var cue_position := (enemy_sprite.position + Vector2(_enemy_head.x - 12.0, _enemy_head.y - 37.0)).round()
 	cue_position.x = clampf(cue_position.x, 0.0, maxf(0.0, arena.size.x - phase_cue.size.x))
@@ -156,9 +144,7 @@ func show_restored() -> void:
 	enemy_sprite.hide()
 	enemy_health.hide()
 	telegraph.hide()
-	_hero_clip_name = "idle"
-	_apply_clip(hero_sprite, _hero_frames["idle"])
-	hero_sprite.play(&"default")
+	_reset_hero_to_idle()
 	layout()
 
 func _on_phase_changed(_phase: int, _ticks_remaining: int) -> void:
@@ -177,14 +163,13 @@ func _on_dodge_begun(_source: String) -> void:
 
 func _on_hero_attack_begun(_run_id: String) -> void:
 	_play_hero_clip("attack")
-	hero_sprite.frame = 0
-	hero_sprite.frame_progress = 0.0
+	if _hero_clip_name == "attack":
+		hero_sprite.set_frame_and_progress(0, 0.0)
 
 func _on_hero_attack_landed(_run_id: String, _target_id: String, _amount: int) -> void:
 	if _hero_clip_name == "attack":
-		hero_sprite.frame = mini(HERO_CONTACT_FRAME, hero_sprite.sprite_frames.get_frame_count(&"default") - 1)
-		hero_sprite.frame_progress = 0.0
-	else:
+		hero_sprite.set_frame_and_progress(_hero_contact_frame, 0.0)
+	if _hero_clip_name != "attack" or _hero_unarmed:
 		_spawn_contact_flash()
 
 func _update_phase_cue() -> void:
@@ -258,16 +243,16 @@ func play_enemy_defeat() -> void:
 	tween.tween_property(enemy_sprite, "position:y", enemy_sprite.position.y + 6.0, 0.55)
 	_track_tween(tween)
 
-func _refresh_weapon_visual() -> void:
-	if weapon_sprite == null:
-		return
-	var data: Dictionary = EquipmentModel.slot(session, "weapon")
-	weapon_sprite.texture = data["icon"]
-	weapon_sprite.visible = data["item"] != null and weapon_sprite.texture != null
-
 func _setup_art() -> void:
-	for clip_name: String in ArtMap.HERO_EXILED:
-		_hero_frames[clip_name] = _build_clip(ArtMap.HERO_EXILED[clip_name], clip_name != "idle")
+	var still_id: String = ArtMap.hero_still_id(session.inventory)
+	_hero_unarmed = still_id == "haruto_exiled_unarmed"
+	if _hero_unarmed:
+		_setup_unarmed_art(still_id)
+	else:
+		var sheets: Dictionary = ArtMap.HERO_EXILED_SWORD if still_id == "haruto_exiled_sword" else ArtMap.HERO_EXILED
+		_hero_contact_frame = sheets["attack"]["contact_frame"]
+		for clip_name: String in sheets:
+			_hero_frames[clip_name] = _build_clip(sheets[clip_name], clip_name != "idle")
 	var enemy_id: String = session.current_enemy_id
 	for clip_name: String in ArtMap.ENEMY_SHEETS.get(enemy_id, {}):
 		_enemy_frames[clip_name] = _build_clip(ArtMap.ENEMY_SHEETS[enemy_id][clip_name], clip_name not in ["idle", "attack"])
@@ -277,8 +262,28 @@ func _setup_art() -> void:
 	hero_sprite.play(&"default")
 	_apply_clip(enemy_sprite, _enemy_frames["idle"])
 	enemy_sprite.play(&"default")
-	hero_sprite.animation_finished.connect(_on_hero_clip_finished)
+	hero_sprite.animation_finished.connect(_reset_hero_to_idle)
 	enemy_sprite.animation_finished.connect(_on_enemy_clip_finished)
+
+func _setup_unarmed_art(still_id: String) -> void:
+	# Until there are unarmed pose sheets, move the empty-handed stance on the
+	# ground line for each action. Contact feedback still comes from the resolver.
+	var still: Dictionary = ArtMap.SOURCE_STILLS[still_id]
+	var texture: Texture2D = ArtMap.texture(still["path"])
+	var scale_factor: float = ArtMap.still_scale(still_id)
+	var padding: float = ceilf(12.0 / scale_factor)
+	var canvas_offset: Vector2 = texture.get_size() * 0.5 - Vector2(still["pivot"])
+	for clip_name: String in UNARMED_MOTION:
+		var frames := SpriteFrames.new()
+		frames.set_animation_speed(&"default", 10.0)
+		frames.set_animation_loop(&"default", clip_name == "idle")
+		for shift: int in UNARMED_MOTION[clip_name]:
+			var frame := AtlasTexture.new()
+			frame.atlas = texture
+			frame.region = Rect2(Vector2.ZERO, texture.get_size())
+			frame.margin = Rect2(padding + roundf(shift / scale_factor), 0.0, padding * 2.0, 0.0)
+			frames.add_frame(&"default", frame)
+		_hero_frames[clip_name] = {"frames": frames, "offset": canvas_offset, "scale": Vector2.ONE * scale_factor}
 
 func _build_clip(sheet: Dictionary, one_shot: bool) -> Dictionary:
 	var spec: Dictionary = ArtMap.animation_spec(sheet)
@@ -299,7 +304,7 @@ func _play_hero_clip(clip_name: String) -> void:
 	_apply_clip(hero_sprite, _hero_frames[clip_name])
 	hero_sprite.play(&"default")
 
-func _on_hero_clip_finished() -> void:
+func _reset_hero_to_idle() -> void:
 	_hero_clip_priority = 0
 	_hero_clip_name = "idle"
 	_apply_clip(hero_sprite, _hero_frames["idle"])

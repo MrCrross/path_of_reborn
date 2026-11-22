@@ -226,6 +226,7 @@ func _test_retry_and_session(context: TestContext) -> void:
 	DomainSuite.claim_pending(session)
 	context.check(session.hero.experience == 4, "A separate won run grants the ordinary reward again on claim")
 	context.check(session.echoes == 1, "The meta echo stays once per enemy type")
+	context.check(session.last_settlement.get("route_node_id") == "forest_edge_cart_slime", "The second slime advances its own route node")
 	session.select_encounter("goblin_scout")
 	var goblin := session.start_combat(session.current_enemy_id)
 	context.check(goblin.enemy.definition.id == "goblin_scout" and goblin.hero == session.hero, "The same runtime and session support the next encounter")
@@ -241,7 +242,7 @@ func _test_single_active_run_guards(context: TestContext) -> void:
 	context.check(first.is_finished and first.won, "Finishing the first run wins")
 	context.check(session.start_combat("goblin_scout") == null, "Pending result blocks the next combat before claim")
 	context.check(DomainSuite.claim_pending(session), "Claim clears the pending result")
-	context.check(session.start_combat("goblin_scout") != null, "Next combat is legal after claim")
+	context.check(session.start_combat("moss_slime") != null, "Next combat is legal after claim")
 	context.check(not session.select_encounter("moss_slime"), "Selection stays locked during the next combat")
 	session.abandon_combat()
 	context.check(session.awaiting_return and not session.in_combat, "Surrender closes the run and awaits return")
@@ -416,7 +417,9 @@ func _test_pending_route_context(context: TestContext) -> void:
 	context.check(session.route_state.get("next_index", 0) == 0, "Rejected context does not advance route")
 	var repeat_session := GameSession.new()
 	repeat_session.route_state["next_index"] = 1
-	var repeat := repeat_session.start_combat("moss_slime")
+	context.check(repeat_session.select_encounter("moss_slime", true), "Repeat can be explicitly selected while the next route node uses the same enemy")
+	var repeat := repeat_session.start_selected_combat()
+	repeat = repeat_session.retry_combat()
 	repeat.advance_ticks(600)
 	context.check(repeat_session.pending_battle_result.get("encounter_mode", "") == GameSession.ENCOUNTER_REPEAT, "A beaten earlier enemy is a repeat")
 	DomainSuite.claim_pending(repeat_session)
@@ -424,7 +427,7 @@ func _test_pending_route_context(context: TestContext) -> void:
 
 func _test_trial_echo_rollback(context: TestContext) -> void:
 	var session := GameSession.new()
-	for enemy_id: String in ["moss_slime", "goblin_scout"]:
+	for enemy_id: String in ["moss_slime", "moss_slime", "goblin_scout"]:
 		var ordinary := session.start_combat(enemy_id)
 		ordinary.advance_ticks(6000)
 		DomainSuite.claim_pending(session)
@@ -484,7 +487,7 @@ func _test_branch_reachable_both_modes(context: TestContext) -> void:
 			var session := GameSession.new()
 			session.set_combat_format(format)
 			if enemy_id == "goblin_scout":
-				session.route_state["next_index"] = 1
+				session.route_state["next_index"] = 2
 			var equipped: Dictionary = EquipmentModel.slot(session, "weapon")
 			context.check(equipped["definition"] != null and equipped["definition"].id == "broken_wanderer_branch", "%s starts with the branch: %s" % [enemy_id, format])
 			var resolver: CombatResolver = session.start_combat(enemy_id)

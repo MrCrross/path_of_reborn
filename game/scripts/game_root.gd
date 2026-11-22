@@ -11,6 +11,7 @@ var save_path: String = SaveService.DEFAULT_PATH
 var _restoring: bool = false
 var _claim_commit_active: bool = false
 var _checkpoint_commit_active: bool = false
+var _shop_commit_active: bool = false
 var _observed_inventory: InventoryService
 
 @onready var screen_host: Control = %ScreenHost
@@ -45,12 +46,21 @@ func _physics_process(_delta: float) -> void:
 		session.play_tick += 1
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not event.is_action_pressed("ui_cancel"):
-		return
-	# Android Back / Esc закрывает только верхний разрешённый слой текущего экрана.
-	var screen: Control = router.current_screen
-	if screen != null and screen.has_method("handle_back") and screen.call("handle_back"):
+	if event.is_action_pressed("ui_cancel") and _handle_back():
 		get_viewport().set_input_as_handled()
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		_handle_back()
+
+func _handle_back() -> bool:
+	if router == null:
+		return false
+	var screen: Control = router.current_screen
+	return screen != null and (
+		ConfirmDialog.dismiss_from(screen)
+		or (screen.has_method("handle_back") and screen.call("handle_back"))
+	)
 
 ## Куда ведёт «Продолжить»: незавершённый пролог доигрывается с первой
 ## непрочитанной cue (повтор незавершённой реплики с начала — осознанная политика).
@@ -63,10 +73,20 @@ static func route_for_continue(target: GameSession) -> String:
 		return "combat"
 	if not target.pending_story_reward.is_empty():
 		return "merchant"
-	if target.world_flags.get("daijiro_scout_defeated", false) and not target.world_flags.get("daijiro_introduction_completed", false):
+	if target.world_flags.get("daijiro_scout_defeated", false) and not target.story_rewards.has(GameSession.DAIJIRO_SWORD_REWARD_ID):
 		return "merchant"
 	if not target.world_flags.get("prologue_completed", false):
 		return "prologue"
+	match target.next_route_approach():
+		"daijiro_lookout":
+			return "trail_dialogue"
+		"daijiro_cart":
+			return "merchant"
+	if target.can_trade() and (
+		not target.world_flags.get(GameSession.WORLD_FLAG_SHOP_INTRO_DONE, false)
+		or (target.world_flags.get(GameSession.WORLD_FLAG_SHOP_FIRST_PURCHASE_DONE, false) and not target.world_flags.get(GameSession.WORLD_FLAG_SHOP_PURCHASE_BRIEFING_DONE, false))
+	):
+		return "shop"
 	return "world"
 
 func _on_screen_added(screen: Control) -> void:
@@ -83,8 +103,10 @@ func _on_screen_added(screen: Control) -> void:
 	if screen.has_signal("sound_change_requested"):
 		screen.connect("sound_change_requested", set_sound_enabled)
 		screen.connect("voice_change_requested", set_voice_id)
-	if screen.has_signal("sale_requested"):
-		screen.connect("sale_requested", _on_sale_requested)
+	if screen.has_signal("shop_deal_requested"):
+		screen.connect("shop_deal_requested", _on_shop_deal_requested)
+	if screen.has_signal("open_bag_requested"):
+		screen.connect("open_bag_requested", _on_open_bag_requested)
 
 func _on_claim_requested(result_id: String) -> void:
 	if not claim_battle_result(result_id):
@@ -92,12 +114,16 @@ func _on_claim_requested(result_id: String) -> void:
 	var settlement: Dictionary = session.last_settlement
 	if settlement.get("enemy_id", "") == "goblin_scout" and settlement.get("encounter_mode", "") == GameSession.ENCOUNTER_ROUTE:
 		router.go_to("merchant")
+	elif settlement.get("route_node_id", "") == "forest_edge_cart_slime" and session.next_route_approach() == "daijiro_lookout":
+		router.go_to("trail_dialogue")
 	else:
 		router.go_to("world")
 
 func _on_story_claim_requested(reward_id: String) -> void:
 	if claim_story_reward(reward_id):
 		router.go_to("world")
+	elif router.current_screen != null and router.current_screen.has_method("retry_gift"):
+		router.current_screen.call("retry_gift")
 
 func claim_story_reward(reward_id: String) -> bool:
 	if _claim_commit_active or _restoring:
@@ -118,27 +144,57 @@ func claim_story_reward(reward_id: String) -> bool:
 	notice_bar.hide()
 	return true
 
-func _on_sale_requested(instance_id: String, quantity: int) -> void:
-	if sell_item(instance_id, quantity):
-		router.go_to("merchant")
+## --- Граница commit сделок лавки ---
+## Покупка, продажа и обмен применяются к кандидату, записываются атомарно и только после
+## успеха публикуется в текущий экран (без re-navigation: вкладка и позиция
+## списка живут на экране). При ошибке записи live-экран получает deal_rejected
+## и перечитывает карточку из неизменённой сессии — повтор применяет сделку
+## ровно один раз.
 
-func sell_item(instance_id: String, quantity: int = 1) -> bool:
-	if _claim_commit_active or _restoring:
+func _on_shop_deal_requested(deal: Dictionary) -> void:
+	commit_shop_deal(deal)
+
+func commit_shop_deal(deal: Dictionary) -> bool:
+	if _shop_commit_active or _claim_commit_active or _restoring or not session.can_trade():
 		return false
-	_claim_commit_active = true
+	var kind: String = String(deal.get("kind", ""))
+	if kind not in ["buy", "sell", "exchange"]:
+		return false
+	_shop_commit_active = true
 	var candidate := GameSession.new()
 	candidate.apply_state_dto(save_service.capture(session))
-	if not candidate.sell_item(instance_id, quantity) or not save_service.save(candidate, save_path):
-		_claim_commit_active = false
-		_show_notice("Не удалось сохранить обмен. Предмет и кошелёк не изменены.")
+	var applied: bool = false
+	var price: int = int(deal.get("unit_price_copper", -1))
+	var quantity: int = int(deal.get("quantity", 1))
+	match kind:
+		"buy":
+			applied = candidate.buy_item(String(deal.get("offer_id", "")), quantity, price)
+		"sell":
+			applied = candidate.sell_item(String(deal.get("instance_id", "")), quantity, price, int(deal.get("stock", -1)))
+		"exchange":
+			applied = candidate.exchange_coins(String(deal.get("from_coin", "")), String(deal.get("to_coin", "")), quantity, deal.get("quote", {}))
+	if not applied or not save_service.save(candidate, save_path):
+		_shop_commit_active = false
+		if router.current_screen != null and router.current_screen.has_method("deal_rejected"):
+			var reason := "Не удалось сохранить сделку. Попробуйте ещё раз." if applied else "Условия изменились. Проверьте сумму и количество."
+			router.current_screen.call("deal_rejected", reason)
 		return false
+	var committed_deal: Dictionary = candidate.last_deal.duplicate(true)
 	_restoring = true
 	session.apply_state_dto(save_service.capture(candidate))
+	session.last_deal = committed_deal
 	_restoring = false
-	_claim_commit_active = false
+	_shop_commit_active = false
 	_connect_session_signals()
 	notice_bar.hide()
+	if router.current_screen != null and router.current_screen.has_method("deal_committed"):
+		router.current_screen.call("deal_committed", committed_deal)
 	return true
+
+func _on_open_bag_requested(instance_id: String) -> void:
+	router.go_to("inventory")
+	if router.current_screen != null and router.current_screen.has_method("open_item"):
+		router.current_screen.call("open_item", instance_id)
 
 func claim_battle_result(result_id: String) -> bool:
 	if _claim_commit_active or _restoring:
@@ -165,7 +221,7 @@ func claim_battle_result(result_id: String) -> bool:
 	return true
 
 func _show_claim_failure() -> void:
-	_show_notice("Не удалось сохранить добычу. Результат сохранён на экране — повторите касание.")
+	_show_notice("Не удалось сохранить результат боя. Нажмите «Повторить запись».")
 	if router.current_screen != null and router.current_screen.has_method("show_claim_error"):
 		router.current_screen.call("show_claim_error")
 
@@ -355,7 +411,7 @@ func _autosave() -> bool:
 		notice_bar.hide()
 		return true
 	if session.has_pending_battle_result():
-		_show_claim_failure()
+		_show_notice("Не удалось сохранить результат боя. Запись повторится при подтверждении.")
 	else:
 		_show_notice(save_service.last_error)
 	return false

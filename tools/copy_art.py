@@ -25,10 +25,16 @@ ASSET_PATHS: list[str] = [
     "characters/animations/haruto_modern_run_sheet.png",
     # CHR-03 Харуто после изгнания (мир и бой)
     "characters/haruto_exiled_idle.png",
+    "characters/haruto_exiled_sword_idle.png",
+    "characters/haruto_exiled_unarmed_idle.png",
     "characters/animations/haruto_exiled_idle_sheet.png",
     "characters/animations/haruto_exiled_branch_attack_sheet.png",
     "characters/animations/haruto_exiled_dodge_sheet.png",
     "characters/animations/haruto_exiled_hit_sheet.png",
+    "characters/animations/haruto_exiled_sword_idle_sheet.png",
+    "characters/animations/haruto_exiled_sword_attack_sheet.png",
+    "characters/animations/haruto_exiled_sword_dodge_sheet.png",
+    "characters/animations/haruto_exiled_sword_hit_sheet.png",
     # CHR-04 Мицуки (пролог)
     "characters/mitsuki_threshold_portrait.png",
     "characters/animations/mitsuki_offer_sheet.png",
@@ -48,11 +54,15 @@ ASSET_PATHS: list[str] = [
     "enemies/animations/goblin_scout_idle_sheet.png",
     "enemies/animations/goblin_scout_double_slash_sheet.png",
     "enemies/animations/goblin_scout_retreat_sheet.png",
+    # CHR-07 Дайдзиро-торговец (лавка и разговоры)
+    "characters/daijiro_merchant_idle.png",
     # Фоны локаций
     "environments/tokyo_crosswalk_background.png",
     "environments/white_threshold_background.png",
     "environments/first_breath_trail_background.png",
     "environments/lioren_south_gate_background.png",
+    "environments/props/daijiro_cart_overturned_prop.png",
+    "environments/cricket_twilight_interior_background.png",
     # NAR-01..06 сюжетные кадры пролога
     "environments/story/haruto_tokyo_evening_story.png",
     "environments/story/haruto_crosswalk_alarm_story.png",
@@ -61,6 +71,7 @@ ASSET_PATHS: list[str] = [
     "environments/story/mitsuki_first_meeting_story.png",
     "environments/story/haruto_receives_path_seal_story.png",
     "environments/story/daijiro_cart_rescue_story.png",
+    "environments/story/daijiro_crystal_appraisal_story.png",
     # OBJ-07/08 реквизит пролога
     "environments/props/haruto_phone_prop.png",
     "environments/props/pedestrian_signal_prop.png",
@@ -85,6 +96,7 @@ ASSET_PATHS: list[str] = [
     "ui/icons/skip_cutscene_icon.png",
     "ui/icons/slot_helmet_icon.png",
     "ui/icons/slot_armor_icon.png",
+    "ui/icons/slot_weapon_icon.png",
     "ui/icons/slot_boots_icon.png",
     "ui/icons/slot_shoulders_icon.png",
     "ui/icons/slot_familiar_icon.png",
@@ -96,6 +108,10 @@ ASSET_PATHS: list[str] = [
     "equipment/moss_core_icon.png",
     "equipment/echo_growth_cloudy_icon.png",
     "equipment/echo_dusk_clear_icon.png",
+    "equipment/wanderer_jacket_icon.png",
+    "equipment/astra_copper_icon.png",
+    "equipment/astra_silver_icon.png",
+    "equipment/astra_gold_icon.png",
 ]
 
 

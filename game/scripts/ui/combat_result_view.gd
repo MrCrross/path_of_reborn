@@ -2,24 +2,25 @@ class_name CombatResultView
 extends PanelContainer
 
 signal claim_requested
+signal summary_acknowledged
 signal choice_requested(entry_id: String, action: String)
-signal item_requested(item_id: String, aspect_id: String, quantity: int)
+signal item_requested(entry: Dictionary)
 
 const XP_COLOR := Color("9fd18a")
 const SWIPE_THRESHOLD: float = 18.0
 const SWIPE_VERTICAL_LIMIT: float = 10.0
+const CARD_PADDING := 5
 
 var rows: VBoxContainer
+var summary_button: Button
 var claim_button: Button
-var scroll: ScrollContainer
 var card: PanelContainer
-var store_button: Button
-var equip_button: Button
 var detail_button: Button
+var _summary_panel: PanelContainer
+var _detail_anchor: Control
 var _session: GameSession
-var _result: Dictionary = {}
 var _entry: Dictionary = {}
-var _model: Dictionary = {}
+var _can_equip: bool = false
 var _processing: bool = false
 var _pointer: Dictionary = {}
 var _origin: Vector2 = Vector2.ZERO
@@ -27,203 +28,199 @@ var _drag: Vector2 = Vector2.ZERO
 var _axis: String = ""
 
 func _ready() -> void:
-	theme_type_variation = &"HudPanel"
-	var margin := MarginContainer.new()
-	for side: String in ["left", "right", "top", "bottom"]:
-		margin.add_theme_constant_override("margin_" + side, 6)
-	add_child(margin)
-	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 4)
-	margin.add_child(column)
-	scroll = ScrollContainer.new()
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.custom_minimum_size = Vector2(0, 24)
-	scroll.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-	column.add_child(scroll)
+	theme_type_variation = &"ArenaPanel"
+	minimum_size_changed.connect(_fit_to_content)
+	_summary_panel = PanelContainer.new()
+	_summary_panel.theme_type_variation = &"HudPanel"
+	add_child(_summary_panel)
+	var column := _padded_column(_summary_panel)
 	rows = VBoxContainer.new()
 	rows.name = "Rows"
-	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	rows.add_theme_constant_override("separation", 1)
-	scroll.add_child(rows)
+	column.add_child(rows)
+	summary_button = _action_button("ОК")
+	summary_button.pressed.connect(func() -> void: summary_acknowledged.emit())
+	column.add_child(summary_button)
+	claim_button = _action_button("Готово")
+	claim_button.name = "ClaimButton"
+	claim_button.custom_minimum_size.x = 42
+	claim_button.pressed.connect(func() -> void: claim_requested.emit())
+	column.add_child(claim_button)
+	_summary_panel.hide()
+
 	card = PanelContainer.new()
 	card.name = "RewardCard"
-	card.theme_type_variation = &"EquipmentPanel"
-	card.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	card.theme_type_variation = &"HudPanel"
 	card.focus_mode = Control.FOCUS_ALL
 	card.gui_input.connect(_on_card_input)
-	column.add_child(card)
-	var hints := Label.new()
-	hints.name = "SwipeHints"
-	hints.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hints.clip_text = true
-	hints.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	hints.add_theme_font_size_override("font_size", 7)
-	hints.add_theme_color_override("font_color", AppTheme.COLOR_TEXT_DIM)
-	column.add_child(hints)
-	# Основные действия — жестами по карточке: tap/влево «Взять», вправо «Надеть».
-	# Кнопки остаются невидимыми программными якорями для клавиатурного доступа.
-	var actions := HBoxContainer.new()
-	actions.visible = false
-	column.add_child(actions)
-	store_button = Button.new()
-	store_button.text = "Взять"
-	store_button.accessibility_name = "Взять"
-	store_button.custom_minimum_size = Vector2(0, 30)
-	store_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	store_button.pressed.connect(_choose.bind("store"))
-	store_button.hide()
-	store_button.focus_mode = Control.FOCUS_NONE
-	actions.add_child(store_button)
-	equip_button = Button.new()
-	equip_button.text = "Надеть"
-	equip_button.accessibility_name = "Надеть"
-	equip_button.custom_minimum_size = Vector2(0, 30)
-	equip_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	equip_button.theme_type_variation = &"PrimaryButton"
-	equip_button.pressed.connect(_choose.bind("equip"))
-	equip_button.hide()
-	equip_button.focus_mode = Control.FOCUS_NONE
-	actions.add_child(equip_button)
+	add_child(card)
+	card.hide()
 	detail_button = Button.new()
-	detail_button.text = "i"
-	detail_button.accessibility_name = "Подробнее о находке"
-	detail_button.custom_minimum_size = Vector2(24, 24)
-	detail_button.add_theme_font_size_override("font_size", 9)
-	detail_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	UiIcons.apply(detail_button, "info", "Подробнее о находке")
+	detail_button.theme_type_variation = &"HudIconButton"
+	detail_button.add_theme_constant_override("icon_max_width", 14)
+	detail_button.add_theme_color_override("icon_normal_color", Color.WHITE)
+	_detail_anchor = Control.new()
+	_detail_anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	card.add_child(_detail_anchor)
+	_detail_anchor.add_child(detail_button)
+	detail_button.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	detail_button.offset_left = -26
+	detail_button.offset_right = -2
+	detail_button.offset_top = 2
+	detail_button.offset_bottom = 26
 	detail_button.pressed.connect(_open_details)
-	column.add_child(detail_button)
-	claim_button = Button.new()
-	claim_button.name = "ClaimButton"
-	claim_button.custom_minimum_size = Vector2(0, 30)
-	claim_button.theme_type_variation = &"PrimaryButton"
-	claim_button.add_theme_font_size_override("font_size", 9)
-	claim_button.text = "Повторить получение"
-	claim_button.tooltip_text = "Повторить запись того же результата"
-	claim_button.accessibility_name = claim_button.tooltip_text
-	claim_button.pressed.connect(func() -> void: claim_requested.emit())
-	claim_button.hide()
-	column.add_child(claim_button)
 
 func present(session: GameSession, result: Dictionary) -> void:
 	_session = session
-	_result = result
+	_entry = {}
+	_reset_input()
+	_show_summary(summary_button)
+	_line(rows, "Итоги боя", AppTheme.COLOR_TEXT, 10)
+	_line(rows, "HP %d/%d" % [session.hero.current_hp, session.hero.max_hp], AppTheme.COLOR_HERO_HP)
+	var xp: int = int(result.get("xp", 0))
+	var echoes: int = int(result.get("echo_gained", false)) + int(result.get("trial_echo_gained", false))
+	_line(rows, "+%d XP   ·   +%d Эхо" % [xp, echoes], AppTheme.COLOR_MAGIC)
+
+func present_next(result: Dictionary) -> bool:
+	_reset_input()
+	_entry = _next_entry(result)
+	if _entry.is_empty():
+		_present_progress(int(result.get("xp", 0)))
+		return false
+	for child: Node in card.get_children():
+		if child != _detail_anchor:
+			card.remove_child(child)
+			child.queue_free()
+	_summary_panel.hide()
+	_build_card()
+	card.show()
+	card.grab_focus()
+	return true
+
+func can_claim() -> bool:
+	return claim_button.is_visible_in_tree()
+
+func _reset_input() -> void:
 	_processing = false
 	_pointer = {}
 	_axis = ""
-	claim_button.hide()
+	_reset_card()
+
+func _show_summary(button: Button) -> void:
+	card.hide()
 	for child: Node in rows.get_children():
 		rows.remove_child(child)
 		child.queue_free()
-	for child: Node in card.get_children():
-		card.remove_child(child)
-		child.queue_free()
-	_entry = _next_entry()
-	var xp: int = int(result.get("xp", 0))
-	if xp > 0:
-		rows.add_child(_line("+%d XP" % xp, XP_COLOR))
-		var preview: Dictionary = session.hero.preview_level_gain(xp)
-		if int(preview.get("levels_gained", 0)) > 0:
-			rows.add_child(_line("Уровень %d · выбор на Тропе" % int(preview.get("level", 0)), AppTheme.COLOR_ACCENT))
-	var echoes: int = int(result.get("echo_gained", false)) + int(result.get("trial_echo_gained", false))
-	if echoes > 0:
-		rows.add_child(_line("+%d Эхо · счётчик" % echoes, AppTheme.COLOR_MAGIC))
-	if _entry.is_empty():
-		return
-	_build_card()
-	var remaining: int = 0
-	for entry: Dictionary in result.get("items", []):
-		if not result.get("choices", {}).has(entry.get("entry_id", "")):
-			remaining += 1
-	var hints: Label = get_node("SwipeHints") if has_node("SwipeHints") else null
-	if hints == null:
-		hints = find_child("SwipeHints", true, false) as Label
-	if hints != null:
-		var hint_text: String = "tap или влево — Взять"
-		if equip_button.visible:
-			hint_text += "\nвправо — Надеть"
-		hints.text = "%s · осталось %d" % [hint_text, remaining]
+	summary_button.visible = button == summary_button
+	claim_button.visible = button == claim_button
+	_summary_panel.show()
 	show()
-	card.grab_focus()
+	button.grab_focus()
+
+func _present_progress(xp: int) -> void:
+	var hero: CharacterState = _session.hero
+	var preview: Dictionary = hero.preview_level_gain(xp)
+	var level: int = int(preview["level"])
+	var choices: int = int(preview["upgrade_choices"])
+	var remaining: int = int(preview["xp_remaining"])
+	claim_button.text = "Готово"
+	_show_summary(claim_button)
+	var heading: String = "Новый уровень · %d" % level if choices > 0 else "Уровень · %d" % level
+	_line(rows, heading, AppTheme.COLOR_ACCENT, 10)
+	var progress: String = "До ур. %d ост. %d XP" % [level + 1, remaining] if remaining > 0 else "Максимальный уровень"
+	_line(rows, progress, XP_COLOR)
+	if choices > 0:
+		_line(rows, "Выбор ×%d: сила или макс. HP" % choices, AppTheme.COLOR_TEXT)
+	for ability: AbilityDefinition in hero.definition.abilities:
+		if hero.level < ability.unlock_level and ability.unlock_level <= level:
+			_line(rows, "Открыто: %s" % ability.display_name, AppTheme.COLOR_MAGIC)
 
 func _build_card() -> void:
 	var item_id: String = String(_entry.get("item_id", ""))
 	var aspect_id: String = String(_entry.get("aspect_id", ""))
 	var quantity: int = int(_entry.get("quantity", 1))
-	_model = EquipmentModel.for_reward(_session, item_id, aspect_id, quantity, _entry)
-	var definition: ItemDefinition = _model["definition"]
-	var margin := MarginContainer.new()
-	for side: String in ["left", "right", "top", "bottom"]:
-		margin.add_theme_constant_override("margin_" + side, 4)
-	card.add_child(margin)
-	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 2)
-	margin.add_child(column)
+	var model: Dictionary = EquipmentModel.for_reward(_session, item_id, aspect_id, quantity, _entry)
+	var definition: ItemDefinition = model["definition"]
+	_can_equip = not definition.slot_id.is_empty()
+	var column := _padded_column(card)
+	card.move_child(_detail_anchor, -1)
 	var title: String = definition.display_name if quantity <= 1 else "%s ×%d" % [definition.display_name, quantity]
-	var name_label := _card_label(column, title, 10, HORIZONTAL_ALIGNMENT_CENTER)
-	name_label.accessibility_name = title
+	var title_slot := MarginContainer.new()
+	title_slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	title_slot.add_theme_constant_override("margin_right", UiIcons.TOUCH_SIZE)
+	column.add_child(title_slot)
+	var name_label := _line(title_slot, title, AppTheme.COLOR_TEXT, 9, HORIZONTAL_ALIGNMENT_LEFT)
+	name_label.custom_minimum_size.y = UiIcons.TOUCH_SIZE - CARD_PADDING
+	name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	var item_row := HBoxContainer.new()
+	item_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	item_row.add_theme_constant_override("separation", 6)
+	column.add_child(item_row)
 	var icon := TextureRect.new()
 	icon.texture = ArtMap.item_icon(item_id, aspect_id)
-	icon.custom_minimum_size = Vector2(30, 30)
+	icon.custom_minimum_size = Vector2(24, 24)
+	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	column.add_child(icon)
-	if definition.slot_id.is_empty():
+	item_row.add_child(icon)
+	var stats := VBoxContainer.new()
+	stats.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stats.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	stats.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	stats.add_theme_constant_override("separation", 0)
+	item_row.add_child(stats)
+	if not _can_equip:
 		var total: int = int(_entry.get("sale_price_copper", definition.sale_price_copper)) * quantity
-		_card_label(column, "Цена: %s" % UiText.astra(total), 9, HORIZONTAL_ALIGNMENT_CENTER)
-	elif _model.get("current_item") == null:
-		for bonus: Dictionary in _model.get("bonuses", []):
-			_card_label(column, "%s %+d" % [bonus["label"], int(bonus["amount"])], 9, HORIZONTAL_ALIGNMENT_CENTER)
+		_line(stats, "Цена: %s" % UiText.astra(total), AppTheme.COLOR_TEXT, 9, HORIZONTAL_ALIGNMENT_LEFT)
+	elif model.get("current_item") == null:
+		for bonus: Dictionary in model.get("bonuses", []):
+			_line(stats, "%s %+d" % [bonus["label"], int(bonus["amount"])], AppTheme.COLOR_TEXT, 9, HORIZONTAL_ALIGNMENT_LEFT)
 	else:
-		for delta: Dictionary in _model.get("deltas", []):
+		for delta: Dictionary in model.get("deltas", []):
 			var difference: int = int(delta["after"]) - int(delta["before"])
 			var lower_better: bool = definition.lower_is_better_stats.has(String(delta["stat_id"]))
 			var improved: bool = difference < 0 if lower_better else difference > 0
 			var arrow: String = "=" if difference == 0 else ("↑" if improved else "↓")
-			var label := _card_label(column, "%s %d  %s" % [delta["label"], int(delta["after"]), arrow], 9, HORIZONTAL_ALIGNMENT_CENTER)
-			label.add_theme_color_override("font_color", AppTheme.COLOR_TEXT_DIM.darkened(0.5) if difference == 0 else (AppTheme.COLOR_HERO_HP.darkened(0.5) if improved else AppTheme.COLOR_DANGER.darkened(0.35)))
-	card.accessibility_name = "Находка: касание или влево — Взять%s" % (", вправо — Надеть" if not definition.slot_id.is_empty() else "")
-	card.tooltip_text = card.accessibility_name
-	store_button.disabled = false
-	equip_button.visible = not definition.slot_id.is_empty()
-	equip_button.disabled = not equip_button.visible
+			var color: Color = AppTheme.COLOR_TEXT_DIM if difference == 0 else (AppTheme.COLOR_HERO_HP if improved else AppTheme.COLOR_DANGER)
+			_line(stats, "%s %d %s" % [delta["label"], int(delta["after"]), arrow], color, 9, HORIZONTAL_ALIGNMENT_LEFT)
+	card.tooltip_text = "Касание или влево — взять%s" % (", вправо — надеть" if _can_equip else "")
+	card.accessibility_name = "%s. %s" % [title, card.tooltip_text]
 	detail_button.disabled = false
 
-func _next_entry() -> Dictionary:
-	for entry: Dictionary in _result.get("items", []):
-		if not _result.get("choices", {}).has(entry.get("entry_id", "")):
+func _next_entry(result: Dictionary) -> Dictionary:
+	for entry: Dictionary in result.get("items", []):
+		if not result.get("choices", {}).has(entry.get("entry_id", "")):
 			return entry
 	return {}
 
 func _choose(action: String) -> void:
 	if _processing or _entry.is_empty():
 		return
-	if action == "equip" and not equip_button.visible:
+	if action == "equip" and not _can_equip:
 		return
 	_processing = true
-	store_button.disabled = true
-	equip_button.disabled = true
 	detail_button.disabled = true
 	choice_requested.emit(String(_entry["entry_id"]), action)
 
 func _open_details() -> void:
 	if _processing or _entry.is_empty():
 		return
-	item_requested.emit(String(_entry["item_id"]), String(_entry["aspect_id"]), int(_entry["quantity"]))
+	item_requested.emit(_entry)
 
 func _on_card_input(event: InputEvent) -> void:
 	if _processing or _entry.is_empty():
 		return
-	if event is InputEventKey and event.pressed and not event.echo:
-		if event.is_action("primary"):
+	if event is InputEventKey or event is InputEventJoypadButton:
+		if event.is_action_pressed("primary") or event.is_action_pressed("ui_accept"):
 			get_viewport().set_input_as_handled()
 			_choose("store")
-		elif event.is_action("secondary") and equip_button.visible:
+		elif event.is_action_pressed("secondary") and _can_equip:
 			get_viewport().set_input_as_handled()
 			_choose("equip")
 		return
-	if event is InputEventMouseButton and event.device == InputEvent.DEVICE_ID_EMULATION:
+	if event is InputEventMouseButton and (event.device == InputEvent.DEVICE_ID_EMULATION or event.button_index != MOUSE_BUTTON_LEFT):
 		return
 	if event is InputEventScreenTouch or event is InputEventMouseButton:
 		var kind: String = "touch" if event is InputEventScreenTouch else "mouse"
@@ -303,41 +300,42 @@ func _reset_card() -> void:
 	card.position.x = 0
 	_drag = Vector2.ZERO
 
-func fit_to_view(view_height: float) -> void:
-	var height: float = clampf(164.0, 132.0, maxf(132.0, view_height - 92.0))
-	anchor_top = 1.0
-	anchor_bottom = 1.0
-	offset_bottom = -2.0
-	offset_top = offset_bottom - height
+func _fit_to_content() -> void:
+	offset_top = offset_bottom - get_combined_minimum_size().y
 
 func show_write_error() -> void:
-	_processing = false
-	claim_button.text = "Не удалось сохранить. Повторить"
-	claim_button.show()
-	store_button.disabled = true
-	equip_button.disabled = true
-	show()
+	claim_button.text = "Повторить запись"
 	claim_button.grab_focus()
 
-func _card_label(parent: Node, text: String, font_size: int, alignment: HorizontalAlignment) -> Label:
-	var label := Label.new()
-	label.text = text
-	label.horizontal_alignment = alignment
-	label.clip_text = true
-	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	label.add_theme_font_size_override("font_size", font_size)
-	label.add_theme_color_override("font_color", AppTheme.COLOR_ACCENT_TEXT)
-	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	parent.add_child(label)
-	return label
+func _action_button(text: String) -> Button:
+	var button := Button.new()
+	button.custom_minimum_size = Vector2(UiIcons.TOUCH_SIZE, UiIcons.TOUCH_SIZE)
+	button.theme_type_variation = &"PrimaryButton"
+	button.add_theme_font_size_override("font_size", 9)
+	button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	button.text = text
+	return button
 
-func _line(text: String, color: Color) -> Control:
+func _padded_column(panel: PanelContainer) -> VBoxContainer:
+	var margin := MarginContainer.new()
+	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for side: String in ["left", "right", "top", "bottom"]:
+		margin.add_theme_constant_override("margin_" + side, CARD_PADDING)
+	panel.add_child(margin)
+	var column := VBoxContainer.new()
+	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	column.add_theme_constant_override("separation", 2)
+	margin.add_child(column)
+	return column
+
+func _line(parent: Node, text: String, color: Color, font_size: int = 8, alignment: HorizontalAlignment = HORIZONTAL_ALIGNMENT_CENTER) -> Label:
 	var label := Label.new()
 	label.text = text
-	label.add_theme_font_size_override("font_size", 8)
+	label.add_theme_font_size_override("font_size", font_size)
 	label.add_theme_color_override("font_color", color)
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	label.clip_text = true
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.horizontal_alignment = alignment
+	parent.add_child(label)
 	return label

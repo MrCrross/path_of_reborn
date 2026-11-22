@@ -43,6 +43,7 @@ func run() -> Array[Dictionary]:
 	results.append(_run_case("xp_remainder_levels_and_upgrades", _test_xp_and_upgrades))
 	results.append(_run_case("character_power_and_upgrade_preview", _test_character_power_and_upgrade_preview))
 	results.append(_run_case("damage_formula_and_minimum", _test_damage_formula))
+	results.append(_run_case("shop_deals_and_travel_contract", _test_shop_and_travel))
 	return results
 
 func _run_case(case_name: String, test: Callable) -> Dictionary:
@@ -170,3 +171,67 @@ func _test_damage_formula(context: TestContext) -> void:
 	context.check(CharacterState.calculate_damage(4, 2, 1.25) == 3, "Half values round once at the end")
 	context.check(CharacterState.calculate_damage(1, 5) == 1, "Defense cannot reduce damage below one")
 	context.check(CharacterState.calculate_damage(5, 1, 0.0) == 1, "Even a zero multiplier respects minimum damage")
+
+func _test_shop_and_travel(context: TestContext) -> void:
+	var session := GameSession.new()
+	context.check(session.location_id == GameSession.LOCATION_FOREST_EDGE, "New game starts on the trail")
+	context.check(session.travel_to("unknown_place") == false, "Unknown location is refused")
+	# Лавка закрыта до сцены ворот.
+	context.check(not session.buy_item("wanderer_jacket"), "Purchase before the gates scene is refused")
+	session.world_flags[GameSession.WORLD_FLAG_LIOREN_SHOP_UNLOCKED] = true
+	context.check(not session.buy_item("wanderer_jacket"), "Purchase without funds is refused")
+	var crystals: Array[ItemInstance] = session.inventory.add(session.get_item_definition("echo_crystal"), 1, "moss")
+	context.check(session.sell_item(crystals[0].instance_id, 1) and session.wallet[GameSession.COPPER] == 20, "One crystal sells for 20 copper")
+	context.check(bool(session.world_flags.get(GameSession.WORLD_FLAG_SHOP_FIRST_SALE_DONE, false)), "First successful sale records its milestone")
+	context.check(session.buy_item("wanderer_jacket") and session.wallet[GameSession.COPPER] == 8, "Jacket purchase deducts 12 copper")
+	context.check(bool(session.world_flags.get(GameSession.WORLD_FLAG_WANDERER_JACKET_PURCHASED, false)) and bool(session.world_flags.get(GameSession.WORLD_FLAG_SHOP_FIRST_PURCHASE_DONE, false)), "Purchase records its one-time flag and milestone")
+	var jacket: ItemInstance = session.inventory.get_item(String(session.last_deal.get("instance_ids", [""])[0]))
+	context.check(jacket != null and jacket.definition_id == "wanderer_jacket", "Bought jacket lands in the inventory")
+	var offers: Array[Dictionary] = session.shop_offers()
+	context.check(offers.size() == 1 and bool(offers[0].get("sold_out", false)) and int(offers[0].get("remaining", -1)) == 0, "One-per-story offer is sold out after the purchase")
+	context.check(not session.buy_item("wanderer_jacket"), "Sold-out offer cannot be bought twice")
+	context.check(session.equip_item(jacket.instance_id) and session.hero.defense == 3, "Jacket equips into the armor slot and adds one defense")
+	context.check(not session.sell_item(jacket.instance_id), "Equipped story items cannot be sold")
+	context.check(String(session.last_deal.get("kind", "")) == "buy" and int(session.last_deal.get("balance_after", -1)) == 8, "Last deal carries the kind and resulting balance for presentation")
+	context.check(session.travel_to(GameSession.LOCATION_LIOREN) and session.location_id == GameSession.LOCATION_LIOREN, "Travel to Lioren applies")
+	context.check(session.travel_to(GameSession.LOCATION_LIOREN), "Travel to the current location is a harmless no-op")
+	session.start_combat("moss_slime")
+	context.check(not session.travel_to(GameSession.LOCATION_FOREST_EDGE), "Travel is refused during combat")
+	var returning := GameSession.new()
+	returning.location_id = GameSession.LOCATION_LIOREN
+	returning.traces = 3
+	context.check(not returning.can_trade() and not returning.travel_to(GameSession.LOCATION_FOREST_EDGE), "A forced arrival needs rest and leaves the shop closed before the introduction")
+	context.check(returning.checkpoints.rest() and returning.travel_to(GameSession.LOCATION_FOREST_EDGE), "Rest opens the return to the Trail without a sword or shop access")
+	returning.travel_to(GameSession.LOCATION_LIOREN)
+	returning.world_flags[GameSession.WORLD_FLAG_LIOREN_SHOP_UNLOCKED] = true
+	returning.wallet[GameSession.COPPER] = 12
+	context.check(not returning.buy_item("wanderer_jacket", 1, 11) and returning.wallet[GameSession.COPPER] == 12, "A stale buy quote changes neither the balance nor the offer")
+	context.check(returning.can_trade() and returning.buy_item("wanderer_jacket", 1, 12) and not returning.world_flags.has(GameSession.WORLD_FLAG_SHOP_FIRST_SALE_DONE), "A funded player can buy before the first sale")
+	var stack: ItemInstance = returning.inventory.add(returning.get_item_definition("echo_crystal"), 3, "moss")[0]
+	context.check(not returning.sell_item(stack.instance_id, 1, 19, 3) and stack.quantity == 3, "A stale sale price leaves the stack intact")
+	context.check(returning.sell_item(stack.instance_id, 1, 20, 3) and stack.quantity == 2, "A partial sale leaves the correct remainder")
+	context.check(not returning.sell_item(stack.instance_id, 1, 20, 3) and returning.wallet[GameSession.COPPER] == 20, "A repeated confirmation with the old stock credits no additional money")
+	context.check(GameSession.trade_total(GameSession.MAX_ASTRAS, 2) == 0, "An overflowing trade total is rejected before multiplication")
+	var copper: String = GameSession.COPPER
+	var silver: String = GameSession.SILVER
+	var gold: String = GameSession.GOLD
+	returning.wallet[copper] = 99
+	var quote: Dictionary = returning.coin_exchange_quote(copper, silver)
+	context.check(not returning.exchange_coins(copper, silver, 1, quote) and returning.wallet[copper] == 99, "99 copper cannot buy silver")
+	returning.wallet[copper] = 10007
+	context.check(returning.wallet[silver] == 0 and returning.wallet[gold] == 0, "Coin balances never convert automatically")
+	quote = returning.coin_exchange_quote(copper, silver)
+	context.check(returning.exchange_coins(copper, silver, 100, quote) and returning.wallet[copper] == 7 and returning.wallet[silver] == 100, "Batch exchange keeps the copper remainder")
+	context.check(not returning.exchange_coins(copper, silver, 100, quote), "A repeated confirmation with old balances has no effect")
+	context.check(returning.exchange_coins(silver, gold, 1, returning.coin_exchange_quote(silver, gold)) and returning.wallet[silver] == 0 and returning.wallet[gold] == 1, "100 silver buys one gold")
+	context.check(returning.exchange_coins(gold, silver, 1, returning.coin_exchange_quote(gold, silver)) and returning.wallet[silver] == 100 and returning.wallet[gold] == 0, "One gold yields 100 silver")
+	context.check(returning.exchange_coins(silver, copper, 1, returning.coin_exchange_quote(silver, copper)) and returning.wallet[copper] == 107 and returning.wallet[silver] == 99, "One silver yields 100 copper")
+	context.check(returning.coin_exchange_quote(copper, gold).is_empty() and not returning.exchange_coins(copper, copper, 1, {}), "Only neighboring denominations can be exchanged")
+	returning.wallet[copper] = GameSession.MAX_ASTRAS - 99
+	context.check(not returning.exchange_coins(silver, copper, 1, returning.coin_exchange_quote(silver, copper)) and returning.wallet[silver] == 99, "An overflowing exchange leaves both balances unchanged")
+	returning.travel_to(GameSession.LOCATION_FOREST_EDGE)
+	context.check(not returning.exchange_coins(copper, silver, 1, returning.coin_exchange_quote(copper, silver)), "Exchange requires presence at the shop")
+	var silver_only := GameSession.new()
+	silver_only.world_flags[GameSession.WORLD_FLAG_LIOREN_SHOP_UNLOCKED] = true
+	silver_only.wallet[silver] = 1
+	context.check(not silver_only.buy_item("wanderer_jacket"), "Silver must be exchanged before buying a copper-priced item")

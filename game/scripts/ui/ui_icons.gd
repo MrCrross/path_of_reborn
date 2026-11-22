@@ -9,11 +9,19 @@ const NAMES := {
 	"attack": "sword", "dodge": "human_run", "inventory": "backpack",
 	"back": "chevron_left", "close": "close", "info": "info_box",
 	"path": "map", "rest": "bed", "delete": "trash", "next": "chevron_right",
-	"health": "heart", "defense": "shield", "currency": "coin", "repeat": "reload",
+	"health": "heart", "defense": "shield", "repeat": "reload",
+}
+const ASTRA_TEXTURES: Dictionary = {
+	GameSession.COPPER: preload("res://art/equipment/astra_copper_icon.png"),
+	GameSession.SILVER: preload("res://art/equipment/astra_silver_icon.png"),
+	GameSession.GOLD: preload("res://art/equipment/astra_gold_icon.png"),
 }
 
 static func texture(action: String) -> Texture2D:
 	return load(ROOT + String(NAMES[action]) + "_icon.svg")
+
+static func astra(coin: String) -> Texture2D:
+	return ASTRA_TEXTURES[coin]
 
 static func apply(button: Button, action: String, label: String, primary: bool = false) -> void:
 	apply_texture(button, texture(action), label, primary)

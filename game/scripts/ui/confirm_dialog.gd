@@ -7,6 +7,8 @@ extends Control
 signal confirmed
 signal cancelled
 
+const MODAL_GROUP: StringName = &"confirm_dialogs"
+
 static func open(
 	parent: Node,
 	title: String,
@@ -17,7 +19,30 @@ static func open(
 ) -> ConfirmDialog:
 	var dialog: ConfirmDialog = preload("res://scenes/ui/confirm_dialog.tscn").instantiate()
 	parent.add_child(dialog)
+	dialog.add_to_group(MODAL_GROUP)
 	dialog._setup(title, message, confirm_text, cancel_text, danger)
+	return dialog
+
+
+static func dismiss_from(screen: Control) -> bool:
+	var dialogs := screen.get_tree().get_nodes_in_group(MODAL_GROUP)
+	for index: int in range(dialogs.size() - 1, -1, -1):
+		var dialog := dialogs[index] as ConfirmDialog
+		if screen.is_ancestor_of(dialog) and dialog.is_visible_in_tree():
+			dialog._on_cancel_pressed()
+			return true
+	return false
+
+
+static func tutorial(parent: Node, session: GameSession, id: String, title: String, message: String) -> ConfirmDialog:
+	if session.seen_cue_ids.has(id):
+		return null
+	var dialog := open(parent, title, message, "Закрыть", "")
+	var remember := func() -> void:
+		session.seen_cue_ids[id] = true
+		session.profile_changed.emit()
+	dialog.confirmed.connect(remember)
+	dialog.cancelled.connect(remember)
 	return dialog
 
 
@@ -43,17 +68,13 @@ func _setup(
 	_cancel.text = cancel_text
 	_confirm.theme_type_variation = "DangerButton" if danger else "PrimaryButton"
 	_focus_guard.capture(self)
-	_confirm.focus_neighbor_left = _confirm.get_path_to(_cancel)
-	_confirm.focus_neighbor_right = _confirm.get_path_to(_cancel)
-	_cancel.focus_neighbor_left = _cancel.get_path_to(_confirm)
-	_cancel.focus_neighbor_right = _cancel.get_path_to(_confirm)
+	_cancel.visible = not cancel_text.is_empty()
+	if _cancel.visible:
+		_confirm.focus_neighbor_left = _confirm.get_path_to(_cancel)
+		_confirm.focus_neighbor_right = _confirm.get_path_to(_cancel)
+		_cancel.focus_neighbor_left = _cancel.get_path_to(_confirm)
+		_cancel.focus_neighbor_right = _cancel.get_path_to(_confirm)
 	_confirm.grab_focus()
-
-
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel"):
-		get_viewport().set_input_as_handled()
-		_on_cancel_pressed()
 
 
 func _on_confirm_pressed() -> void:
@@ -75,7 +96,7 @@ func _on_cancel_pressed() -> void:
 func _on_outside_pressed(event: InputEvent = null) -> void:
 	# Касание/клик по dim-слою снаружи панели — безопасная отмена.
 	if event != null:
-		var pressed: bool = event is InputEventMouseButton and (event as InputEventMouseButton).pressed
+		var pressed: bool = event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT
 		pressed = pressed or (event is InputEventScreenTouch and (event as InputEventScreenTouch).pressed)
 		if not pressed:
 			return

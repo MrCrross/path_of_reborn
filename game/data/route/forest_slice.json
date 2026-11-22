@@ -6,8 +6,10 @@
     {
       "node_id": "forest_edge_slime",
       "enemy_id": "moss_slime",
+      "approach": "first_slime",
       "first_clear_rewards": []
     },
-    {"node_id": "forest_edge_goblin", "enemy_id": "goblin_scout"}
+    {"node_id": "forest_edge_cart_slime", "enemy_id": "moss_slime"},
+    {"node_id": "forest_edge_goblin", "enemy_id": "goblin_scout", "approach": "daijiro"}
   ]
 }

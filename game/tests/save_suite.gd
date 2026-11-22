@@ -17,11 +17,14 @@ func run() -> Array[Dictionary]:
 	results.append(_run_case("save_respects_safe_boundaries_and_checkpoint_state", _test_safe_boundaries))
 	results.append(_run_case("invalid_route_state_is_rejected", _test_invalid_route))
 	results.append(_run_case("real_v0_v1_v2_nested_snapshots_migrate_without_errors", _test_legacy_nested_snapshots))
+	results.append(_run_case("v5_forest_route_keeps_pending_scout_and_checkpoint_positions", _test_v5_forest_route))
 	results.append(_run_case("v3_pending_migration_has_one_explicit_source_policy", _test_v3_pending_source_policy))
 	results.append(_run_case("pending_and_return_contradictions_are_rejected", _test_pending_contradictions))
 	results.append(_run_case("preferences_restart_backup_and_profile_independence", _test_preferences))
 	results.append(_run_case("pending_choices_and_historical_equipment_survive_continue", _test_pending_continue))
 	results.append(_run_case("crystal_sale_round_trip_backup_and_rollback", _test_sale_persistence))
+	results.append(_run_case("shop_purchase_round_trip_and_checkpoint_restore", _test_shop_purchase_persistence))
+	results.append(_run_case("v6_wallet_migration_and_exchange_rollback", _test_wallet_persistence))
 	_cleanup_root()
 	return results
 
@@ -29,6 +32,35 @@ func _run_case(case_name: String, test: Callable) -> Dictionary:
 	var context := TestContext.new()
 	test.call(context)
 	return {"name": case_name, "checks": context.checks}
+
+func _test_v5_forest_route(context: TestContext) -> void:
+	var service := SaveService.new()
+	var session := GameSession.new()
+	session.route_state["next_index"] = 1
+	session.checkpoints.begin()
+	session.checkpoints.advance_ticks(CheckpointService.CHANNEL_TICKS)
+	session.checkpoints.apply_completion()
+	session.route_state["next_index"] = 2
+	session.world_flags["prologue_completed"] = true
+	session.world_flags["daijiro_intervened"] = true
+	var scout := session.start_combat("goblin_scout")
+	scout.enemy.current_hp = 1
+	scout.advance_ticks(scout.hero.definition.attack_startup_ticks + 1)
+	var old := _as_legacy(service.capture(session), 5)
+	old["profile"]["route_state"]["next_index"] = 1
+	var migrated := service.migrate(old)
+	context.check(service.validate(migrated), "Migrated pending scout profile validates")
+	context.check(old["profile"]["route_state"]["next_index"] == 1, "Migration leaves the source untouched")
+	context.check(migrated["checkpoints"]["first_trace_snapshot"]["profile"]["route_state"]["next_index"] == 0, "An initial checkpoint still points to the first slime")
+	context.check(migrated["checkpoints"]["manual_snapshots"][0]["profile"]["route_state"]["next_index"] == 1, "An old checkpoint after one slime gains the new encounter")
+	var restored := GameSession.new()
+	restored.apply_state_dto(migrated)
+	context.check(restored.next_route_node().get("node_id") == "forest_edge_goblin" and GameRoot.route_for_continue(restored) == "combat", "Pending scout stays at the cart and resumes its result")
+	context.check(DomainSuite.claim_pending(restored) and restored.route_completed(), "A migrated scout victory still completes the route on claim")
+	old["pending_battle_result"] = {}
+	old["profile"]["route_state"] = {"route_id": "forest_edge_slice", "next_index": 2, "completed": true}
+	var completed := service.migrate(old)
+	context.check(service.validate(completed) and completed["profile"]["route_state"]["next_index"] == 3, "Completed old routes remain completed")
 
 func _test_round_trip(context: TestContext) -> void:
 	var path: String = _path("round_trip")
@@ -40,7 +72,7 @@ func _test_round_trip(context: TestContext) -> void:
 	session.inventory.equip(charms[0].instance_id)
 	var echoes: Array[ItemInstance] = session.inventory.add(session.get_item_definition("echo_crystal"), 2, "goblin")
 	echoes[0].secured = true
-	session.currency = 42
+	session.wallet[GameSession.COPPER] = 42
 	session.quest_flags["quest"] = "started"
 	session.npc_flags["npc"] = true
 	session.world_flags["tree"] = "fallen"
@@ -55,7 +87,7 @@ func _test_round_trip(context: TestContext) -> void:
 	session.checkpoints.begin()
 	session.checkpoints.advance_ticks(CheckpointService.CHANNEL_TICKS)
 	session.checkpoints.apply_completion()
-	session.currency = 77
+	session.wallet[GameSession.COPPER] = 77
 	session.traces = 1
 	session.hero.set_void_traces(1)
 	session.location_id = "forest_edge"
@@ -66,8 +98,8 @@ func _test_round_trip(context: TestContext) -> void:
 	context.check(restored.hero.level == 2 and restored.hero.pending_upgrade_choices == 0 and restored.hero.max_hp == 18, "Hero level, upgrade and trace-adjusted HP survive")
 	context.check(restored.inventory.items.size() == 4 and restored.inventory.is_equipped(charms[0].instance_id), "Item instances, delivery and equipment survive")
 	context.check(restored.inventory.get_item(echoes[0].instance_id).secured and restored.inventory.get_item(echoes[0].instance_id).aspect_id == "goblin", "Crystal security and aspect survive")
-	context.check(restored.currency == 77 and restored.quest_flags["quest"] == "started" and restored.world_flags["tree"] == "fallen", "Currency and narrative/world flags survive")
-	context.check(restored.checkpoints.manual_snapshots.size() == 1 and restored.checkpoints.manual_snapshots[0]["profile"]["currency"] == 42, "Checkpoint snapshot remains distinct from current state")
+	context.check(restored.wallet[GameSession.COPPER] == 77 and restored.quest_flags["quest"] == "started" and restored.world_flags["tree"] == "fallen", "Currency and narrative/world flags survive")
+	context.check(restored.checkpoints.manual_snapshots.size() == 1 and restored.checkpoints.manual_snapshots[0]["profile"]["wallet"][GameSession.COPPER] == "42", "Checkpoint snapshot remains distinct from current state")
 	context.check(restored.echoes == 3 and restored.memory_flags.has("memory") and restored.adaptation_nodes.has("node") and restored.techniques.has("technique") and restored.enemy_journal.has("moss_slime"), "Meta progression survives")
 	context.check(restored.traces == 1, "Traces survive")
 	context.check(restored.pending_reward.is_empty(), "Legacy pending reward is consumed by the one-time delivery")
@@ -84,7 +116,7 @@ func _test_stable_round_trip(context: TestContext) -> void:
 	var path: String = _path("stable")
 	var service := SaveService.new()
 	var session := GameSession.new()
-	session.currency = 19
+	session.wallet[GameSession.COPPER] = 19
 	session.checkpoints.begin()
 	session.checkpoints.advance_ticks(CheckpointService.CHANNEL_TICKS)
 	session.checkpoints.apply_completion()
@@ -100,29 +132,29 @@ func _test_backup(context: TestContext) -> void:
 	var path: String = _path("backup")
 	var service := SaveService.new()
 	var session := GameSession.new()
-	session.currency = 10
+	session.wallet[GameSession.COPPER] = 10
 	service.save(session, path)
-	session.currency = 20
+	session.wallet[GameSession.COPPER] = 20
 	service.save(session, path)
 	_write_text(path, "{broken")
 	var restored := GameSession.new()
 	context.check(service.load_into(restored, path), "Backup is used when primary is malformed")
-	context.check(service.loaded_from_backup and restored.currency == 10, "Previous valid state, not the latest corrupt write, is restored")
+	context.check(service.loaded_from_backup and restored.wallet[GameSession.COPPER] == 10, "Previous valid state, not the latest corrupt write, is restored")
 	_cleanup(path)
 
 func _test_rejection(context: TestContext) -> void:
 	var service := SaveService.new()
 	var session := GameSession.new()
-	session.currency = 55
+	session.wallet[GameSession.COPPER] = 55
 	var missing: String = _path("missing")
 	context.check(not service.load_into(session, missing) and service.last_error.is_empty(), "Missing profile is an empty state, not a crash or error")
-	context.check(session.currency == 55, "Missing profile does not mutate the session")
+	context.check(session.wallet[GameSession.COPPER] == 55, "Missing profile does not mutate the session")
 	var malformed: String = _path("malformed")
 	_write_text(malformed, "not json")
-	context.check(not service.load_into(session, malformed) and session.currency == 55, "Malformed JSON is rejected without partial apply")
+	context.check(not service.load_into(session, malformed) and session.wallet[GameSession.COPPER] == 55, "Malformed JSON is rejected without partial apply")
 	var incomplete: String = _path("incomplete")
 	_write_text(incomplete, JSON.stringify({"schema_version": 1, "profile": {}}))
-	context.check(not service.load_into(session, incomplete) and session.currency == 55, "Incomplete DTO is rejected without partial apply")
+	context.check(not service.load_into(session, incomplete) and session.wallet[GameSession.COPPER] == 55, "Incomplete DTO is rejected without partial apply")
 	_cleanup(malformed)
 	_cleanup(incomplete)
 
@@ -140,12 +172,11 @@ func _test_newer_version(context: TestContext) -> void:
 func _test_migration(context: TestContext) -> void:
 	var path: String = _path("migration")
 	var service := SaveService.new()
-	var old: Dictionary = service.capture(GameSession.new())
+	var old: Dictionary = _as_legacy(service.capture(GameSession.new()), 0)
 	var loot: Dictionary = old["loot"]
 	old.erase("loot")
 	old["loot_seed"] = loot["seed"]
 	old["loot_state"] = loot["state"]
-	old["schema_version"] = 0
 	var migrated: Dictionary = service.migrate(old)
 	context.check(old["schema_version"] == 0 and not old.has("loot"), "Migration does not mutate its source")
 	context.check(migrated.get("schema_version") == SaveService.CURRENT_VERSION and service.validate(migrated), "Sequential migration produces a valid current DTO")
@@ -159,8 +190,7 @@ func _test_v1_pending_reward_delivery(context: TestContext) -> void:
 	var service := SaveService.new()
 	# Регрессия UX-07: сейв v1 с незабранной добычей. v1 начислял XP сразу,
 	# поэтому доставка приносит только предметы и ровно один раз.
-	var dto: Dictionary = service.capture(GameSession.new())
-	dto["schema_version"] = 1
+	var dto: Dictionary = _as_legacy(service.capture(GameSession.new()), 1)
 	dto["profile"].erase("route_state")
 	dto["profile"].erase("run_sequence")
 	dto["pending_reward"] = [{"item_id": "slime_residue", "quantity": 2, "aspect_id": ""}]
@@ -190,14 +220,14 @@ func _test_write_failure(context: TestContext) -> void:
 	var path: String = _path("write_failure")
 	var service := SaveService.new()
 	var session := GameSession.new()
-	session.currency = 77
+	session.wallet[GameSession.COPPER] = 77
 	service.save(session, path)
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(path + ".tmp"))
-	session.currency = 99
+	session.wallet[GameSession.COPPER] = 99
 	context.check(not service.save(session, path) and not service.last_error.is_empty(), "A temporary-file failure is reported")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path + ".tmp"))
 	var restored := GameSession.new()
-	context.check(service.load_into(restored, path) and restored.currency == 77, "Failed write leaves previous primary intact")
+	context.check(service.load_into(restored, path) and restored.wallet[GameSession.COPPER] == 77, "Failed write leaves previous primary intact")
 	_cleanup(path)
 
 func _test_safe_boundaries(context: TestContext) -> void:
@@ -273,8 +303,7 @@ func _test_v3_pending_source_policy(context: TestContext) -> void:
 	var session := GameSession.new()
 	var resolver: CombatResolver = session.start_combat("moss_slime")
 	resolver.advance_ticks(600)
-	var dto: Dictionary = service.capture(session)
-	dto["schema_version"] = 3
+	var dto: Dictionary = _as_legacy(service.capture(session), 3)
 	dto["profile"]["pending_battle_result"] = dto["pending_battle_result"].duplicate(true)
 	dto["profile"]["trial_echo_claimed"] = false
 	dto["meta"].erase("trial_echo_claimed")
@@ -323,8 +352,7 @@ func _legacy_dto(version: int) -> Dictionary:
 	session.checkpoints.begin()
 	session.checkpoints.advance_ticks(CheckpointService.CHANNEL_TICKS)
 	session.checkpoints.apply_completion()
-	var dto: Dictionary = service.capture(session)
-	dto["schema_version"] = version
+	var dto: Dictionary = _as_legacy(service.capture(session), version)
 	var profiles: Array[Dictionary] = [dto["profile"], dto["checkpoints"]["first_trace_snapshot"]["profile"]]
 	for snapshot: Dictionary in dto["checkpoints"]["manual_snapshots"]:
 		profiles.append(snapshot["profile"])
@@ -340,6 +368,20 @@ func _legacy_dto(version: int) -> Dictionary:
 		dto["loot_seed"] = dto["loot"]["seed"]
 		dto["loot_state"] = dto["loot"]["state"]
 		dto.erase("loot")
+	return dto
+
+func _as_legacy(dto: Dictionary, version: int) -> Dictionary:
+	dto["schema_version"] = version
+	var snapshots: Array = [dto["checkpoints"]["first_trace_snapshot"]]
+	snapshots.append_array(dto["checkpoints"]["manual_snapshots"])
+	if not dto["checkpoints"]["pending_completion"].is_empty():
+		snapshots.append(dto["checkpoints"]["pending_completion"])
+	var profiles: Array[Dictionary] = [dto["profile"]]
+	for snapshot: Dictionary in snapshots:
+		profiles.append(snapshot["profile"])
+	for profile: Dictionary in profiles:
+		profile["currency"] = int(profile["wallet"][GameSession.COPPER])
+		profile.erase("wallet")
 	return dto
 
 func _path(case_name: String) -> String:
@@ -415,8 +457,7 @@ func _test_pending_continue(context: TestContext) -> void:
 	var historical := GameSession.new()
 	var old_resolver: CombatResolver = historical.start_combat("moss_slime")
 	old_resolver.advance_ticks(600)
-	var dto: Dictionary = service.capture(historical)
-	dto["schema_version"] = 4
+	var dto: Dictionary = _as_legacy(service.capture(historical), 4)
 	dto["pending_battle_result"]["items"].append({"item_id": "training_sword", "quantity": 1, "aspect_id": "", "slot_id": "weapon"})
 	var historical_path: String = _path("v4_pending_equipment")
 	_write_text(historical_path, JSON.stringify(dto))
@@ -436,18 +477,103 @@ func _test_sale_persistence(context: TestContext) -> void:
 	session.checkpoints.begin()
 	session.checkpoints.advance_ticks(CheckpointService.CHANNEL_TICKS)
 	session.checkpoints.apply_completion()
-	context.check(session.sell_item(crystals[0].instance_id, 2) and session.currency == 4000 and crystals[0].quantity == 1, "Sale removes crystals and credits their copper price in one domain transaction")
+	context.check(session.sell_item(crystals[0].instance_id, 2) and session.wallet[GameSession.COPPER] == 40 and crystals[0].quantity == 1, "Sale removes crystals and credits their copper price in one domain transaction")
 	context.check(service.save(session, path), "The sale saves")
 	var restored := GameSession.new()
-	context.check(service.load_into(restored, path) and restored.currency == 4000 and restored.inventory.get_item(crystals[0].instance_id).quantity == 1, "Save/load preserves both sides of the sale")
-	context.check(session.sell_item(crystals[0].instance_id, 1) and session.currency == 6000 and session.inventory.get_item(crystals[0].instance_id) == null, "Selling the last crystal removes its stack")
+	context.check(service.load_into(restored, path) and restored.wallet[GameSession.COPPER] == 40 and restored.inventory.get_item(crystals[0].instance_id).quantity == 1, "Save/load preserves both sides of the sale")
+	context.check(session.sell_item(crystals[0].instance_id, 1) and session.wallet[GameSession.COPPER] == 60 and session.inventory.get_item(crystals[0].instance_id) == null, "Selling the last crystal removes its stack")
 	context.check(service.save(session, path), "The second sale creates a previous-state backup")
 	_write_text(path, "{broken")
 	var backup := GameSession.new()
-	context.check(service.load_into(backup, path) and backup.currency == 4000 and backup.inventory.get_item(crystals[0].instance_id).quantity == 1, "A corrupt primary restores matching wallet and stack from .bak")
+	context.check(service.load_into(backup, path) and backup.wallet[GameSession.COPPER] == 40 and backup.inventory.get_item(crystals[0].instance_id).quantity == 1, "A corrupt primary restores matching wallet and stack from .bak")
 	session.start_combat("moss_slime")
 	session.abandon_combat()
-	context.check(session.checkpoints.restore() and session.currency == 0 and session.inventory.get_item(crystals[0].instance_id).quantity == 3, "Checkpoint rollback restores the wallet and sold crystals together")
+	context.check(session.checkpoints.restore() and session.wallet[GameSession.COPPER] == 0 and session.inventory.get_item(crystals[0].instance_id).quantity == 3, "Checkpoint rollback restores the wallet and sold crystals together")
 	var branch: ItemInstance = EquipmentModel.slot(session, "weapon")["item"]
-	context.check(not session.sell_item(branch.instance_id) and session.currency == 0, "Equipment without an explicit sellable rule cannot be exchanged")
+	context.check(not session.sell_item(branch.instance_id) and session.wallet[GameSession.COPPER] == 0, "Equipment without an explicit sellable rule cannot be exchanged")
+	_cleanup(path)
+
+func _test_shop_purchase_persistence(context: TestContext) -> void:
+	var path: String = _path("shop_purchase")
+	var service := SaveService.new()
+	var session := GameSession.new()
+	var crystals: Array[ItemInstance] = session.inventory.add(session.get_item_definition("echo_crystal"), 1, "moss")
+	# Печать до сделок: откат должен вернуть кошелёк, кристалл и предложение.
+	session.checkpoints.begin()
+	session.checkpoints.advance_ticks(CheckpointService.CHANNEL_TICKS)
+	session.checkpoints.apply_completion()
+	session.world_flags[GameSession.WORLD_FLAG_LIOREN_SHOP_UNLOCKED] = true
+	session.seen_cue_ids["tutorial_shop_sale"] = true
+	context.check(session.sell_item(crystals[0].instance_id, 1) and session.wallet[GameSession.COPPER] == 20, "Sale credits 20 copper")
+	context.check(session.buy_item("wanderer_jacket") and session.wallet[GameSession.COPPER] == 8, "Jacket purchase leaves 8 copper")
+	context.check(service.save(session, path), "The purchase saves")
+	var restored := GameSession.new()
+	context.check(
+		service.load_into(restored, path)
+		and restored.wallet[GameSession.COPPER] == 8
+		and restored.shop_access_unlocked()
+		and restored.seen_cue_ids.has("tutorial_shop_sale")
+		and restored.inventory.items.any(func(item: ItemInstance) -> bool: return item.definition_id == "wanderer_jacket")
+		and bool(restored.shop_offers()[0].get("sold_out", false)),
+		"Save/load preserves wallet, shop access, jacket and the spent offer"
+	)
+	session.start_combat("moss_slime")
+	session.abandon_combat()
+	context.check(session.checkpoints.restore(), "Checkpoint restore runs after the shop deals")
+	context.check(session.wallet[GameSession.COPPER] == 0, "Rollback returns the pre-sale wallet")
+	context.check(session.inventory.items.all(func(item: ItemInstance) -> bool: return item.definition_id != "wanderer_jacket"), "Rollback removes the bought jacket")
+	context.check(session.inventory.filter("echo").size() == 1, "Rollback returns the sold crystal")
+	context.check(not bool(session.shop_offers()[0].get("sold_out", false)), "Rollback restores the one-per-story offer")
+	context.check(not bool(session.world_flags.get(GameSession.WORLD_FLAG_SHOP_FIRST_SALE_DONE, false)), "Rollback reverts the sale milestone together with the deal")
+	context.check(session.seen_cue_ids.has("tutorial_shop_sale"), "Rollback keeps dismissed tutorials in profile meta")
+	_cleanup(path)
+
+func _test_wallet_persistence(context: TestContext) -> void:
+	var service := SaveService.new()
+	var session := GameSession.new()
+	var copper: String = GameSession.COPPER
+	var silver: String = GameSession.SILVER
+	var gold: String = GameSession.GOLD
+	session.location_id = GameSession.LOCATION_LIOREN
+	session.world_flags[GameSession.WORLD_FLAG_LIOREN_SHOP_UNLOCKED] = true
+	session.wallet[copper] = 2800
+	var crystal: ItemDefinition = session.get_item_definition("echo_crystal")
+	var old_crystal: ItemInstance = session.inventory.add(crystal, 1, "", {"sale_price_copper": 2000})[0]
+	var custom_crystal: ItemInstance = session.inventory.add(crystal, 1, "", {"sale_price_copper": 15})[0]
+	session.checkpoints.refresh_first_trace()
+	session.wallet[copper] = 4000
+	session.checkpoints.begin()
+	session.checkpoints.advance_ticks(CheckpointService.CHANNEL_TICKS)
+	session.checkpoints.apply_completion()
+	session.wallet[copper] = 10000
+	session.checkpoints.begin()
+	session.checkpoints.advance_ticks(CheckpointService.CHANNEL_TICKS)
+	session.wallet[copper] = 10101
+	var old := _as_legacy(service.capture(session), 6)
+	var path: String = _path("wallet")
+	_write_text(path, JSON.stringify(old))
+	var restored := GameSession.new()
+	context.check(service.load_into(restored, path) and restored.wallet == {copper: 10101, silver: 0, gold: 0}, "The v6 balance migrates to copper at face value")
+	context.check(restored.inventory.get_item(old_crystal.instance_id).sale_price_copper == 20 and restored.inventory.get_item(custom_crystal.instance_id).sale_price_copper == 15, "Only the former standard crystal price is replaced during migration")
+	context.check(restored.checkpoints.first_trace_snapshot["profile"]["wallet"][copper] == "2800", "First Trace keeps its own migrated balance")
+	context.check(restored.checkpoints.pending_completion["profile"]["wallet"][copper] == "10000", "A staged checkpoint keeps its own migrated balance")
+	context.check(restored.exchange_coins(copper, silver, 101, restored.coin_exchange_quote(copper, silver)), "Migrated copper can be exchanged at the merchant")
+	context.check(restored.exchange_coins(silver, gold, 1, restored.coin_exchange_quote(silver, gold)), "Migrated funds can be exchanged through both rates")
+	context.check(service.save(restored, path), "All three coin balances save together")
+	var reloaded := GameSession.new()
+	context.check(service.load_into(reloaded, path) and reloaded.wallet == {copper: 1, silver: 1, gold: 1}, "Reload preserves the three exact balances")
+	reloaded.awaiting_return = true
+	context.check(reloaded.checkpoints.restore() and reloaded.wallet == {copper: 4000, silver: 0, gold: 0}, "Checkpoint restores the wallet as a unit")
+	reloaded.wallet[gold] = GameSession.MAX_ASTRAS
+	context.check(service.save(reloaded, path) and service.load_into(restored, path) and restored.wallet[gold] == GameSession.MAX_ASTRAS, "Even the maximum balance survives an exact JSON round trip")
+	var invalid := service.capture(restored)
+	invalid["profile"]["wallet"][gold] = "9223372036854775808"
+	context.check(not service.validate(invalid), "Out-of-range coin amounts are refused")
+	var pending_session := GameSession.new()
+	var resolver: CombatResolver = pending_session.start_combat("moss_slime")
+	resolver.advance_ticks(600)
+	var pending := _as_legacy(service.capture(pending_session), 6)
+	pending["pending_battle_result"]["items"][0]["sale_price_copper"] = 2000
+	var migrated := service.migrate(pending)
+	context.check(service.validate(migrated) and migrated["pending_battle_result"]["items"][0]["sale_price_copper"] == 20, "An unclaimed crystal adopts the new copper price without re-rolling rewards")
 	_cleanup(path)

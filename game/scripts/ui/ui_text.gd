@@ -18,6 +18,7 @@ const ASPECT_LABELS: Dictionary = {
 }
 const TYPE_LABELS: Dictionary = {
 	"weapon": "Оружие",
+	"armor": "Доспех",
 	"charm": "Амулет",
 	"material": "Материал",
 	"echo": "Кристалл Эха",
@@ -47,6 +48,7 @@ const ENEMY_LABELS: Dictionary = {
 	"goblin_scout": "Гоблин-разведчик",
 	"goblin_trial": "Гоблин-испытание",
 }
+const COIN_SUFFIXES: Dictionary = {GameSession.COPPER: "мед.", GameSession.SILVER: "сер.", GameSession.GOLD: "зол."}
 
 
 static func rarity(rarity_id: String) -> String:
@@ -76,29 +78,35 @@ static func location(location_id: String) -> String:
 static func enemy_name(enemy_id: String) -> String:
 	return String(ENEMY_LABELS.get(enemy_id, enemy_id))
 
-static func astra(copper: int) -> String:
-	var value: int = maxi(0, copper)
-	if value >= 100 and value % 100 == 0:
-		return "%s сер." % _grouped(value / 100)
-	return "%s мед." % _grouped(value)
+static func astra(amount: int, coin: String = GameSession.COPPER) -> String:
+	return _grouped(amount) + " " + COIN_SUFFIXES[coin]
 
-static func currency_compact(copper: int) -> String:
-	var value: int = maxi(0, copper)
-	if value < 1000:
-		return str(value)
-	var units: Array[String] = ["K", "M", "B", "T", "Q"]
-	var scaled: float = float(value)
-	var unit: String = ""
-	for next_unit: String in units:
-		scaled /= 1000.0
-		unit = next_unit
-		if scaled < 1000.0:
-			break
-	var shortened: float = floorf(scaled * 10.0) / 10.0
-	return ("%d" % int(shortened)) + unit if is_equal_approx(shortened, floorf(shortened)) else ("%.1f%s" % [shortened, unit])
+static func astra_compact(amount: int, coin: String = GameSession.COPPER) -> String:
+	return coin_count(amount) + " " + COIN_SUFFIXES[coin]
 
-static func currency_exact(copper: int) -> String:
-	return "%s мед. астры" % _grouped(maxi(0, copper))
+static func coin_count(amount: int) -> String:
+	var value: int = maxi(0, amount)
+	var scale: int = 1000
+	if value < 10000:
+		return _grouped(value)
+	var units: Array[String] = ["K", "M", "B", "T", "Q", "E"]
+	var unit_index: int = 0
+	@warning_ignore_start("integer_division")
+	while value / scale >= 1000:
+		scale *= 1000
+		unit_index += 1
+	var compact: String = str(value / scale)
+	var tenths: int = (value % scale) / (scale / 10)
+	@warning_ignore_restore("integer_division")
+	if tenths > 0:
+		compact += ",%d" % tenths
+	return compact + units[unit_index]
+
+static func wallet(wallet_balances: Dictionary[String, int], separator: String = " · ") -> String:
+	var amounts: PackedStringArray = []
+	for coin: String in GameSession.COIN_TYPES:
+		amounts.append(astra(wallet_balances[coin], coin))
+	return separator.join(amounts)
 
 static func _grouped(value: int) -> String:
 	var digits: String = str(maxi(0, value))

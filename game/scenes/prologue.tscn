@@ -210,37 +210,38 @@ theme_override_font_sizes/font_size = 9
 theme_override_colors/font_color = Color(0.914, 0.894, 0.847, 1)
 autowrap_mode = 3
 
-[node name="HoldArea" type="PanelContainer" parent="SafeArea/DialoguePanel/Margin/Column"]
+[node name="HoldArea" type="PanelContainer" parent="SafeArea"]
 unique_name_in_owner = true
 visible = false
-layout_mode = 2
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 1
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -36.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 0
 
-[node name="Margin" type="MarginContainer" parent="SafeArea/DialoguePanel/Margin/Column/HoldArea"]
+[node name="HoldLabel" type="Label" parent="SafeArea/HoldArea"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 5
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 5
-
-[node name="Column" type="VBoxContainer" parent="SafeArea/DialoguePanel/Margin/Column/HoldArea/Margin"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 3
-
-[node name="HoldLabel" type="Label" parent="SafeArea/DialoguePanel/Margin/Column/HoldArea/Margin/Column"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.851, 0.706, 0.361, 1)
+theme_override_colors/font_color = Color(0.125, 0.125, 0.086, 1)
 theme_override_font_sizes/font_size = 10
 text = "Спасти"
 accessibility_name = "Спасти: удерживайте палец до заполнения индикатора"
 horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="HoldProgressBar" type="ProgressBar" parent="SafeArea/DialoguePanel/Margin/Column/HoldArea/Margin/Column"]
+[node name="HoldProgressBar" type="ProgressBar" parent="SafeArea/HoldArea/HoldLabel"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 8)
-layout_mode = 2
+visible = false
+layout_mode = 1
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -2.0
 mouse_filter = 2
 show_percentage = false
 max_value = 100.0
@@ -286,5 +287,5 @@ theme_override_font_sizes/font_size = 8
 autowrap_mode = 2
 
 [connection signal="gui_input" from="StoryArt/HotspotMarker" to="." method="_on_hotspot_gui_input"]
-[connection signal="gui_input" from="SafeArea/DialoguePanel/Margin/Column/HoldArea" to="." method="_on_hold_area_gui_input"]
+[connection signal="gui_input" from="SafeArea/HoldArea" to="." method="_on_hold_area_gui_input"]
 [connection signal="pressed" from="SafeArea/SkipButton" to="." method="_on_skip_pressed"]

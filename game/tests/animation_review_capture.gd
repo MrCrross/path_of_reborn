@@ -53,6 +53,8 @@ func _run() -> void:
 	viewport.add_child(host)
 	for enemy: String in ["moss_slime", "goblin_scout"]:
 		var session := GameSession.new()
+		if enemy == "goblin_scout":
+			session.route_state["next_index"] = 2
 		session.select_encounter(enemy)
 		var scene: Control = await _screen("combat", session)
 		scene.set_physics_process(false)

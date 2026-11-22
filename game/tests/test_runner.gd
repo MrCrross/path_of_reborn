@@ -7,7 +7,7 @@ const CheckpointSuite = preload("res://tests/checkpoint_suite.gd")
 const SaveSuite = preload("res://tests/save_suite.gd")
 const DialogueSuite = preload("res://tests/dialogue_suite.gd")
 const UxSuite = preload("res://tests/ux_suite.gd")
-const EXPECTED_TEST_CASES: int = 89
+const EXPECTED_TEST_CASES: int = 95
 
 var _passed: int = 0
 var _failed: int = 0

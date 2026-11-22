@@ -1,0 +1,4 @@
+[
+  {"id":"DIA_TRAIL_CART_001","speaker":"Харуто","text":"Телега перевёрнута… Там торговец! Гоблин замахнулся на него.","shot":"cart_lookout","once":true},
+  {"id":"DIA_TRAIL_CART_002","speaker":"Харуто","text":"Надо ему помочь. Брошу камень и отвлеку гоблина.","shot":"cart_lookout","destination":"world","commands":[{"type":"set_world_flag","key":"daijiro_spotted","value":true}]}
+]

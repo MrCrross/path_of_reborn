@@ -1,6 +1,7 @@
 extends SceneTree
 
 const OUT := "res://../docs/reviews/first_session_iteration_2026_11_21"
+const MERCHANT_OUT := "res://../docs/reviews/merchant_stage_2026_11_22/reaudit"
 const WINDOW_SIZES: Array[Vector2i] = [Vector2i(360, 640), Vector2i(360, 800), Vector2i(390, 844), Vector2i(412, 915)]
 
 var _checks: int = 0
@@ -36,11 +37,18 @@ func _run() -> void:
 			await _movie_flow()
 		"active":
 			await _active_flow()
+		"merchant":
+			await _merchant_flow()
 		_:
 			_check(false, "Unknown acceptance mode")
 	_report["failed"] = _failed
 	_report["checks_count"] = _checks
-	var file := FileAccess.open(OUT + "/verification/" + _mode + "_report.json", FileAccess.WRITE)
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(_out_dir() + "/verification"))
+	var file := FileAccess.open(_out_dir() + "/verification/" + _mode + "_report.json", FileAccess.WRITE)
+	if file == null:
+		printerr("FAIL cannot write report for mode %s" % _mode)
+		quit(1)
+		return
 	file.store_string(JSON.stringify(_report, "\t"))
 	file.close()
 	print("FIRST_SESSION_ACCEPTANCE mode=%s checks=%d failed=%d" % [_mode, _checks, _failed])
@@ -99,13 +107,15 @@ func _flow() -> void:
 	await _measure_windows("checkpoint")
 	await _click(_game.router.current_screen.back_button)
 	await _tap_world_progress()
-	_check(_game.router.current_screen.name == "Combat", "A free-area tap starts the first encounter")
+	await _first_slime_dialogue(true)
+	_check(_game.router.current_screen.name == "Combat", "Finishing the first dialogue starts the encounter")
 	var combat: Control = _game.router.current_screen
 	_check(combat.resolver.auto_dodge_enabled and not combat.dodge_button.visible, "Clean profile keeps full auto as the default")
 	await _wait_intro(combat)
 	await _capture("06_slime")
 	_check(not combat.format_label.get_global_rect().intersects(combat.pause_button.get_global_rect()), "Mode HUD and Pause do not intersect at 360x640")
 	await _wait_result(combat)
+	await _dismiss_tutorial(combat)
 	await _capture("07_first_loot")
 	_check(_game.session.inventory.items.size() == 1 and not _has_item("echo_crystal") and _game.session.has_pending_battle_result(), "Victory waits for claim without granting the crystal")
 	var result_id: String = String(_game.session.pending_battle_result.get("result_id", ""))
@@ -128,7 +138,12 @@ func _flow() -> void:
 	_report["first_upgrade"]["strength_after"] = _game.session.hero.strength
 	await _measure_windows("inventory")
 	await _click(inventory.back_button)
-	await _tap_world_progress()
+	await _click(_game.router.current_screen.inventory_button)
+	_check(_game.router.current_screen.name == "Inventory", "The backpack displays the new equipment illustrations")
+	await _frames(90)
+	await _measure_windows("backpack")
+	await _click(_game.router.current_screen.back_button)
+	await _second_slime_and_lookout(true)
 	await _advance_merchant_to_combat()
 	combat = _game.router.current_screen
 	_check(combat.name == "Combat" and not _has_item("training_sword"), "Daijiro's introduction starts the story fight without an early sword")
@@ -141,6 +156,7 @@ func _flow() -> void:
 	_check(merchant.gift_layer.visible and not _has_item("training_sword"), "Gratitude opens the separate gift card before its claim")
 	await _click(merchant.equip_button)
 	_check(_game.router.current_screen.name == "World" and _has_item("training_sword"), "Daijiro grants exactly one sword after the completed introduction")
+	await _dismiss_tutorial(_game.router.current_screen)
 	await _capture("11_end_of_trail")
 	_check("К испытанию" in _game.router.current_screen.main_action_button.text, "Scout completion promotes the trial")
 	await _click(_game.router.current_screen.repeats_button)
@@ -221,6 +237,7 @@ func _active_flow() -> void:
 	await _click(_game.router.current_screen.skip_button)
 	await _frames(30)
 	await _tap_world_progress()
+	await _first_slime_dialogue()
 	var combat: Control = _game.router.current_screen
 	_check(combat.name == "Combat", "Active fixture enters its first combat")
 	if combat.name != "Combat":
@@ -234,7 +251,6 @@ func _active_flow() -> void:
 	await _wait_result(combat)
 	await _claim_result(combat)
 	await _tap_world_progress()
-	await _advance_merchant_to_combat()
 	combat = _game.router.current_screen
 	await _wait_intro(combat)
 	_check(combat.attack_button.visible and combat.dodge_button.visible and combat.format_label.text == "Ручной", "Next encounter enables intentional manual attack and dodge")
@@ -248,6 +264,7 @@ func _movie_flow() -> void:
 	await _click(_game.router.current_screen.skip_button)
 	await _frames(90)
 	await _tap_world_progress()
+	await _first_slime_dialogue()
 	var combat: Control = _game.router.current_screen
 	await _wait_result(combat, 1200)
 	await _frames(90)
@@ -255,10 +272,359 @@ func _movie_flow() -> void:
 	await _frames(90)
 	_check(_game.router.current_screen.name == "World", "Movie route completes a normal-speed encounter")
 
+## Штатный путь этапа «Дайдзиро и первая торговля»: первая слизь → кристалл →
+## «В Лиорен» → ворота → оценка → продажа ×1 → покупка куртки → Сумка →
+## повторный вход в лавку. Суммы учебного примера: 20 мед. → 12 мед. → 8 мед.
+func _merchant_flow() -> void:
+	await _click(_game.router.current_screen.begin_button)
+	await _click(_game.router.current_screen.skip_button)
+	await _frames(30)
+	# Узел 1: первая слизь, гарантированный кристалл для будущей продажи.
+	await _tap_world_progress()
+	await _first_slime_dialogue()
+	var combat: Control = _game.router.current_screen
+	_check(combat.name == "Combat", "Merchant fixture enters its first combat")
+	await _wait_intro(combat)
+	await _wait_result(combat)
+	_check(combat.result_panel.summary_button.visible and not combat.result_panel.card.visible, "Victory first shows HP and Echo with an OK button")
+	await _click(combat.result_panel.summary_button)
+	_check(combat.get_node_or_null("ConfirmDialog") != null, "The first item opens the gesture tutorial")
+	await _capture("17_loot_tutorial")
+	await _press_android_back()
+	_check(_game.router.current_screen == combat and combat.get_node_or_null("ConfirmDialog") == null and _game.session.has_pending_battle_result(), "Android Back dismisses only the loot tutorial")
+	await _click(combat.result_panel.detail_button)
+	_check(combat.details_layer.visible and _game.session.has_pending_battle_result(), "The top-right information button opens details without claiming loot")
+	await _click(combat.detail_close)
+	await _measure_windows("loot")
+	await _capture("18_loot_card")
+	await _claim_result(combat)
+	_check(_game.router.current_screen.name == "World" and _game.session.inventory.filter("echo").size() >= 1, "First slime grants an echo crystal for the future sale")
+	# Вторая слизь, затем встреча у телеги, бой с разведчиком и подарок меча.
+	await _second_slime_and_lookout()
+	_check(_game.router.current_screen.name == "Merchant", "Daijiro lookout leads to the stone-throw scene before the scout")
+	await _measure_windows("cart")
+	await _capture("19_cart_dialogue")
+	await _advance_merchant_to_combat()
+	combat = _game.router.current_screen
+	await _wait_result(combat)
+	await _claim_result(combat)
+	_check(_game.router.current_screen.name == "Merchant", "The story win returns to Daijiro before granting the sword")
+	var aftermath: Control = _game.router.current_screen
+	_check(aftermath._daijiro != null and aftermath._cart != null, "Daijiro and the cart have a separate post-battle composition")
+	await _capture("19c_cart_aftermath")
+	await _advance_merchant_to_gift()
+	var merchant: Control = _game.router.current_screen
+	_check(merchant.gift_layer.visible and not _has_item("training_sword"), "Gratitude opens the gift card before its claim")
+	await _click(merchant.store_button)
+	_check(_game.router.current_screen.name == "World" and _has_item("training_sword"), "Daijiro grants exactly one sword after the completed introduction")
+	_check(_game.session.inventory.filter("weapon").size() == 2, "The old branch stays in the backpack beside the single new sword")
+	# «В Лиорен»: сцена ворот открывает лавку.
+	var world: Control = _game.router.current_screen
+	_check(world.travel_button.visible, "Travel action appears after the gift")
+	_check(world.get_node_or_null("ConfirmDialog") != null, "Trail instructions open as a dismissible tutorial")
+	await _dismiss_tutorial(world)
+	await _capture("19b_trail")
+	await _click(world.travel_button)
+	await _frames(5)
+	_check(_game.session.location_id == "lioren", "Travel applies the Lioren location")
+	world = _game.router.current_screen
+	_check(world.gates_dialogue.is_active(), "First arrival opens the gates scene")
+	await _measure_windows("gates")
+	await _capture("20_gates")
+	await _click(world.gates_dialogue.next_button)
+	await _new_game_root()
+	await _click(_game.router.current_screen.continue_button)
+	world = _game.router.current_screen
+	_check(world.gates_dialogue.is_active() and world.gates_dialogue.runner.current_cue().get("id") != "DIA_CITY_001", "Continue resumes the gates with the first unread line")
+	for step: int in range(30):
+		world = _game.router.current_screen
+		if world.name != "World" or not world.gates_dialogue.is_active():
+			break
+		await _click(world.gates_dialogue.next_button)
+	_check(_game.router.current_screen.name == "Shop" and _game.session.shop_access_unlocked(), "Gates finish opens the shop")
+	# Первый визит: оценка с итоговым действием «Оценить кристалл».
+	var shop: Control = _game.router.current_screen
+	_check(shop.dialogue.is_active(), "First shop entry starts the appraisal")
+	await _measure_windows("appraisal")
+	await _capture("21_shop_intro")
+	await _click_through_dialogue()
+	shop = _game.router.current_screen
+	_check(shop.name == "Shop" and not shop.dialogue.is_active(), "Appraisal completes back in the catalog")
+	_check(bool(_game.session.world_flags.get(GameSession.WORLD_FLAG_SHOP_INTRO_DONE, false)), "Appraisal records its story flag")
+	_check(shop.get_node_or_null("ConfirmDialog") != null, "The sale tutorial opens in a separate modal")
+	await _press_android_back()
+	_check(_game.router.current_screen == shop and shop.get_node_or_null("ConfirmDialog") == null and _game.session.seen_cue_ids.has("tutorial_shop_sale"), "Android Back dismisses and remembers the sale tutorial without leaving the shop")
+	await _capture("22_shop_appraisal")
+	await _click(shop.buy_tab)
+	await _click(shop.rows_box.get_child(0))
+	_check(shop.deal_confirm.disabled and "Не хватает" in shop.deal_reason.text, "An unaffordable purchase explains the missing balance")
+	await _press_back()
+	_check(not shop.deal_layer.visible and root.gui_get_focus_owner() == shop.rows_box.get_child(0), "Back closes only the deal and restores the row focus")
+	await _click(shop.sell_tab)
+	# Первая продажа: одна строка, карточка, «20 мед.».
+	var sell_row: Button = shop.rows_box.get_child(0)
+	await _click(sell_row)
+	_check(shop.deal_layer.visible, "Sell row opens the deal card")
+	_check("20 мед." in shop.deal_summary.text, "Deal card shows the live crystal revenue in copper")
+	await _measure_windows("deal")
+	await _capture("23_deal_sell")
+	var blocker: String = ProjectSettings.globalize_path(_save_path + ".tmp")
+	_check(DirAccess.make_dir_recursive_absolute(blocker) == OK, "The isolated profile blocks the next write")
+	var quantity_before: int = _game.session.inventory.get_item(shop._deal["instance_id"]).quantity
+	await _click(shop.deal_confirm)
+	_check(_game.session.wallet[GameSession.COPPER] == 0 and shop.deal_layer.visible and not shop.deal_confirm.disabled, "Write failure keeps the sale card open and leaves the wallet unchanged")
+	_check(_game.session.inventory.get_item(shop._deal["instance_id"]).quantity == quantity_before, "Failed sale leaves the original stack intact")
+	DirAccess.remove_absolute(blocker)
+	await _click(shop.deal_confirm)
+	_check(_game.session.wallet[GameSession.COPPER] == 20, "Selling one crystal credits 20 copper")
+	_check(bool(_game.session.world_flags.get(GameSession.WORLD_FLAG_SHOP_FIRST_SALE_DONE, false)), "The first sale records its milestone")
+	_check(shop.get_node_or_null("ConfirmDialog") != null, "The first sale opens the purchase tutorial once")
+	await _dismiss_tutorial(shop)
+	# Первая покупка: куртка за 12 мед., остаток 8 мед.
+	shop = _game.router.current_screen
+	await _click(shop.buy_tab)
+	await _click(shop.rows_box.get_child(0))
+	_check("12 мед." in shop.deal_summary.text and "8 мед." in shop.deal_summary.text, "Jacket card shows the cost and the resulting balance")
+	await _measure_windows("purchase")
+	await _capture("24_deal_buy")
+	await _click(shop.deal_confirm)
+	_check(_game.session.wallet[GameSession.COPPER] == 8, "Jacket purchase leaves 8 copper")
+	_check(_game.session.inventory.items.any(func(item: ItemInstance) -> bool: return item.definition_id == "wanderer_jacket"), "Bought jacket lands in the inventory")
+	shop = _game.router.current_screen
+	_check(shop.dialogue.is_active(), "First purchase opens the guild briefing")
+	await _capture("24b_shop_purchase_dialogue")
+	for step: int in range(12):
+		if not shop.dialogue.is_active() or shop.dialogue.runner.current_cue().get("id") != "DIA_SHOP_P01":
+			break
+		await _click(shop.dialogue.next_button)
+	await _new_game_root()
+	await _click(_game.router.current_screen.continue_button)
+	shop = _game.router.current_screen
+	_check(shop.dialogue.is_active() and shop.dialogue.runner.current_cue().get("id") != "DIA_SHOP_P01", "Continue resumes the guild briefing without replaying read lines")
+	await _click_through_dialogue()
+	shop = _game.router.current_screen
+	_check(shop.bag_button.visible, "Briefing offers the bag shortcut for the jacket")
+	await _click(shop.bag_button)
+	var bag: Control = _game.router.current_screen
+	_check(bag.name == "Inventory" and bag.details_layer.visible, "Bag opens with the jacket card")
+	await _capture("25_bag_jacket")
+	await _click(bag.equip_action)
+	_check(_game.session.hero.defense == 3, "Jacket equips from the bag and adds one defense")
+	await _measure_windows("inventory")
+	# Повторный вход: приветствие и торговля сразу. Back сначала закрывает
+	# карточку предмета — повторяем штатный путь ввода.
+	await _click(bag.detail_close)
+	await _click(bag.back_button)
+	var city: Control = _game.router.current_screen
+	_check(city.name == "World" and _game.session.location_id == "lioren", "Bag returns to the Lioren city mode")
+	_check(not city.main_action_button.visible, "The city keeps the hidden combat action")
+	await _tap_world_progress()
+	_check(_game.router.current_screen == city, "A background tap in Lioren does not start combat")
+	await _measure_windows("city")
+	await _click(city.shop_button)
+	shop = _game.router.current_screen
+	_check(shop.name == "Shop" and "Снова ты" in shop.status_label.text, "Repeat entry greets with one line and trade is open")
+	_check(shop.talk_button.visible, "Optional conversation is available after the introduction")
+	_check(shop.get_node_or_null("ConfirmDialog") == null and _game.session.seen_cue_ids.has("tutorial_shop_sale") and _game.session.seen_cue_ids.has("tutorial_shop_purchase"), "Dismissed shop tutorials stay closed across visits and profile reload")
+	await _measure_windows("shop")
+	await _capture("26_shop_welcome")
+	await _click(shop.talk_button)
+	_check(shop.dialogue.is_active(), "Optional talk opens on explicit interaction")
+	await _press_android_back()
+	_check(not shop.dialogue.is_active() and root.gui_get_focus_owner() == shop.talk_button, "Android Back dismisses only the optional talk and restores its focus")
+	await _click(shop.talk_button)
+	await _click_through_dialogue()
+	_check(not shop.talk_button.visible, "The completed optional conversation leaves no inactive action")
+	await _verify_merchant_edge_profiles()
+	await _verify_shop_exchange()
+
+func _verify_shop_exchange() -> void:
+	var shop: Control = _game.router.current_screen
+	var copper: String = GameSession.COPPER
+	var silver: String = GameSession.SILVER
+	var gold: String = GameSession.GOLD
+	await _click(shop.exchange_tab)
+	var first_rate: Button = shop.rows_box.get_child(0)
+	await _click(first_rate)
+	_check(shop.deal_confirm.disabled and "Не хватает 73 мед." in shop.deal_reason.text, "Exchange explains exactly how much copper is missing")
+	await _press_android_back()
+	_check(not shop.deal_layer.visible and root.gui_get_focus_owner() == first_rate, "Back cancels an exchange and restores its row focus")
+	_game.session.wallet[copper] = 128
+	_game.session.wallet[silver] = 99
+	_check(_game.save_service.save(_game.session, _save_path), "The isolated exchange wallet is saved")
+	await _click(shop.back_button)
+	await _click(_game.router.current_screen.shop_button)
+	shop = _game.router.current_screen
+	await _click(shop.exchange_tab)
+	var rates: Array[String] = ["100 мед. → 1 сер.", "100 сер. → 1 зол.", "1 зол. → 100 сер.", "1 сер. → 100 мед."]
+	var row_indices: Array[int] = [0, 2, 3, 1]
+	var expected: Array[Dictionary] = [
+		{copper: 28, silver: 100, gold: 0}, {copper: 28, silver: 0, gold: 1},
+		{copper: 28, silver: 100, gold: 0}, {copper: 128, silver: 99, gold: 0},
+	]
+	for index: int in range(WINDOW_SIZES.size()):
+		var window_size: Vector2i = WINDOW_SIZES[index]
+		DisplayServer.window_set_size(window_size)
+		await _frames(8)
+		var row: Button = shop.rows_box.get_child(row_indices[index])
+		await _click(row)
+		_check(DisplayServer.window_get_size() == window_size and shop.deal_layer.visible and _out_of_window_control(shop).is_empty(), "Exchange card fits the real %s window" % window_size)
+		_check(rates[index] in shop.deal_summary.text and "После обмена" in shop.deal_summary.text, "The card shows the rate and both resulting balances")
+		if index == 0:
+			var blocker: String = ProjectSettings.globalize_path(_save_path + ".tmp")
+			_check(DirAccess.make_dir_recursive_absolute(blocker) == OK, "Exchange fixture blocks its next write")
+			await _click(shop.deal_confirm)
+			_check(shop.deal_layer.visible and not shop.deal_confirm.disabled and "сохранить" in shop.deal_reason.text, "Exchange retains an actionable confirmation after a write failure")
+			_check(_game.session.wallet == {copper: 128, silver: 99, gold: 0}, "Failed exchange keeps both balances")
+			DirAccess.remove_absolute(blocker)
+		await _capture("exchange_deal_%dx%d" % [window_size.x, window_size.y])
+		await _click(shop.deal_confirm)
+		_check(not shop.deal_layer.visible and _game.session.wallet == expected[index], "Each exchange changes only the selected coin balances")
+		for coin: String in GameSession.COIN_TYPES:
+			var amount: Label = shop.wallet_labels[coin]
+			var icon: TextureRect = amount.get_parent().get_child(0)
+			_check(amount.accessibility_name == UiText.astra(expected[index][coin], coin) and icon.texture == UiIcons.astra(coin), "The shop shows the exact balance and icon for %s" % coin)
+		_check(root.gui_get_focus_owner() == shop.rows_box.get_child(row_indices[index]), "Exchange returns focus to the selected rate")
+		await _capture("exchange_catalog_%dx%d" % [window_size.x, window_size.y])
+	var restored := GameSession.new()
+	_check(_game.save_service.load_into(restored, _save_path) and restored.wallet == expected.back(), "Reload restores the three coin balances after exchange")
+
+func _verify_merchant_edge_profiles() -> void:
+	var forced := GameSession.new()
+	forced.world_flags["prologue_completed"] = true
+	forced.mark_path_started()
+	forced.location_id = GameSession.LOCATION_LIOREN
+	forced.traces = 3
+	forced.hero.set_void_traces(3)
+	_check(_game.save_service.save(forced, _save_path), "Forced Lioren fixture is saved in isolation")
+	await _new_game_root()
+	await _click(_game.router.current_screen.continue_button)
+	var city: Control = _game.router.current_screen
+	_check(city.name == "World" and city.rest_button.visible and not city.shop_button.visible and not city.gates_dialogue.is_active(), "Forced Lioren offers rest before meeting Daijiro")
+	await _click(city.rest_button)
+	await _click(city.travel_button)
+	_check(_game.session.location_id == GameSession.LOCATION_FOREST_EDGE and _game.session.traces == 0, "Rest opens the route back to the Trail")
+
+	var legacy := GameSession.new()
+	legacy.world_flags["prologue_completed"] = true
+	legacy.mark_path_started()
+	legacy.inventory.add(legacy.get_item_definition("training_sword"), 1)
+	legacy.story_rewards[GameSession.DAIJIRO_SWORD_REWARD_ID] = true
+	legacy.wallet[GameSession.COPPER] = 12
+	_check(_game.save_service.save(legacy, _save_path), "Historically funded profile with a sword and no crystals saves")
+	await _new_game_root()
+	await _click(_game.router.current_screen.continue_button)
+	var trail: Control = _game.router.current_screen
+	_check(trail.name == "World" and trail.travel_button.visible and not trail.gates_dialogue.is_active(), "Continue opens travel for older owners of the sword")
+	await _click(trail.travel_button)
+	for step: int in range(30):
+		if _game.router.current_screen != trail or not trail.gates_dialogue.is_active():
+			break
+		await _click(trail.gates_dialogue.next_button)
+	var shop: Control = _game.router.current_screen
+	_check(shop.name == "Shop" and shop.dialogue.runner.current_cue().get("text", "").begins_with("Кристаллы Эха можно продать"), "Appraisal with no crystal gives the right dialogue")
+	if shop.name != "Shop":
+		return
+	await _click_through_dialogue()
+	_check(shop.get_node_or_null("ConfirmDialog") == null and shop.rows_box.get_child(0) is Label, "Empty Sell shows the route to loot without a blocked tutorial")
+	await _click(shop.buy_tab)
+	await _click(shop.rows_box.get_child(0))
+	_check(not shop.deal_confirm.disabled and "12 мед." in shop.deal_summary.text, "The funded player can buy without selling first")
+	await _press_back()
+	await _press_back()
+	_check(_game.router.current_screen.name == "World" and _game.session.wallet[GameSession.COPPER] == 12, "Esc leaves an unconfirmed purchase and returns to the city")
+	var crystal: ItemDefinition = _game.session.get_item_definition("echo_crystal")
+	_game.session.inventory.add(crystal, 1)
+	var second_stack: ItemInstance = _game.session.inventory.add(crystal, 2, "", {"sale_price_copper": 15})[0]
+	var second_stack_id: String = second_stack.instance_id
+	city = _game.router.current_screen
+	await _click(city.shop_button)
+	shop = _game.router.current_screen
+	await _dismiss_tutorial(shop)
+	await _click(shop.rows_box.get_child(1))
+	await _click(shop.deal_confirm)
+	await _dismiss_tutorial(shop)
+	_check(_game.session.inventory.get_item(second_stack_id).quantity == 1 and _game.session.wallet[GameSession.COPPER] == 27, "Partial sale keeps the rest of the second stack at its own price")
+	_check(root.gui_get_focus_owner() == shop.rows_box.get_child(1), "Partial sale restores focus to the second row after rebuilding the list")
+
+func _dismiss_tutorial(screen: Control) -> void:
+	var dialog: ConfirmDialog = screen.get_node_or_null("ConfirmDialog")
+	if dialog != null:
+		await _click(dialog._confirm)
+
+func _press_back() -> void:
+	var press := InputEventKey.new()
+	press.keycode = KEY_ESCAPE
+	press.pressed = true
+	root.push_input(press, true)
+	var release := InputEventKey.new()
+	release.keycode = KEY_ESCAPE
+	root.push_input(release, true)
+	await _frames(3)
+
+func _press_android_back() -> void:
+	root.propagate_notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
+	await _frames(3)
+
+
+func _click_through_dialogue() -> void:
+	for step: int in range(40):
+		var screen: Control = _game.router.current_screen
+		if screen.name != "Shop" or screen.dialogue == null or not screen.dialogue.is_active():
+			return
+		await _click(screen.dialogue.next_button)
+
+
 func _tap_world_progress() -> void:
 	var screen: Control = _game.router.current_screen
 	var point: Vector2 = Vector2(screen.size.x * 0.5, screen.size.y * 0.42)
 	await _tap(point)
+
+func _first_slime_dialogue(capture: bool = false) -> void:
+	var screen: Control = _game.router.current_screen
+	_check(screen.name == "TrailDialogue" and not _game.session.in_combat, "First trail tap opens dialogue before starting combat")
+	if screen.name != "TrailDialogue":
+		return
+	if capture:
+		await _measure_windows("slime_approach")
+	for step: int in range(8):
+		if _game.router.current_screen != screen:
+			break
+		if capture and screen.dialogue.runner.current_shot() == "slime_leaps":
+			for frame: int in range(60):
+				if screen._leap_progress >= 0.4:
+					break
+				await _frames(1)
+			_check(screen.slime.position.y < SceneStaging.floor_y(screen.size.y) - 8, "The slime jumps toward Haruto while the second line is visible")
+			await _capture("05b_slime_leap")
+		await _click(screen.dialogue.next_button)
+
+func _second_slime_and_lookout(capture: bool = false) -> void:
+	await _tap_world_progress()
+	var combat: Control = _game.router.current_screen
+	_check(combat.name == "Combat" and _game.session.active_encounter_context.get("route_node_id") == "forest_edge_cart_slime", "Second trail tap starts a distinct slime encounter")
+	if combat.name != "Combat":
+		return
+	await _wait_result(combat)
+	_check(not _game.session.pending_battle_result.get("echo_gained", true), "Second slime does not award the first-species Echo again")
+	await _claim_result(combat)
+	var lookout: Control = _game.router.current_screen
+	_check(lookout.name == "TrailDialogue" and not _game.session.world_flags.get("daijiro_intervened", false), "The second slime leads to the separate lookout before Haruto throws")
+	if lookout.name != "TrailDialogue":
+		return
+	if capture:
+		await _measure_windows("cart_lookout")
+		await _click(lookout.dialogue.next_button)
+		await _new_game_root()
+		await _click(_game.router.current_screen.continue_button)
+		lookout = _game.router.current_screen
+		_check(lookout.name == "TrailDialogue" and lookout.dialogue.runner.current_cue().get("id") == "DIA_TRAIL_CART_002", "Continue restores the unread lookout line after the second battle")
+		if lookout.name != "TrailDialogue":
+			return
+	for step: int in range(8):
+		if _game.router.current_screen != lookout:
+			break
+		await _click(lookout.dialogue.next_button)
 
 
 func _tap(point: Vector2) -> void:
@@ -278,28 +644,37 @@ func _tap(point: Vector2) -> void:
 
 
 func _claim_result(screen: Control) -> void:
-	for step: int in range(8):
-		if not _game.session.has_pending_battle_result():
+	if screen.result_panel.summary_button.is_visible_in_tree():
+		await _click(screen.result_panel.summary_button)
+	await _dismiss_tutorial(screen)
+	var items: Array = _game.session.pending_battle_result.get("items", [])
+	for _item: Dictionary in items:
+		if not screen.result_panel.card.is_visible_in_tree():
 			break
 		await _click(screen.result_panel.card)
-	_check(not _game.session.has_pending_battle_result(), "Every visible reward card participates in one atomic claim")
+	_check(screen.result_panel.can_claim() and _game.session.has_pending_battle_result(), "The last reward leads to the level card before the atomic claim")
+	if screen.result_panel.can_claim():
+		await _click(screen.result_panel.claim_button)
+	_check(not _game.session.has_pending_battle_result(), "Confirming the level applies every reward in one atomic claim")
 
 
 func _advance_merchant_to_combat() -> void:
-	for step: int in range(16):
+	for step: int in range(24):
 		var screen: Control = _game.router.current_screen
-		if screen.name != "Merchant":
+		if screen.name != "Merchant" or screen.dialogue == null or not screen.dialogue.is_active():
 			break
-		await _click(screen.next_button)
+		await _click(screen.dialogue.next_button)
 	_check(_game.router.current_screen.name == "Combat", "Daijiro's intervention leads to the story scout encounter")
 
 
 func _advance_merchant_to_gift() -> void:
-	for step: int in range(16):
+	for step: int in range(24):
 		var screen: Control = _game.router.current_screen
 		if screen.name != "Merchant" or screen.gift_layer.visible:
 			break
-		await _click(screen.next_button)
+		if screen.dialogue == null or not screen.dialogue.is_active():
+			break
+		await _click(screen.dialogue.next_button)
 
 
 func _wait_intro(screen: Control) -> void:
@@ -339,20 +714,26 @@ func _measure_windows(label: String) -> void:
 		}
 		_report["windows"].append(measurement)
 		_check(screen.size.y >= 320.0 and Rect2(Vector2.ZERO, Vector2(window_size)).encloses(gameplay_rect), "%s uses the real %s window within integer-scale bounds" % [label, window_size])
-		_check(_visible_bounds_valid(screen), "%s has no visible out-of-window controls at %s" % [label, window_size])
+		var offender: String = _out_of_window_control(screen)
+		_check(offender.is_empty(), "%s has no visible out-of-window controls at %s%s" % [label, window_size, ": " + offender if not offender.is_empty() else ""])
 		if label == "world" and window_size == Vector2i(390, 844):
 			await _capture("16_tall_view")
+		if label == "shop" and window_size == Vector2i(412, 915):
+			await _capture("26b_shop_welcome_tall")
+		if label in ["slime_approach", "cart_lookout", "backpack"]:
+			await _capture("%s_%dx%d" % [label, window_size.x, window_size.y])
 	DisplayServer.window_set_size(Vector2i(360, 640))
 	await _frames(8)
 
-func _visible_bounds_valid(screen: Control) -> bool:
+## Имя первого видимого контрола за пределами экрана; пусто — всё в границах.
+func _out_of_window_control(screen: Control) -> String:
 	for node: Node in screen.find_children("*", "Control", true, false):
 		var control: Control = node
 		if not control.is_visible_in_tree() or not (control is Button or control is Label):
 			continue
 		if not screen.get_global_rect().grow(0.5).encloses(control.get_global_rect()):
-			return false
-	return true
+			return "%s rect=%s screen=%s" % [control.name, control.get_global_rect(), screen.get_global_rect()]
+	return ""
 
 func _has_item(item_id: String) -> bool:
 	for item: ItemInstance in _game.session.inventory.items:
@@ -424,11 +805,15 @@ func _hold(control: Control, runner: DialogueRunner) -> void:
 	root.push_input(release, true)
 	await _frames(3)
 
+func _out_dir() -> String:
+	return MERCHANT_OUT if _mode == "merchant" else OUT
+
+
 func _capture(label: String) -> void:
 	await _frames(4)
 	RenderingServer.force_draw()
 	var image: Image = root.get_texture().get_image()
-	var path: String = ProjectSettings.globalize_path(OUT + "/" + label + ".png")
+	var path: String = ProjectSettings.globalize_path(_out_dir() + "/" + label + ".png")
 	DirAccess.make_dir_recursive_absolute(path.get_base_dir())
 	var error: Error = image.save_png(path)
 	_report["captures"].append({"label": label, "size": [image.get_width(), image.get_height()], "error": error})

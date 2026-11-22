@@ -1,0 +1,4 @@
+[
+  {"id":"DIA_TRAIL_SLIME_001","speaker":"Харуто","text":"Что там шевелится под мхом? Глаза?..","shot":"slime_waits","once":true},
+  {"id":"DIA_TRAIL_SLIME_002","speaker":"Харуто","text":"Оно прыгает прямо на меня!","shot":"slime_leaps","destination":"world","commands":[{"type":"set_world_flag","key":"first_slime_spotted","value":true}]}
+]

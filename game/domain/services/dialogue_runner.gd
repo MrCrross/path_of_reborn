@@ -11,13 +11,15 @@ const TRANSITION_TICKS: int = 12
 const HOLD_TICKS: int = 45
 const PAGE_CHARACTERS: int = 88
 const ALLOWED_KINDS: Array[String] = ["line", "look", "hold", "title"]
-const ALLOWED_DESTINATIONS: Array[String] = ["world"]
+const ALLOWED_DESTINATIONS: Array[String] = ["world", "shop", "lioren"]
 const ALLOWED_ENTERS: Array[String] = ["", "approach", "signal", "rescue_motion", "flash", "night_pause", "threshold", "wing_glitch", "offer_gift", "title"]
 const ALLOWED_COMMANDS: Array[String] = ["set_world_flag", "set_npc_flag"]
 
 var entries: Array[Dictionary] = []
 var session: GameSession
 var first_pass_only: bool = false
+## Сюжетная веха откатывается Печатью, а прочитанные реплики остаются в meta.
+var replay_seen_commands: bool = false
 ## Character fallback for standalone/headless callers without a shaped policy.
 var page_character_limit: int = PAGE_CHARACTERS
 ## Presentation can inject shaped pages; standalone use keeps the text fallback.
@@ -299,6 +301,8 @@ func _skip_unavailable_cues() -> void:
 	while index < entries.size():
 		var cue: Dictionary = entries[index]
 		var seen: bool = bool(cue.get("once", false)) and session.seen_cue_ids.has(cue["id"])
+		if replay_seen_commands and not cue.get("commands", []).is_empty():
+			seen = false
 		var outside_first_pass: bool = first_pass_only and not bool(cue.get("first_pass", false))
 		if not seen and not outside_first_pass:
 			break

@@ -86,7 +86,7 @@ func _ready() -> void:
 	note.add_theme_font_size_override("font_size", 8)
 	column.add_child(note)
 	balance_label = Label.new()
-	balance_label.text = "Точный баланс\n" + UiText.currency_exact(session.currency)
+	balance_label.text = "Точный баланс\n" + UiText.wallet(session.wallet)
 	balance_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	balance_label.add_theme_font_size_override("font_size", 9)
 	column.add_child(balance_label)

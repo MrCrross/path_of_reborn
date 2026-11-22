@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://domain/definitions/item_definition.gd" id="1_item"]
+[ext_resource type="Script" path="res://domain/definitions/stat_modifier_definition.gd" id="2_modifier"]
+
+[sub_resource type="Resource" id="Resource_defense"]
+script = ExtResource("2_modifier")
+source_id = "item_definition"
+stat_id = "defense"
+amount = 1
+
+[resource]
+script = ExtResource("1_item")
+id = "wanderer_jacket"
+display_name = "Куртка странника"
+description = "Плотная дорожная куртка. Не броня из баллад, но на дороге держит удар лучше молитвы."
+rarity_id = "common"
+type_id = "armor"
+slot_id = "armor"
+stack_limit = 1
+level = 1
+sale_price_copper = 0
+sellable = false
+modifiers = Array[StatModifierDefinition]([SubResource("Resource_defense")])

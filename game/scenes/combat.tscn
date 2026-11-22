@@ -123,19 +123,20 @@ theme_override_colors/font_color = Color(0.949, 0.761, 0.306, 1)
 theme_override_colors/font_outline_color = Color(0.145, 0.086, 0.031, 1)
 theme_override_constants/outline_size = 5
 
-[node name="ResultPanel" type="PanelContainer" parent="."]
+[node name="ResultPanel" type="PanelContainer" parent="HudSafeArea/Hud"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
 anchor_bottom = 1.0
 grow_horizontal = 2
-grow_vertical = 2
-offset_left = 12.0
-offset_top = 98.0
-offset_right = -12.0
-offset_bottom = -2.0
+grow_vertical = 0
+offset_left = -66.0
+offset_top = -8.0
+offset_right = 66.0
+offset_bottom = -8.0
 script = ExtResource("4_result")
 
 [node name="Actions" type="HBoxContainer" parent="HudSafeArea/Hud"]

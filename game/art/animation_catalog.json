@@ -293,6 +293,244 @@
       }
     ]
   },
+  "characters/animations/haruto_exiled_sword_idle_sheet.png": {
+    "frame": [
+      970,
+      1293
+    ],
+    "count": 2,
+    "scale": 0.09903381642512077,
+    "offset": [
+      0.0,
+      -484.5
+    ],
+    "regions": [
+      {
+        "region": [
+          2,
+          2,
+          470,
+          828
+        ],
+        "margin": [
+          220,
+          303,
+          500,
+          465
+        ]
+      },
+      {
+        "region": [
+          485,
+          2,
+          479,
+          833
+        ],
+        "margin": [
+          210,
+          298,
+          491,
+          460
+        ]
+      }
+    ]
+  },
+  "characters/animations/haruto_exiled_sword_attack_sheet.png": {
+    "frame": [
+      739,
+      740
+    ],
+    "count": 5,
+    "scale": 0.1729957805907173,
+    "offset": [
+      45.5,
+      -277.0
+    ],
+    "regions": [
+      {
+        "region": [
+          2,
+          2,
+          273,
+          474
+        ],
+        "margin": [
+          172,
+          173,
+          466,
+          266
+        ]
+      },
+      {
+        "region": [
+          449,
+          2,
+          313,
+          449
+        ],
+        "margin": [
+          142,
+          198,
+          426,
+          291
+        ]
+      },
+      {
+        "region": [
+          896,
+          2,
+          382,
+          447
+        ],
+        "margin": [
+          243,
+          200,
+          357,
+          293
+        ]
+      },
+      {
+        "region": [
+          2,
+          480,
+          443,
+          419
+        ],
+        "margin": [
+          296,
+          228,
+          296,
+          321
+        ]
+      },
+      {
+        "region": [
+          449,
+          480,
+          309,
+          463
+        ],
+        "margin": [
+          156,
+          184,
+          430,
+          277
+        ]
+      }
+    ]
+  },
+  "characters/animations/haruto_exiled_sword_dodge_sheet.png": {
+    "frame": [
+      674,
+      898
+    ],
+    "count": 4,
+    "scale": 0.14260869565217393,
+    "offset": [
+      0.0,
+      -336.0
+    ],
+    "regions": [
+      {
+        "region": [
+          2,
+          2,
+          343,
+          575
+        ],
+        "margin": [
+          146,
+          210,
+          331,
+          323
+        ]
+      },
+      {
+        "region": [
+          444,
+          2,
+          389,
+          515
+        ],
+        "margin": [
+          111,
+          270,
+          285,
+          383
+        ]
+      },
+      {
+        "region": [
+          2,
+          581,
+          438,
+          531
+        ],
+        "margin": [
+          64,
+          254,
+          236,
+          367
+        ]
+      },
+      {
+        "region": [
+          444,
+          581,
+          350,
+          572
+        ],
+        "margin": [
+          144,
+          213,
+          324,
+          326
+        ]
+      }
+    ]
+  },
+  "characters/animations/haruto_exiled_sword_hit_sheet.png": {
+    "frame": [
+      962,
+      1282
+    ],
+    "count": 2,
+    "scale": 0.09987819732034105,
+    "offset": [
+      0.0,
+      -480.0
+    ],
+    "regions": [
+      {
+        "region": [
+          2,
+          2,
+          554,
+          821
+        ],
+        "margin": [
+          125,
+          300,
+          408,
+          461
+        ]
+      },
+      {
+        "region": [
+          560,
+          2,
+          503,
+          821
+        ],
+        "margin": [
+          186,
+          300,
+          459,
+          461
+        ]
+      }
+    ]
+  },
   "characters/animations/mitsuki_offer_sheet.png": {
     "frame": [
       941,

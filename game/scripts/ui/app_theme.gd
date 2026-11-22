@@ -21,6 +21,13 @@ const COLOR_DANGER_TEXT := Color("202016")
 const COLOR_HERO_HP := Color("b9d99a")
 const COLOR_ENEMY_HP := Color("e68c78")
 const COLOR_PROGRESS := Color("e4bd6c")
+const COLOR_DIALOGUE_BG := Color("111a24e8")
+const COLOR_DIALOGUE_BORDER := Color("8fa3c0")
+const COLOR_DIALOGUE_TEXT := Color("e9e4d8")
+const DIALOGUE_TEXT_LINES := 3
+
+static func dialogue_speaker_color(speaker: String) -> Color:
+	return COLOR_ACCENT if speaker == "Харуто" else COLOR_MAGIC
 
 
 static func build() -> Theme:

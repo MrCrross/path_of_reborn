@@ -12,6 +12,6 @@ type_id = "echo"
 aspect_id = "unspecified"
 stack_limit = 99
 level = 1
-sale_price_copper = 2000
+sale_price_copper = 20
 sellable = true
 modifiers = Array[StatModifierDefinition]([])

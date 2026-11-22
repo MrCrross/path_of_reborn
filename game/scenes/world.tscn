@@ -33,7 +33,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 5
+stretch_mode = 6
 
 [node name="HeroSprite" type="TextureRect" parent="."]
 unique_name_in_owner = true
@@ -131,18 +131,6 @@ theme_override_colors/font_color = Color(0.78, 0.8, 0.86, 1)
 theme_override_colors/font_outline_color = Color(0.06, 0.11, 0.08, 1)
 theme_override_constants/outline_size = 3
 
-[node name="GoalPanel" type="PanelContainer" parent="Margin/Column"]
-visible = false
-layout_mode = 2
-theme_type_variation = &"HudPanel"
-
-[node name="GoalLabel" type="Label" parent="Margin/Column/GoalPanel"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 9
-theme_override_colors/font_color = Color(0.78, 0.8, 0.86, 1)
-autowrap_mode = 2
-
 [node name="LockedPanel" type="PanelContainer" parent="Margin/Column"]
 visible = false
 layout_mode = 2
@@ -176,13 +164,21 @@ theme_type_variation = &"PrimaryButton"
 theme_override_font_sizes/font_size = 9
 text = "Выбрать улучшение"
 
-[node name="MerchantButton" type="Button" parent="Margin/Column/BottomColumn"]
+[node name="TravelButton" type="Button" parent="Margin/Column/BottomColumn"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-custom_minimum_size = Vector2(0, 22)
-theme_override_font_sizes/font_size = 8
-text = "Оценка кристаллов у Дайдзиро"
+custom_minimum_size = Vector2(0, 24)
+theme_override_font_sizes/font_size = 9
+text = "В Лиорен"
+
+[node name="ShopButton" type="Button" parent="Margin/Column/BottomColumn"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+custom_minimum_size = Vector2(0, 24)
+theme_override_font_sizes/font_size = 9
+text = "В лавку"
 
 [node name="RepeatsButton" type="Button" parent="Margin/Column/BottomColumn"]
 unique_name_in_owner = true
@@ -286,9 +282,10 @@ text = "Закрыть"
 [connection signal="pressed" from="Margin/Column/TopBar/Row/LeftZone/SettingsButton" to="." method="_on_settings_pressed"]
 [connection signal="pressed" from="Margin/Column/TopBar/Row/RightZone/BalanceButton" to="." method="_on_balance_pressed"]
 [connection signal="pressed" from="Margin/Column/BottomColumn/UpgradeButton" to="." method="_on_hero_profile_pressed"]
+[connection signal="pressed" from="Margin/Column/BottomColumn/TravelButton" to="." method="_on_travel_pressed"]
+[connection signal="pressed" from="Margin/Column/BottomColumn/ShopButton" to="." method="_on_shop_pressed"]
 [connection signal="pressed" from="Margin/Column/BottomColumn/MainActionButton" to="." method="_on_main_action_pressed"]
 [connection signal="pressed" from="Margin/Column/BottomColumn/RepeatsButton" to="." method="_on_repeats_pressed"]
-[connection signal="pressed" from="Margin/Column/BottomColumn/MerchantButton" to="." method="_on_merchant_pressed"]
 [connection signal="gui_input" from="EncounterSheet/Dim" to="." method="_on_sheet_dismiss"]
 [connection signal="pressed" from="EncounterSheet/Panel/Column/SheetClose" to="." method="_on_sheet_close_pressed"]
 [connection signal="pressed" from="Margin/Column/BottomColumn/NavBar/InventoryButton" to="." method="_on_inventory_pressed"]
