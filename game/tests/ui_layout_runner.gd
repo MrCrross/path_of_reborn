@@ -91,6 +91,12 @@ func _run() -> void:
 			if id == "inventory":
 				for item: ItemDefinition in session.item_definitions.values():
 					session.inventory.add(item, 2)
+			if id == "guild":
+				session.location_id = GameSession.LOCATION_LIOREN
+				session.world_flags[GameSession.WORLD_FLAG_LIOREN_SHOP_UNLOCKED] = true
+				session.world_flags[GameSession.WORLD_FLAG_SHOP_PURCHASE_BRIEFING_DONE] = true
+				session.set_guild_visit_active(true)
+				session.seen_cue_ids[GameSession.GUILD_LAST_CUE_ID] = true
 			var screen: Control = await _screen(id, session)
 			_bounds(screen)
 			if id == "prologue":

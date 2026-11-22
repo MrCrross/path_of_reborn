@@ -13,6 +13,7 @@ const SCENES: Dictionary = {
 	"checkpoint": "res://scenes/checkpoint.tscn",
 	"merchant": "res://scenes/merchant.tscn",
 	"shop": "res://scenes/shop.tscn",
+	"guild": "res://scenes/guild.tscn",
 	"characters": "res://scenes/characters.tscn",
 	"settings": "res://scenes/settings.tscn",
 }
@@ -28,6 +29,8 @@ func configure(host: Control, session: GameSession) -> void:
 func go_to(scene_id: String) -> bool:
 	var open_hero: bool = scene_id == "hero_profile"
 	var screen_id: String = "characters" if open_hero else scene_id
+	if scene_id == "world_from_guild":
+		screen_id = "world"
 	if not SCENES.has(screen_id):
 		return false
 	var packed: PackedScene = load(SCENES[screen_id])
@@ -36,6 +39,8 @@ func go_to(scene_id: String) -> bool:
 		screen.call("configure", _session, true)
 	elif screen.has_method("configure"):
 		screen.call("configure", _session)
+	if scene_id == "world_from_guild":
+		screen.set("focus_guild_on_entry", true)
 	if screen.has_signal("navigate_requested"):
 		screen.connect("navigate_requested", go_to)
 	if is_instance_valid(current_screen):

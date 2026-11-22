@@ -973,15 +973,15 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        96,
-        128
+        288,
+        384
       ],
-      "sha256": "939672b8889a19e6491ac0fce11955eecf3c15b58154cc715b0324cc2b763490",
-      "rgba_sha256": "42c9c54517ce126f45dc3c05388b8469793a667b2f34a248f3511b11198533ba",
+      "sha256": "76c54c2cca435359ee4e947325d15845e812d956b616c902ecdf96e3a3d4e049",
+      "rgba_sha256": "c8146562938c6214bc6f5bfffca058e8c3028c834a847cebb4019036139d8c67",
       "priority": "P0",
       "source": {
-        "export": "art_working/identity_p0_2026_11_18/chr_08/normalized/midori_registrar_idle_v01.png",
-        "export_sha256": "939672b8889a19e6491ac0fce11955eecf3c15b58154cc715b0324cc2b763490",
+        "export": "art_working/guild_stage_2026_11_22/exports/midori_registrar_idle.png",
+        "export_sha256": "76c54c2cca435359ee4e947325d15845e812d956b616c902ecdf96e3a3d4e049",
         "manifest": "art_working/identity_p0_2026_11_18/manifest.json",
         "original": "art_working/identity_p0_2026_11_18/chr_08/source/midori_registrar_idle_v01.png",
         "original_sha256": "817bb0b212e346556b1f382b1fdf3e0e93ec4fc8d4bce8bc073b510fccaf955a",
@@ -989,8 +989,8 @@
         "prompt_sha256": "0b47153665a2707d25f231d43206a67e9313d290395ac277384437d5d9d3645e"
       },
       "pivot": [
-        48,
-        112
+        144,
+        336
       ]
     },
     {
@@ -1025,15 +1025,15 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        96,
-        128
+        288,
+        384
       ],
-      "sha256": "9bbfb164797aa6a45d993cc8ac47587bb300e7f18b97438b278bb446a7ff8819",
-      "rgba_sha256": "b824bd19aec9e66ef5decb890b689a0d32ab08a756805b3ae2bf409e93dbd924",
+      "sha256": "fbb86014a6eedcc044c256fc997c6b8dfd6894386b59f2e49f36138116fd69c7",
+      "rgba_sha256": "2e1cf7c56cb63885f4a0679bbd1782058e8c4cda329ee8ce2f5509d99643efcb",
       "priority": "P1",
       "source": {
-        "export": "art_working/lioren_gate_and_guild_p1_2026_11_18/chr_10/normalized/goro_guildmaster_idle_v01.png",
-        "export_sha256": "9bbfb164797aa6a45d993cc8ac47587bb300e7f18b97438b278bb446a7ff8819",
+        "export": "art_working/guild_stage_2026_11_22/exports/goro_guildmaster_idle.png",
+        "export_sha256": "fbb86014a6eedcc044c256fc997c6b8dfd6894386b59f2e49f36138116fd69c7",
         "manifest": "art_working/lioren_gate_and_guild_p1_2026_11_18/manifest.json",
         "original": "art_working/lioren_gate_and_guild_p1_2026_11_18/chr_10/source/goro_guildmaster_idle_v01.png",
         "original_sha256": "d0a0e2ce582feccd9e7cdc549350a714059f190fd898d85a24e49dd6085d1da3",
@@ -1041,8 +1041,8 @@
         "prompt_sha256": "80ce491a9891f10940d9a2bf382a7ce02930d269755d3587a7ec50ab8e92451e"
       },
       "pivot": [
-        48,
-        112
+        144,
+        336
       ]
     },
     {
@@ -1077,15 +1077,15 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        96,
-        128
+        288,
+        384
       ],
-      "sha256": "354680f184cf290b96ee55fbd98af4b48601adbb6b1ae79f9c44733b3eaae5cc",
-      "rgba_sha256": "badaa0bb629dbaf069cd812468d149392e38f334644594a75645ea4a0e54dd69",
+      "sha256": "9f71fb0fd11236eaa0173fd5488281d25f777dbdca239f2b8ac42990895d5e30",
+      "rgba_sha256": "ab783732e60aab9ab2c37d5994f2da9606c5725798efc8fea4d76d74aebff5a5",
       "priority": "P1",
       "source": {
-        "export": "art_working/whispering_grove_p1_2026_11_18/chr_12/normalized/kenta_novice_idle_v01.png",
-        "export_sha256": "354680f184cf290b96ee55fbd98af4b48601adbb6b1ae79f9c44733b3eaae5cc",
+        "export": "art_working/guild_stage_2026_11_22/exports/kenta_novice_idle.png",
+        "export_sha256": "9f71fb0fd11236eaa0173fd5488281d25f777dbdca239f2b8ac42990895d5e30",
         "manifest": "art_working/whispering_grove_p1_2026_11_18/manifest.json",
         "original": "art_working/whispering_grove_p1_2026_11_18/chr_12/source/kenta_novice_idle_v01.png",
         "original_sha256": "cabb655ca0d50d483d036b7712fe97e64e8c58c8564a580375673221d36d6261",
@@ -1093,8 +1093,8 @@
         "prompt_sha256": "7ce59ce020e09b13648891440d38aca8b2681089b12628217677d333ce752480"
       },
       "pivot": [
-        48,
-        112
+        144,
+        336
       ]
     },
     {
@@ -1679,15 +1679,15 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        180,
-        320
+        540,
+        960
       ],
-      "sha256": "8ec9733e1985d73e1ca15de448765bc04e7c7fd9ef96d8a0c458a4b811023048",
-      "rgba_sha256": "01763162d66b1a9c11fa590fafae2d479ae5ba244ccab4fe8a2c0ede9364cccc",
+      "sha256": "1be7dc9051fc1639719557777d1065d18a5595f87a4de2cde381ec4c0cb6f702",
+      "rgba_sha256": "2c17839c261b9546221b98588f3ff9ce8943040ad8025e5a565e34ac493140e4",
       "priority": "P0",
       "source": {
-        "export": "art_working/threshold_guild_routes_p0_2026_11_18/env_09/normalized/dawn_trail_guild_hall_background_v01.png",
-        "export_sha256": "8ec9733e1985d73e1ca15de448765bc04e7c7fd9ef96d8a0c458a4b811023048",
+        "export": "art_working/guild_stage_2026_11_22/exports/dawn_trail_guild_hall_background.png",
+        "export_sha256": "1be7dc9051fc1639719557777d1065d18a5595f87a4de2cde381ec4c0cb6f702",
         "manifest": "art_working/threshold_guild_routes_p0_2026_11_18/manifest.json",
         "original": "art_working/threshold_guild_routes_p0_2026_11_18/env_09/source/dawn_trail_guild_hall_background_v01.png",
         "original_sha256": "5736815d5b615e75b6be4becb04feb48b8fc9b66b8c8211381dc6b0042ef8cea",
@@ -3685,15 +3685,15 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        180,
-        320
+        540,
+        960
       ],
-      "sha256": "5fa68275952527d5bfa0508c81b7f37fd9762e9991abdffb997cf6cea982eac2",
-      "rgba_sha256": "b5831e7239e41a348b564f3b3ccbc472f752b1e547c53687802a7365ee4604b1",
+      "sha256": "422b2007426dddc1546f429efdb6efc6b36738a9028da148781e76dda4140d3a",
+      "rgba_sha256": "b429ed778b776419a7ca58064ca1a34acd9bc544e90f4e66f96383097b369d4a",
       "priority": "P1",
       "source": {
-        "export": "art_working/nar_guild_to_epilogue_p1_2026_11_18/nar_12/normalized/midori_registers_haruto_story_v01.png",
-        "export_sha256": "5fa68275952527d5bfa0508c81b7f37fd9762e9991abdffb997cf6cea982eac2",
+        "export": "art_working/guild_stage_2026_11_22/exports/midori_registers_haruto_story.png",
+        "export_sha256": "422b2007426dddc1546f429efdb6efc6b36738a9028da148781e76dda4140d3a",
         "manifest": "art_working/nar_guild_to_epilogue_p1_2026_11_18/manifest.json",
         "original": "art_working/nar_guild_to_epilogue_p1_2026_11_18/nar_12/source/midori_registers_haruto_story_v01.png",
         "original_sha256": "358d31f5c89af30fb5f68c4f62d3509024734677e15af9f0589335e78b79dbb4",

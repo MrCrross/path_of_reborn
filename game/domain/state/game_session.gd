@@ -56,6 +56,10 @@ const WORLD_FLAG_SHOP_FIRST_SALE_DONE: String = "shop_first_sale_done"
 const WORLD_FLAG_SHOP_FIRST_PURCHASE_DONE: String = "shop_first_purchase_done"
 const WORLD_FLAG_SHOP_PURCHASE_BRIEFING_DONE: String = "shop_purchase_briefing_done"
 const WORLD_FLAG_WANDERER_JACKET_PURCHASED: String = "wanderer_jacket_purchased"
+const FIRST_GUILD_ORDER_ID: String = "guild_moon_flax"
+const GUILD_LAST_CUE_ID: String = "DIA_GUILD_035"
+const WORLD_FLAG_GUILD_VISIT: String = "guild_visit_active"
+const WORLD_FLAG_GUILD_REGISTERED: String = "guild_registered"
 const LOOT_PATHS: Dictionary = {
 	"moss_slime": "res://data/loot/moss_slime.tres",
 	"goblin_scout": "res://data/loot/goblin_scout.tres",
@@ -820,6 +824,35 @@ func shop_access_unlocked() -> bool:
 
 func can_trade() -> bool:
 	return location_id == LOCATION_LIOREN and shop_access_unlocked() and not in_combat and not awaiting_return and not has_pending_reward()
+
+func can_visit_guild() -> bool:
+	return can_trade() and world_flags.get(WORLD_FLAG_SHOP_PURCHASE_BRIEFING_DONE, false) == true
+
+func guild_visit_active() -> bool:
+	return can_visit_guild() and world_flags.get(WORLD_FLAG_GUILD_VISIT, false) == true
+
+func set_guild_visit_active(active: bool) -> void:
+	if not can_visit_guild() or active == guild_visit_active():
+		return
+	if active:
+		world_flags[WORLD_FLAG_GUILD_VISIT] = true
+	else:
+		world_flags.erase(WORLD_FLAG_GUILD_VISIT)
+	profile_changed.emit()
+
+func guild_rank() -> String:
+	return "E" if world_flags.get(WORLD_FLAG_GUILD_REGISTERED, false) == true else ""
+
+func can_register_with_guild() -> bool:
+	return guild_visit_active() and guild_rank().is_empty() and seen_cue_ids.has(GUILD_LAST_CUE_ID)
+
+func register_with_guild() -> bool:
+	if not can_register_with_guild() or checkpoints.channel_active:
+		return false
+	world_flags[WORLD_FLAG_GUILD_REGISTERED] = true
+	quest_flags[FIRST_GUILD_ORDER_ID] = true
+	profile_changed.emit()
+	return true
 
 func coin_exchange_quote(from_coin: String, to_coin: String) -> Dictionary:
 	var from_index: int = COIN_TYPES.find(from_coin)

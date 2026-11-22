@@ -56,6 +56,9 @@ ASSET_PATHS: list[str] = [
     "enemies/animations/goblin_scout_retreat_sheet.png",
     # CHR-07 Дайдзиро-торговец (лавка и разговоры)
     "characters/daijiro_merchant_idle.png",
+    "characters/midori_registrar_idle.png",
+    "characters/goro_guildmaster_idle.png",
+    "characters/kenta_novice_idle.png",
     # Фоны локаций
     "environments/tokyo_crosswalk_background.png",
     "environments/white_threshold_background.png",
@@ -63,6 +66,7 @@ ASSET_PATHS: list[str] = [
     "environments/lioren_south_gate_background.png",
     "environments/props/daijiro_cart_overturned_prop.png",
     "environments/cricket_twilight_interior_background.png",
+    "environments/dawn_trail_guild_hall_background.png",
     # NAR-01..06 сюжетные кадры пролога
     "environments/story/haruto_tokyo_evening_story.png",
     "environments/story/haruto_crosswalk_alarm_story.png",
@@ -72,6 +76,7 @@ ASSET_PATHS: list[str] = [
     "environments/story/haruto_receives_path_seal_story.png",
     "environments/story/daijiro_cart_rescue_story.png",
     "environments/story/daijiro_crystal_appraisal_story.png",
+    "environments/story/midori_registers_haruto_story.png",
     # OBJ-07/08 реквизит пролога
     "environments/props/haruto_phone_prop.png",
     "environments/props/pedestrian_signal_prop.png",
@@ -109,6 +114,7 @@ ASSET_PATHS: list[str] = [
     "equipment/echo_growth_cloudy_icon.png",
     "equipment/echo_dusk_clear_icon.png",
     "equipment/wanderer_jacket_icon.png",
+    "equipment/dawn_trail_guild_badge_icon.png",
     "equipment/astra_copper_icon.png",
     "equipment/astra_silver_icon.png",
     "equipment/astra_gold_icon.png",

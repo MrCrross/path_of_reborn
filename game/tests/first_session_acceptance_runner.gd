@@ -2,6 +2,7 @@ extends SceneTree
 
 const OUT := "res://../docs/reviews/first_session_iteration_2026_11_21"
 const MERCHANT_OUT := "res://../docs/reviews/merchant_stage_2026_11_22/reaudit"
+const GUILD_OUT := "res://.godot/guild_acceptance"
 const WINDOW_SIZES: Array[Vector2i] = [Vector2i(360, 640), Vector2i(360, 800), Vector2i(390, 844), Vector2i(412, 915)]
 
 var _checks: int = 0
@@ -37,10 +38,12 @@ func _run() -> void:
 			await _movie_flow()
 		"active":
 			await _active_flow()
-		"merchant":
+		"merchant", "guild":
 			await _merchant_flow()
 		_:
 			_check(false, "Unknown acceptance mode")
+	if _mode == "guild":
+		_check(_report.get("guild_finished", false), "The guild scenario reached its final check")
 	_report["failed"] = _failed
 	_report["checks_count"] = _checks
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(_out_dir() + "/verification"))
@@ -350,6 +353,8 @@ func _merchant_flow() -> void:
 	await _click_through_dialogue()
 	shop = _game.router.current_screen
 	_check(shop.name == "Shop" and not shop.dialogue.is_active(), "Appraisal completes back in the catalog")
+	if _mode == "guild":
+		_check(not _game.session.can_visit_guild(), "The guild stays closed before the recommendation")
 	_check(bool(_game.session.world_flags.get(GameSession.WORLD_FLAG_SHOP_INTRO_DONE, false)), "Appraisal records its story flag")
 	_check(shop.get_node_or_null("ConfirmDialog") != null, "The sale tutorial opens in a separate modal")
 	await _press_android_back()
@@ -392,6 +397,8 @@ func _merchant_flow() -> void:
 	_check(_game.session.inventory.items.any(func(item: ItemInstance) -> bool: return item.definition_id == "wanderer_jacket"), "Bought jacket lands in the inventory")
 	shop = _game.router.current_screen
 	_check(shop.dialogue.is_active(), "First purchase opens the guild briefing")
+	if _mode == "guild":
+		_check(not _game.session.can_visit_guild(), "Buying the jacket alone does not finish the guild briefing")
 	await _capture("24b_shop_purchase_dialogue")
 	for step: int in range(12):
 		if not shop.dialogue.is_active() or shop.dialogue.runner.current_cue().get("id") != "DIA_SHOP_P01":
@@ -403,6 +410,12 @@ func _merchant_flow() -> void:
 	_check(shop.dialogue.is_active() and shop.dialogue.runner.current_cue().get("id") != "DIA_SHOP_P01", "Continue resumes the guild briefing without replaying read lines")
 	await _click_through_dialogue()
 	shop = _game.router.current_screen
+	if _mode == "guild":
+		await _click(shop.back_button)
+		await _new_game_root()
+		await _click(_game.router.current_screen.continue_button)
+		await _guild_flow()
+		return
 	_check(shop.bag_button.visible, "Briefing offers the bag shortcut for the jacket")
 	await _click(shop.bag_button)
 	var bag: Control = _game.router.current_screen
@@ -437,6 +450,107 @@ func _merchant_flow() -> void:
 	_check(not shop.talk_button.visible, "The completed optional conversation leaves no inactive action")
 	await _verify_merchant_edge_profiles()
 	await _verify_shop_exchange()
+
+func _guild_flow() -> void:
+	var city: Control = _game.router.current_screen
+	_check(city.name == "World" and city.guild_button.visible and city.shop_button.visible and city.travel_button.visible, "The finished briefing opens the guild beside the usual city actions")
+	_check(not city.equipment_strip.visible and city.inventory_button.visible, "Lioren hides the equipment strip and keeps the bag shortcut")
+	await _click(city.inventory_button)
+	_check(_game.router.current_screen.name == "Inventory", "The bag shortcut still opens inventory from Lioren")
+	await _press_back()
+	city = _game.router.current_screen
+	_check(not _game.session.inventory.equipment_for().has("armor"), "Guild entry does not require wearing the jacket")
+	await _measure_windows("guild_city")
+	await _click(city.checkpoint_button)
+	var seal: Control = _game.router.current_screen
+	await _click(seal.start_button)
+	for step: int in range(420):
+		if not _game.session.checkpoints.manual_snapshots.is_empty():
+			break
+		await _frames(1)
+	var points := _game.session.checkpoints.manual_snapshots
+	_check(points.size() == 1, "The city checkpoint precedes registration")
+	if points.is_empty():
+		return
+	var checkpoint_id: String = points[0]["checkpoint_id"]
+	await _click(seal.back_button)
+
+	await _click(_game.router.current_screen.guild_button)
+	var guild: Control = _game.router.current_screen
+	_check(guild.name == "Guild" and guild.dialogue.is_active(), "The normal city button opens the registration dialogue")
+	if guild.name != "Guild" or not guild.dialogue.is_active():
+		return
+	_check(guild.dialogue.runner.current_cue()["id"] == "DIA_GUILD_001" and not guild.get_node("SafeArea").visible, "The first unread line hides the desk controls")
+	_check(_game.session.guild_rank().is_empty() and not _game.session.register_with_guild(), "Rank cannot be granted before reading the introduction")
+	for step: int in range(12):
+		if guild.dialogue.runner.current_cue()["id"] == "DIA_GUILD_002":
+			break
+		await _click(guild.dialogue.next_button)
+	_check(guild.get_node("Kenta").visible, "The hall plan shows Kenta when he speaks")
+	await _measure_windows("guild_opening")
+	await _new_game_root()
+	await _click(_game.router.current_screen.continue_button)
+	guild = _game.router.current_screen
+	_check(guild.name == "Guild" and guild.dialogue.runner.current_cue()["id"] == "DIA_GUILD_002", "Continue resumes the first unread registration cue")
+	await _press_android_back()
+	city = _game.router.current_screen
+	_check(city.name == "World" and root.gui_get_focus_owner() == city.guild_button, "Android Back returns to the city and restores the guild button focus")
+	_check(GameRoot.route_for_continue(_game.session) == "world", "Leaving explicitly clears the active guild visit")
+	await _click(city.guild_button)
+	guild = _game.router.current_screen
+	_check(guild.dialogue.runner.current_cue()["id"] == "DIA_GUILD_002", "Opening the guild again preserves progress")
+	for step: int in range(32):
+		if guild.dialogue.runner.current_cue()["id"] == "DIA_GUILD_014":
+			break
+		await _click(guild.dialogue.next_button)
+	_check(guild.dialogue.runner.current_shot() == "guild_registration" and not guild.get_node("Midori").visible, "The seal check uses the painted close-up without doubling the registrar")
+	await _measure_windows("guild_register_dialogue")
+	for step: int in range(40):
+		if guild.dialogue.runner.current_cue()["id"] == "DIA_GUILD_027":
+			break
+		await _click(guild.dialogue.next_button)
+	_check(guild.get_node("Goro").visible, "Goro appears in the hall when he gives his advice")
+	await _measure_windows("guild_mentor")
+	for step: int in range(100):
+		if not guild.dialogue.is_active():
+			break
+		await _click(guild.dialogue.next_button)
+	_check(not guild.dialogue.is_active() and guild.register_button.visible and _game.session.guild_rank().is_empty(), "Reading all lines opens the explicit registration action")
+	await _measure_windows("guild_desk")
+	var blocker: String = ProjectSettings.globalize_path(_save_path + ".tmp")
+	_check(DirAccess.make_dir_recursive_absolute(blocker) == OK, "The fixture blocks the registration write")
+	var wallet := _game.session.wallet.duplicate()
+	await _click(guild.register_button)
+	_check(guild.get_node("%Error").visible and root.gui_get_focus_owner() == guild.register_button, "Write failure keeps registration actionable and focused")
+	_check(_game.session.guild_rank().is_empty() and not _game.session.quest_flags.has(GameSession.FIRST_GUILD_ORDER_ID), "Failed registration applies neither rank nor order")
+	var saved := GameSession.new()
+	_check(_game.save_service.load_into(saved, _save_path) and saved.guild_rank().is_empty(), "The last saved profile still has no rank")
+	DirAccess.remove_absolute(blocker)
+	await _click(guild.register_button)
+	_check(_game.session.guild_rank() == "E" and _game.session.quest_flags.get(GameSession.FIRST_GUILD_ORDER_ID, false), "Retry grants rank E and the first order together")
+	_check(_game.session.wallet == wallet and not guild.register_button.visible, "Registration is free and removes the spent action")
+	_check(not _game.session.register_with_guild(), "Duplicate registration is rejected by the session")
+	await _measure_windows("guild_order")
+	await _new_game_root()
+	await _click(_game.router.current_screen.continue_button)
+	guild = _game.router.current_screen
+	_check(guild.name == "Guild" and not guild.dialogue.is_active() and not guild.register_button.visible and _game.session.guild_rank() == "E", "Continue restores the registered desk and skips the one-time talk")
+	await _click(guild.back_button)
+	city = _game.router.current_screen
+	_check(city.name == "World" and root.gui_get_focus_owner() == city.guild_button, "The desk back button restores the city action")
+	await _click(city.guild_button)
+	_check(not _game.router.current_screen.dialogue.is_active(), "A return visit opens the desk directly")
+	await _press_back()
+	_game.session.awaiting_return = true
+	_check(_game._commit_checkpoint_restore(checkpoint_id), "The root restores the isolated city checkpoint")
+	_check(_game.session.guild_rank().is_empty() and not _game.session.quest_flags.has(GameSession.FIRST_GUILD_ORDER_ID), "Checkpoint rolls back the rank and order together")
+	await _click(_game.router.current_screen.guild_button)
+	guild = _game.router.current_screen
+	_check(not guild.dialogue.is_active() and guild.register_button.visible, "After rollback the remembered dialogue still leads to registration")
+	await _click(guild.register_button)
+	_check(_game.session.guild_rank() == "E" and _game.session.quest_flags.get(GameSession.FIRST_GUILD_ORDER_ID, false), "The restored timeline can register again")
+	await _verify_forced_city_profile()
+	_report["guild_finished"] = true
 
 func _verify_shop_exchange() -> void:
 	var shop: Control = _game.router.current_screen
@@ -489,7 +603,7 @@ func _verify_shop_exchange() -> void:
 	var restored := GameSession.new()
 	_check(_game.save_service.load_into(restored, _save_path) and restored.wallet == expected.back(), "Reload restores the three coin balances after exchange")
 
-func _verify_merchant_edge_profiles() -> void:
+func _verify_forced_city_profile() -> void:
 	var forced := GameSession.new()
 	forced.world_flags["prologue_completed"] = true
 	forced.mark_path_started()
@@ -500,11 +614,14 @@ func _verify_merchant_edge_profiles() -> void:
 	await _new_game_root()
 	await _click(_game.router.current_screen.continue_button)
 	var city: Control = _game.router.current_screen
-	_check(city.name == "World" and city.rest_button.visible and not city.shop_button.visible and not city.gates_dialogue.is_active(), "Forced Lioren offers rest before meeting Daijiro")
+	_check(city.name == "World" and city.rest_button.visible and not city.shop_button.visible and not city.guild_button.visible and not city.gates_dialogue.is_active(), "Forced Lioren offers rest before meeting Daijiro")
 	await _click(city.rest_button)
 	await _click(city.travel_button)
 	_check(_game.session.location_id == GameSession.LOCATION_FOREST_EDGE and _game.session.traces == 0, "Rest opens the route back to the Trail")
+	_check(_game.router.current_screen.equipment_strip.visible, "The Trail restores the equipment strip after leaving Lioren")
 
+func _verify_merchant_edge_profiles() -> void:
+	await _verify_forced_city_profile()
 	var legacy := GameSession.new()
 	legacy.world_flags["prologue_completed"] = true
 	legacy.mark_path_started()
@@ -537,7 +654,7 @@ func _verify_merchant_edge_profiles() -> void:
 	_game.session.inventory.add(crystal, 1)
 	var second_stack: ItemInstance = _game.session.inventory.add(crystal, 2, "", {"sale_price_copper": 15})[0]
 	var second_stack_id: String = second_stack.instance_id
-	city = _game.router.current_screen
+	var city: Control = _game.router.current_screen
 	await _click(city.shop_button)
 	shop = _game.router.current_screen
 	await _dismiss_tutorial(shop)
@@ -722,8 +839,29 @@ func _measure_windows(label: String) -> void:
 			await _capture("26b_shop_welcome_tall")
 		if label in ["slime_approach", "cart_lookout", "backpack"]:
 			await _capture("%s_%dx%d" % [label, window_size.x, window_size.y])
+		if label.begins_with("guild_"):
+			await _capture("%s_%dx%d" % [label, window_size.x, window_size.y])
+		if label in ["guild_opening", "guild_mentor"]:
+			_check_guild_actor_framing(screen, window_size)
 	DisplayServer.window_set_size(Vector2i(360, 640))
 	await _frames(8)
+
+func _check_guild_actor_framing(guild: Control, window_size: Vector2i) -> void:
+	var dialogue_top: float = guild.dialogue.next_button.get_global_rect().position.y
+	var hall: Rect2 = guild.get_global_rect()
+	hall.end.y = dialogue_top
+	# Measure the visible art so transparent padding does not count as character height.
+	var minimum_heights := {"Merchant": 125.0, "Kenta": 105.0, "Goro": 125.0, "Midori": 55.0}
+	for actor_name: String in minimum_heights:
+		var actor: Sprite2D = guild.get_node(actor_name)
+		if not actor.visible:
+			continue
+		var opaque: Rect2 = actor.texture.get_image().get_used_rect()
+		if actor.region_enabled:
+			opaque = opaque.intersection(actor.region_rect)
+			opaque.position -= actor.region_rect.position
+		var silhouette := Rect2(actor.to_global(opaque.position + actor.offset), opaque.size * actor.scale)
+		_check(silhouette.size.y >= minimum_heights[actor_name] and hall.encloses(silhouette), "%s fills the hall and stays above the dialogue at %s" % [actor_name, window_size])
 
 ## Имя первого видимого контрола за пределами экрана; пусто — всё в границах.
 func _out_of_window_control(screen: Control) -> String:
@@ -806,10 +944,14 @@ func _hold(control: Control, runner: DialogueRunner) -> void:
 	await _frames(3)
 
 func _out_dir() -> String:
+	if _mode == "guild":
+		return GUILD_OUT
 	return MERCHANT_OUT if _mode == "merchant" else OUT
 
 
 func _capture(label: String) -> void:
+	if _mode == "guild" and not label.begins_with("guild_"):
+		return
 	await _frames(4)
 	RenderingServer.force_draw()
 	var image: Image = root.get_texture().get_image()

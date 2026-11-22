@@ -36,14 +36,23 @@ static func apply_animation_transform(sprite: AnimatedSprite2D, sheet: Dictionar
 		# Prologue actors historically used a centered 96x128 canvas, not a foot pivot.
 		sprite.offset -= Vector2(sheet.get("offset", Vector2.ZERO)) / sprite.scale
 
-# Фоновые иллюстрации 180x320.
+# Фоновые иллюстрации для портретной сцены.
 const BACKGROUNDS := {
 	"title": "environments/white_threshold_background.png",
 	"world_forest_edge": "environments/first_breath_trail_background.png",
 	"world_lioren": "environments/lioren_south_gate_background.png",
 	"shop_cricket_twilight": "environments/cricket_twilight_interior_background.png",
 	"shop_appraisal": "environments/story/daijiro_crystal_appraisal_story.png",
+	"guild_hall": "environments/dawn_trail_guild_hall_background.png",
+	"guild_registration": "environments/story/midori_registers_haruto_story.png",
 	"combat": "environments/first_breath_trail_background.png",
+}
+
+const GUILD_ART := {
+	"badge": "equipment/dawn_trail_guild_badge_icon.png",
+	"goro": "characters/goro_guildmaster_idle.png",
+	"kenta": "characters/kenta_novice_idle.png",
+	"midori": "characters/midori_registrar_idle.png",
 }
 
 # Сюжетные кадры пролога по shot из data/narrative/prologue.json.

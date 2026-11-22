@@ -30,6 +30,8 @@ var equipment_strip: EquipmentStrip
 var details_layer: Control
 var details_view: ItemDetailsView
 var gates_dialogue: DialogueOverlay
+var guild_button: Button
+var focus_guild_on_entry: bool = false
 var _travel_actions: HBoxContainer
 var _tutorial: ConfirmDialog
 var _shown_background: String = ""
@@ -107,6 +109,12 @@ func _ready() -> void:
 	for route_button: Button in [travel_button, shop_button]:
 		route_button.reparent(_travel_actions, false)
 		route_button.custom_minimum_size.x = 64
+	guild_button = Button.new()
+	guild_button.name = "GuildButton"
+	guild_button.text = "Гильдия"
+	guild_button.custom_minimum_size.y = UiIcons.TOUCH_SIZE
+	guild_button.pressed.connect(_on_guild_pressed)
+	_travel_actions.add_child(guild_button)
 	equipment_strip = EquipmentStrip.new()
 	equipment_strip.name = "EquipmentStrip"
 	nav_bar.get_parent().add_child(equipment_strip)
@@ -133,7 +141,10 @@ func _ready() -> void:
 	_refresh_hero_art()
 	if not resized.is_connected(_layout_scene):
 		resized.connect(_layout_scene)
-	inventory_button.grab_focus()
+	if focus_guild_on_entry and guild_button.visible:
+		guild_button.grab_focus()
+	else:
+		inventory_button.grab_focus()
 	_try_start_gates_dialogue()
 	_show_trail_tutorial.call_deferred()
 
@@ -280,6 +291,12 @@ func _on_shop_pressed() -> void:
 	if _navigating or not session.can_trade():
 		return
 	navigate_requested.emit("shop")
+
+func _on_guild_pressed() -> void:
+	if _navigating or gates_dialogue.is_active() or not session.can_visit_guild():
+		return
+	session.set_guild_visit_active(true)
+	navigate_requested.emit("guild")
 
 func _on_dialogue_command(command: Dictionary) -> void:
 	var key: String = String(command.get("key", ""))
@@ -463,6 +480,7 @@ func _refresh() -> void:
 	repeats_button.tooltip_text = "Повторы и испытание"
 	repeats_button.accessibility_name = repeats_button.tooltip_text
 	var in_city: bool = session.location_id == GameSession.LOCATION_LIOREN
+	equipment_strip.visible = not in_city
 	repeats_button.visible = not in_city and not combat_blocked and not session.route_repeat_enemy_ids().is_empty()
 	var has_daijiro_sword: bool = session.story_rewards.has(GameSession.DAIJIRO_SWORD_REWARD_ID)
 	travel_button.visible = (in_city or has_daijiro_sword) and not session.awaiting_return
@@ -470,7 +488,10 @@ func _refresh() -> void:
 	travel_button.text = "На Тропу" if in_city else "В Лиорен"
 	travel_button.accessibility_name = travel_button.text
 	shop_button.visible = session.can_trade()
-	_travel_actions.visible = travel_button.visible or shop_button.visible
+	guild_button.visible = session.can_visit_guild()
+	travel_button.custom_minimum_size.x = 0 if guild_button.visible else 64
+	shop_button.custom_minimum_size.x = travel_button.custom_minimum_size.x
+	_travel_actions.visible = travel_button.visible or shop_button.visible or guild_button.visible
 	rest_button.visible = session.location_id == "lioren" and session.traces > 0
 	_inventory_badge.visible = session.hero.pending_upgrade_choices > 0 or session.pending_receive_fx
 	upgrade_button.visible = session.hero.pending_upgrade_choices > 0 and not combat_blocked

@@ -82,6 +82,8 @@ static func route_for_continue(target: GameSession) -> String:
 			return "trail_dialogue"
 		"daijiro_cart":
 			return "merchant"
+	if target.guild_visit_active():
+		return "guild"
 	if target.can_trade() and (
 		not target.world_flags.get(GameSession.WORLD_FLAG_SHOP_INTRO_DONE, false)
 		or (target.world_flags.get(GameSession.WORLD_FLAG_SHOP_FIRST_PURCHASE_DONE, false) and not target.world_flags.get(GameSession.WORLD_FLAG_SHOP_PURCHASE_BRIEFING_DONE, false))
@@ -105,6 +107,8 @@ func _on_screen_added(screen: Control) -> void:
 		screen.connect("voice_change_requested", set_voice_id)
 	if screen.has_signal("shop_deal_requested"):
 		screen.connect("shop_deal_requested", _on_shop_deal_requested)
+	if screen.has_signal("guild_registration_requested"):
+		screen.connect("guild_registration_requested", _on_guild_registration_requested)
 	if screen.has_signal("open_bag_requested"):
 		screen.connect("open_bag_requested", _on_open_bag_requested)
 
@@ -190,6 +194,22 @@ func commit_shop_deal(deal: Dictionary) -> bool:
 	if router.current_screen != null and router.current_screen.has_method("deal_committed"):
 		router.current_screen.call("deal_committed", committed_deal)
 	return true
+
+func _on_guild_registration_requested() -> void:
+	var screen: Control = router.current_screen
+	if _restoring or not session.can_register_with_guild():
+		return
+	var candidate := GameSession.new()
+	candidate.apply_state_dto(save_service.capture(session))
+	if not candidate.register_with_guild() or not save_service.save(candidate, save_path):
+		screen.call("registration_rejected")
+		return
+	_restoring = true
+	session.apply_state_dto(save_service.capture(candidate))
+	_restoring = false
+	_connect_session_signals()
+	notice_bar.hide()
+	screen.call("registration_committed")
 
 func _on_open_bag_requested(instance_id: String) -> void:
 	router.go_to("inventory")

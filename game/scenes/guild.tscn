@@ -1,0 +1,147 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/guild_screen.gd" id="1_guild"]
+[ext_resource type="Script" path="res://scripts/ui/safe_area.gd" id="2_safe"]
+
+[node name="Guild" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_guild")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Midori" type="Sprite2D" parent="."]
+visible = false
+centered = false
+offset = Vector2(-144, -240)
+region_enabled = true
+region_rect = Rect2(0, 0, 288, 240)
+
+[node name="Merchant" type="Sprite2D" parent="."]
+visible = false
+centered = false
+offset = Vector2(-144, -374)
+
+[node name="Kenta" type="Sprite2D" parent="."]
+visible = false
+centered = false
+offset = Vector2(-144, -336)
+
+[node name="Goro" type="Sprite2D" parent="."]
+visible = false
+centered = false
+offset = Vector2(-144, -336)
+
+[node name="SafeArea" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_safe")
+padding = 7
+
+[node name="Column" type="VBoxContainer" parent="SafeArea"]
+layout_mode = 2
+
+[node name="Header" type="HBoxContainer" parent="SafeArea/Column"]
+layout_mode = 2
+
+[node name="Back" type="Button" parent="SafeArea/Column/Header"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+text = "‹"
+accessibility_name = "В Лиорен"
+
+[node name="TitlePanel" type="PanelContainer" parent="SafeArea/Column/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="Title" type="Label" parent="SafeArea/Column/Header/TitlePanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "Гильдия Рассветной Тропы"
+autowrap_mode = 2
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="SafeArea/Column"]
+layout_mode = 2
+mouse_filter = 2
+size_flags_vertical = 3
+
+[node name="Order" type="PanelContainer" parent="SafeArea/Column"]
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="SafeArea/Column/Order"]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 5
+
+[node name="Details" type="VBoxContainer" parent="SafeArea/Column/Order/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Heading" type="HBoxContainer" parent="SafeArea/Column/Order/Margin/Details"]
+layout_mode = 2
+
+[node name="Badge" type="TextureRect" parent="SafeArea/Column/Order/Margin/Details/Heading"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Rank" type="Label" parent="SafeArea/Column/Order/Margin/Details/Heading"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 11
+text = "Регистрация"
+autowrap_mode = 2
+
+[node name="OrderTitle" type="Label" parent="SafeArea/Column/Order/Margin/Details"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "Первое задание"
+
+[node name="Objectives" type="Label" parent="SafeArea/Column/Order/Margin/Details"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 9
+text = "В Роще Шепчущих Трав:\n• Собрать лунный лён.\n• Проверить восточный маркер."
+autowrap_mode = 2
+
+[node name="Error" type="Label" parent="SafeArea/Column/Order/Margin/Details"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 9
+text = "Запись не удалась. Попробуйте ещё раз."
+autowrap_mode = 2
+
+[node name="Register" type="Button" parent="SafeArea/Column/Order/Margin/Details"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+theme_type_variation = &"PrimaryButton"
+text = "Зарегистрироваться"
