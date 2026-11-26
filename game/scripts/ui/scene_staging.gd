@@ -41,3 +41,13 @@ static func grove_enemy_anchor(size: Vector2, index: int, airborne: bool) -> Vec
 	var fraction: float = 0.53 if index == 0 else 0.77
 	var depth: float = 0.0 if index == 0 else 19.0
 	return Vector2(size.x * fraction, floor_y(size.y) - depth - (28.0 if airborne else 0.0))
+
+
+static func hollow_enemy_anchor(size: Vector2, index: int, count: int) -> Vector2:
+	var floor: float = floor_y(size.y)
+	if count == 1:
+		return Vector2(size.x * 0.67, floor)
+	match index:
+		0: return Vector2(size.x * 0.48, floor + 9.0)
+		1: return Vector2(size.x * 0.79, floor + 9.0)
+		_: return Vector2(size.x * 0.67, floor - 52.0)

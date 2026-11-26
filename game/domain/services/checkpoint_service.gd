@@ -54,7 +54,7 @@ func can_begin() -> bool:
 		and pending_completion.is_empty()
 		and manual_snapshots.size() < MANUAL_LIMIT
 		and session.traces < 3
-		and (session.location_id != GameSession.LOCATION_GROVE or session.grove_stage() == "clearing")
+		and session.can_place_expedition_checkpoint()
 		and not session.in_combat
 		and session.pending_battle_result.is_empty()
 		and session.pending_story_reward.is_empty()

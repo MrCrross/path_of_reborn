@@ -42,6 +42,9 @@ const BACKGROUNDS := {
 	"world_forest_edge": "environments/first_breath_trail_background.png",
 	"world_grove": "environments/whispering_grass_grove_background.png",
 	"grove_bridge": "environments/story/kenta_root_bridge_story.png",
+	"world_hollow": "environments/blue_hollow_quarry_background.png",
+	"hollow_basin": "environments/crystal_toad_basin_background.png",
+	"hollow_cloth": "environments/story/haruto_finds_grey_cloth_story.png",
 	"world_lioren": "environments/lioren_south_gate_background.png",
 	"shop_cricket_twilight": "environments/cricket_twilight_interior_background.png",
 	"shop_appraisal": "environments/story/daijiro_crystal_appraisal_story.png",
@@ -74,12 +77,26 @@ const GROVE_STILLS := {
 	"root_weaver": {"path": "enemies/root_weaver_idle.png", "crop": Rect2(6, 32, 82, 52), "size": Vector2(53, 34)},
 }
 
+const HOLLOW_PROPS := {
+	"shelf": "environments/props/quarry_crumbling_shelf_prop.png",
+	"cloth": "equipment/shoma_grey_cloth_icon.png",
+}
+
+const HOLLOW_STILLS := {
+	"river_shieldback": {"path": "enemies/river_shieldback_idle.png", "crop": Rect2(4, 18, 86, 38), "size": Vector2(64, 28)},
+	"stone_rodent": {"path": "enemies/stone_rodent_idle.png", "crop": Rect2(18, 20, 42, 36), "size": Vector2(33, 28)},
+	"ash_raven": {"path": "enemies/ash_raven_idle.png", "crop": Rect2(18, 26, 60, 46), "size": Vector2(42, 32)},
+	"crystal_toad": {"path": "enemies/crystal_toad_idle.png", "crop": Rect2(28, 24, 70, 60), "size": Vector2(62, 53)},
+}
+
 static func world_background(location_id: String) -> Texture2D:
 	match location_id:
 		GameSession.LOCATION_LIOREN:
 			return texture(BACKGROUNDS["world_lioren"])
 		GameSession.LOCATION_GROVE:
 			return texture(BACKGROUNDS["world_grove"])
+		GameSession.LOCATION_HOLLOW:
+			return texture(BACKGROUNDS["world_hollow"])
 		_:
 			return texture(BACKGROUNDS["world_forest_edge"])
 
@@ -152,6 +169,8 @@ const ITEM_ICONS := {
 	"moon_flax_bandage": "equipment/moon_flax_bandage_icon.png",
 	"needle_hound_quills": "equipment/needle_hound_quills_icon.png",
 	"moth_pollen_jar": "equipment/moth_pollen_jar_icon.png",
+	"river_shieldback_shell": "equipment/river_shieldback_shell_icon.png",
+	"old_masonry_shard": "equipment/old_masonry_shard_icon.png",
 	"broken_wanderer_branch": "equipment/broken_wanderer_branch_icon.png",
 	"training_sword": "equipment/novice_short_sword_icon.png",
 	"moss_charm": "equipment/moss_core_icon.png",
@@ -159,6 +178,8 @@ const ITEM_ICONS := {
 	"echo_crystal": {
 		"moss": "equipment/echo_growth_cloudy_icon.png",
 		"goblin": "equipment/echo_dusk_clear_icon.png",
+		"water": "equipment/echo_water_clear_icon.png",
+		"stone_radiant": "equipment/echo_stone_radiant_icon.png",
 		"": "equipment/echo_growth_cloudy_icon.png",
 	},
 }
@@ -258,6 +279,24 @@ const GOBLIN_SCOUT_SHEETS := {
 ## solid-силуэта высотой 32 logical px (ENEMY_SOLID_HEIGHT), не в пустоте
 ## прозрачного canvas старого logical-размера.
 const ENEMY_SHEETS := {
+	"river_shieldback": {
+		"idle": {"path": "enemies/animations/river_shieldback_guard_sheet.png", "count": 2, "frame": Vector2i(96, 64), "offset": Vector2(0, -24), "scale": 0.74, "head": Vector2(0, -38)},
+		"attack": {"path": "enemies/animations/river_shieldback_claw_attack_sheet.png", "count": 6, "frame": Vector2i(96, 64), "offset": Vector2(0, -24), "scale": 0.74, "contact_frame": 3},
+	},
+	"stone_rodent": {
+		"idle": {"path": "enemies/animations/stone_rodent_idle_sheet.png", "count": 2, "frame": Vector2i(80, 64), "offset": Vector2(0, -24), "scale": 0.78, "head": Vector2(0, -33)},
+		"attack": {"path": "enemies/animations/stone_rodent_stone_throw_sheet.png", "count": 4, "frame": Vector2i(80, 64), "offset": Vector2(0, -24), "scale": 0.78, "contact_frame": 2},
+		"stunned": {"path": "enemies/animations/stone_rodent_stunned_sheet.png", "count": 3, "frame": Vector2i(80, 64), "offset": Vector2(0, -24), "scale": 0.78},
+	},
+	"ash_raven": {
+		"idle": {"path": "enemies/animations/ash_raven_flap_sheet.png", "count": 4, "frame": Vector2i(96, 96), "offset": Vector2(0, -24), "scale": 0.7, "head": Vector2(0, -39)},
+		"attack": {"path": "enemies/animations/ash_raven_dive_sheet.png", "count": 6, "frame": Vector2i(96, 96), "offset": Vector2(0, -24), "scale": 0.7, "contact_frame": 3},
+	},
+	"crystal_toad": {
+		"idle": {"path": "enemies/animations/crystal_toad_idle_sheet.png", "count": 2, "frame": Vector2i(128, 96), "offset": Vector2(0, -36), "scale": 0.89, "head": Vector2(0, -55)},
+		"attack": {"path": "enemies/animations/crystal_toad_tongue_sheet.png", "count": 6, "frame": Vector2i(128, 96), "offset": Vector2(0, -36), "scale": 0.89, "contact_frame": 3},
+		"leap": {"path": "enemies/animations/crystal_toad_jump_sheet.png", "count": 6, "frame": Vector2i(128, 96), "offset": Vector2(0, -36), "scale": 0.89, "contact_frame": 3},
+	},
 	"needle_hound": {
 		"idle": {"path": "enemies/animations/needle_hound_idle_sheet.png", "count": 2, "frame": Vector2i(96, 64), "offset": Vector2(0, -24), "scale": 0.72, "head": Vector2(0, -40), "contact_frame": 0},
 		"attack": {"path": "enemies/animations/needle_hound_quill_shot_sheet.png", "count": 4, "frame": Vector2i(96, 64), "offset": Vector2(0, -24), "scale": 0.72, "head": Vector2(0, -40), "contact_frame": 2},

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://domain/definitions/item_definition.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = "old_masonry_shard"
+display_name = "Осколок старой кладки"
+description = "Сланец с кристаллической прожилкой из каменоломни."
+type_id = "material"
+stack_limit = 99
+sale_price_copper = 10
+sellable = true

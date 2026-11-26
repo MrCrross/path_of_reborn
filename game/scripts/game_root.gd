@@ -112,6 +112,8 @@ func _on_screen_added(screen: Control) -> void:
 		screen.connect("guild_registration_requested", _on_guild_registration_requested)
 	if screen.has_signal("grove_command_requested"):
 		screen.connect("grove_command_requested", _on_grove_command_requested)
+	if screen.has_signal("hollow_command_requested"):
+		screen.connect("hollow_command_requested", _on_hollow_command_requested)
 	if screen.has_signal("open_bag_requested"):
 		screen.connect("open_bag_requested", _on_open_bag_requested)
 
@@ -222,6 +224,19 @@ func _on_grove_command_requested(command: String) -> void:
 		screen.call("grove_command_rejected", command)
 
 func commit_grove_command(command: String) -> bool:
+	return _commit_expedition_command(command, GameSession.LOCATION_GROVE)
+
+func _on_hollow_command_requested(command: String) -> void:
+	var screen: Control = router.current_screen
+	if commit_hollow_command(command):
+		screen.call("hollow_command_committed", command)
+	else:
+		screen.call("hollow_command_rejected", command)
+
+func commit_hollow_command(command: String) -> bool:
+	return _commit_expedition_command(command, GameSession.LOCATION_HOLLOW)
+
+func _commit_expedition_command(command: String, route_id: String) -> bool:
 	if _restoring or _grove_commit_active or _claim_commit_active or _checkpoint_commit_active or _shop_commit_active:
 		return false
 	if session.in_combat or session.checkpoints.channel_active or session.checkpoints.has_pending_completion():
@@ -229,7 +244,8 @@ func commit_grove_command(command: String) -> bool:
 	_grove_commit_active = true
 	var candidate := GameSession.new()
 	candidate.apply_state_dto(save_service.capture(session))
-	if not candidate.apply_grove_command(command) or not save_service.save(candidate, save_path):
+	var applied: bool = candidate.apply_hollow_command(command) if route_id == GameSession.LOCATION_HOLLOW else candidate.apply_grove_command(command)
+	if not applied or not save_service.save(candidate, save_path):
 		_grove_commit_active = false
 		return false
 	_restoring = true

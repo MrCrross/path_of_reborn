@@ -230,6 +230,8 @@ func _refresh_progression(state: CharacterState) -> void:
 				ability_lines.append("%s · готова в бою" % ability.display_name)
 		else:
 			ability_lines.append("%s · ур. %d" % [ability.display_name, ability.unlock_level])
+	if state == session.hero and session.quest_flags.get(GameSession.HOLLOW_TEMPO, false):
+		ability_lines.append("Смена темпа I · быстрый замах после уклонения")
 	%Abilities.visible = not ability_lines.is_empty()
 	%Abilities.text = "\n".join(ability_lines)
 	var has_choices: bool = state.pending_upgrade_choices > 0

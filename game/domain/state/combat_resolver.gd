@@ -31,6 +31,7 @@ class EnemySlot:
 	var remaining: int = 0
 	var strike_index: int = 0
 	var pollen_slow_ticks: int = 0
+	var stunned: bool = false
 
 	func _init(definition: ActorDefinition, options: Dictionary) -> void:
 		instance_id = String(options.get("id", definition.id))
@@ -64,6 +65,9 @@ var strike_index: int:
 	get: return enemy_slots[0].strike_index
 var target: EnemySlot
 var vulnerable_ability_bonus: float = 1.0
+var tempo_window_ticks: int = 0
+var tempo_startup_reduction: int = 0
+var _tempo_ticks: int = 0
 var slowed_ticks: int = 0
 var hero_attack_cooldown: int = 0
 var hero_ability_cooldown: int = 0
@@ -101,6 +105,15 @@ func _add_enemy(definition: ActorDefinition, options: Dictionary) -> void:
 	enemy_slots.append(slot)
 	_enter_phase(slot, Phase.TELEGRAPH)
 	slot.remaining = maxi(1, slot.remaining + int(options.get("telegraph_offset", 0)))
+	var stun_ticks: int = int(options.get("initial_stun_ticks", 0))
+	if stun_ticks > 0:
+		_enter_phase(slot, Phase.VULNERABILITY)
+		slot.stunned = true
+		slot.remaining = stun_ticks
+
+func add_encounter_enemy(definition: ActorDefinition, options: Dictionary) -> void:
+	assert(tick_count == 0 and not _hero_strike_started)
+	_add_enemy(definition, options)
 
 func select_target(instance_id: String) -> bool:
 	if not is_active or is_finished or combat_format != "active":
@@ -170,6 +183,7 @@ func advance_ticks(count: int) -> void:
 			if not is_active or is_finished:
 				return
 		slowed_ticks = maxi(0, slowed_ticks - 1)
+		_tempo_ticks = maxi(0, _tempo_ticks - 1)
 		hero_attack_cooldown = maxi(0, hero_attack_cooldown - 1)
 		hero_ability_cooldown = maxi(0, hero_ability_cooldown - 1)
 		dodge_ticks_remaining = maxi(0, dodge_ticks_remaining - 1)
@@ -192,6 +206,9 @@ func _begin_hero_strike(ability: bool = false) -> void:
 	if slowed_ticks > 0:
 		_hero_strike_ticks_remaining += ceili(hero.definition.attack_startup_ticks * 0.5)
 		hero_attack_cooldown += ceili(hero.definition.attack_cooldown_ticks * 0.5)
+	if _tempo_ticks > 0:
+		_hero_strike_ticks_remaining = maxi(1, _hero_strike_ticks_remaining - tempo_startup_reduction)
+		_tempo_ticks = 0
 	hero_attack_begun.emit(run_id)
 
 func _tick_hero_strike() -> void:
@@ -211,6 +228,8 @@ func _tick_hero_strike() -> void:
 		strike_multiplier *= slot.actor.definition.vulnerability_multiplier
 		if _hero_strike_is_ability:
 			strike_multiplier *= vulnerable_ability_bonus
+	else:
+		strike_multiplier *= slot.actor.definition.guarded_damage_multiplier
 	var damage: int = CharacterState.calculate_damage(hero.strength, slot.actor.defense, strike_multiplier)
 	var applied_damage: int = slot.actor.take_damage(damage)
 	damage_dealt.emit(slot.instance_id, applied_damage)
@@ -244,6 +263,7 @@ func _advance_phase(slot: EnemySlot) -> void:
 
 func _enter_phase(slot: EnemySlot, next_phase: int) -> void:
 	slot.phase = next_phase
+	slot.stunned = false
 	var definition: ActorDefinition = slot.actor.definition
 	match slot.phase:
 		Phase.TELEGRAPH:
@@ -277,12 +297,15 @@ func _begin_dodge(source: String) -> void:
 func _resolve_enemy_strike(slot: EnemySlot) -> void:
 	if slot.pollen_slow_ticks > 0:
 		var avoided: bool = dodge_ticks_remaining > 0
-		if not avoided:
+		if avoided:
+			_tempo_ticks = tempo_window_ticks
+		else:
 			slowed_ticks = maxi(slowed_ticks, slot.pollen_slow_ticks)
 		dodge_resolved.emit(avoided)
 		pollen_resolved.emit(avoided)
 		return
 	if dodge_ticks_remaining > 0:
+		_tempo_ticks = tempo_window_ticks
 		dodge_resolved.emit(true)
 		return
 	dodge_resolved.emit(false)

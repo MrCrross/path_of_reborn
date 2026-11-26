@@ -71,7 +71,7 @@ func configure(target_session: GameSession, arena_node: Control, hero: AnimatedS
 func bind_resolver(next_resolver: CombatResolver) -> void:
 	resolver = next_resolver
 	_last_phase = -1
-	if resolver.enemy_slots.size() == 2:
+	if uses_expedition_art():
 		_build_grove_enemies()
 		resolver.enemy_phase_changed.connect(_on_grove_actor_changed)
 		resolver.target_changed.connect(_on_grove_actor_changed)
@@ -329,8 +329,11 @@ func _setup_art() -> void:
 	_apply_clip(enemy_sprite, _enemy_frames["idle"])
 	enemy_sprite.play(&"default")
 	hero_sprite.animation_finished.connect(_reset_hero_to_idle)
-	if session.location_id != GameSession.LOCATION_GROVE:
+	if not uses_expedition_art():
 		enemy_sprite.animation_finished.connect(_on_enemy_clip_finished)
+
+func uses_expedition_art() -> bool:
+	return session.location_id in [GameSession.LOCATION_GROVE, GameSession.LOCATION_HOLLOW]
 
 func _build_grove_enemies() -> void:
 	_pollen_cloud = Sprite2D.new()
@@ -350,14 +353,14 @@ func _build_grove_enemies() -> void:
 			view.cue = phase_cue
 		else:
 			view.sprite = AnimatedSprite2D.new()
-			view.sprite.name = "SecondEnemySprite"
+			view.sprite.name = "SecondEnemySprite" if index == 1 else "ThirdEnemySprite"
 			view.health = ActorHealthDisplay.new()
-			view.health.name = "SecondEnemyHealth"
+			view.health.name = "SecondEnemyHealth" if index == 1 else "ThirdEnemyHealth"
 			view.health.setup("enemy", true)
 			view.warning = Sprite2D.new()
 			view.warning.texture = telegraph.texture
 			view.cue = Label.new()
-			view.cue.name = "SecondPhaseCue"
+			view.cue.name = "SecondPhaseCue" if index == 1 else "ThirdPhaseCue"
 			for control: Node in [view.warning, view.sprite, view.health, view.cue]:
 				arena.add_child(control)
 		view.sprite.z_index = 2
@@ -371,13 +374,16 @@ func _build_grove_enemies() -> void:
 		var species: String = slot.actor.definition.id
 		var sheets: Dictionary = ArtMap.ENEMY_SHEETS[species]
 		view.head = sheets["idle"]["head"]
-		view.body_width = float(ArtMap.GROVE_STILLS[species]["size"].x)
+		var stills: Dictionary = ArtMap.HOLLOW_STILLS if session.location_id == GameSession.LOCATION_HOLLOW else ArtMap.GROVE_STILLS
+		view.body_width = float(stills[species]["size"].x)
 		view.body_bottom = 17.0 if slot.pollen_slow_ticks > 0 else 5.0
 		for clip_name: String in sheets:
-			view.clips[clip_name] = _build_clip(sheets[clip_name], clip_name != "idle")
+			view.clips[clip_name] = _build_clip(sheets[clip_name], clip_name not in ["idle", "stunned"])
 		_grove_enemies.append(view)
 
 func _grove_anchor(index: int) -> Vector2:
+	if session.location_id == GameSession.LOCATION_HOLLOW:
+		return SceneStaging.hollow_enemy_anchor(arena.size, index, resolver.enemy_slots.size()).round()
 	return SceneStaging.grove_enemy_anchor(arena.size, index, resolver.enemy_slots[index].pollen_slow_ticks > 0).round()
 
 func _update_grove_positions() -> void:
@@ -390,7 +396,8 @@ func _update_grove_positions() -> void:
 		if not view.defeated:
 			_update_grove_attack_frame(view, slot)
 		view.warning.position = (hero_sprite.position if slot.pollen_slow_ticks > 0 else view.sprite.position) + Vector2(0, 1)
-		view.cue.position = (Vector2(view.sprite.position.x - view.cue.size.x * 0.5, view.health.position.y - 15.0)).round()
+		var cue_x: float = clampf(view.sprite.position.x - view.cue.size.x * 0.5, 0.0, maxf(0.0, arena.size.x - view.cue.size.x))
+		view.cue.position = Vector2(cue_x, view.health.position.y - 15.0).round()
 	if _pollen_cloud.visible:
 		_pollen_cloud.position = hero_sprite.position + Vector2(19, -12)
 
@@ -409,7 +416,7 @@ func _refresh_grove_enemies() -> void:
 		view.health.set_hp(slot.actor.current_hp, slot.actor.max_hp)
 		view.health.set_targeted(resolver.combat_format == "active" and resolver.target == slot)
 		view.warning.visible = alive and slot.phase in [CombatResolver.Phase.TELEGRAPH, CombatResolver.Phase.STARTUP]
-		view.cue.visible = view.warning.visible
+		view.cue.visible = alive and (view.warning.visible or slot.stunned or (slot.actor.definition.guarded_damage_multiplier < 1.0 and slot.phase == CombatResolver.Phase.VULNERABILITY))
 		if not alive:
 			view.defeated = true
 			var fade := create_tween()
@@ -423,7 +430,9 @@ func _refresh_grove_enemies() -> void:
 		view.phase = slot.phase
 		var species: String = slot.actor.definition.id
 		var attack: bool = slot.phase in [CombatResolver.Phase.STARTUP, CombatResolver.Phase.ACTIVE, CombatResolver.Phase.RECOVERY]
-		var clip_name: String = slot.attack_id if attack else "idle"
+		var clip_name: String = _attack_clip(slot) if attack else "idle"
+		if slot.stunned:
+			clip_name = "stunned"
 		_apply_clip(view.sprite, view.clips[clip_name])
 		view.sprite.modulate = Color(1.16, 1.05, 0.76) if slot.phase == CombatResolver.Phase.VULNERABILITY else Color.WHITE
 		if not attack:
@@ -438,7 +447,7 @@ func _refresh_grove_enemies() -> void:
 
 func _update_grove_attack_frame(view: GroveEnemyView, slot: CombatResolver.EnemySlot) -> void:
 	var definition: ActorDefinition = slot.actor.definition
-	var spec: Dictionary = ArtMap.ENEMY_SHEETS[definition.id][slot.attack_id]
+	var spec: Dictionary = ArtMap.ENEMY_SHEETS[definition.id][_attack_clip(slot)]
 	var contact: int = int(spec["contact_frame"])
 	var last: int = int(spec["count"]) - 1
 	var frame: int
@@ -456,10 +465,21 @@ func _update_grove_attack_frame(view: GroveEnemyView, slot: CombatResolver.Enemy
 	if view.sprite.frame != frame:
 		view.sprite.set_frame_and_progress(frame, 0.0)
 
+func _attack_clip(slot: CombatResolver.EnemySlot) -> String:
+	if slot.actor.definition.id == "crystal_toad" and slot.strike_index == 1:
+		return "leap"
+	return slot.attack_id
+
 func _grove_warning(slot: CombatResolver.EnemySlot) -> String:
+	if slot.stunned:
+		return "Оглушён"
 	match slot.actor.definition.id:
 		"dust_moth": return "Пыльца"
 		"root_weaver": return "Захват"
+		"river_shieldback": return "Уязвим" if slot.phase == CombatResolver.Phase.VULNERABILITY else "Удар клешнёй"
+		"stone_rodent": return "Бросок"
+		"ash_raven": return "Пикирование"
+		"crystal_toad": return "Прыжок" if slot.strike_index == 1 else "Удар языком"
 		_: return "Прыжок" if slot.attack_id == "leap" else "Иглы"
 
 func target_at(position: Vector2) -> String:

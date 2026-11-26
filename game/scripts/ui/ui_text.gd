@@ -13,6 +13,8 @@ const RARITY_LABELS: Dictionary = {
 const ASPECT_LABELS: Dictionary = {
 	"moss": "Рост",
 	"goblin": "Сумрак",
+	"water": "Вода",
+	"stone_radiant": "Камень · лучистый",
 	"unspecified": "",
 	"": "",
 }
@@ -43,6 +45,7 @@ const STAT_LABELS: Dictionary = {
 const LOCATION_LABELS: Dictionary = {
 	"lioren": "Лиорен",
 	"whispering_grass_grove": "Роща Шелестящих Трав",
+	"blue_hollow": "Синий Овраг",
 	"forest_edge": "Граница леса",
 }
 const ENEMY_LABELS: Dictionary = {
@@ -52,6 +55,10 @@ const ENEMY_LABELS: Dictionary = {
 	"needle_hound": "Иглопёс",
 	"dust_moth": "Пыльный мотылёк",
 	"root_weaver": "Корневой плетун",
+	"river_shieldback": "Речной щитень",
+	"stone_rodent": "Каменный грызун",
+	"ash_raven": "Пепельный ворон",
+	"crystal_toad": "Кристальная жаба",
 }
 const COIN_SUFFIXES: Dictionary = {GameSession.COPPER: "мед.", GameSession.SILVER: "сер.", GameSession.GOLD: "зол."}
 

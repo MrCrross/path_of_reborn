@@ -82,18 +82,19 @@ func present(session: GameSession, result: Dictionary) -> void:
 	var echoes: int = session.battle_echo_reward(result)
 	_line(rows, "+%d XP   ·   +%d Эхо" % [xp, echoes], AppTheme.COLOR_MAGIC)
 
-func present_guild_report(session: GameSession, reward: Dictionary) -> void:
+func present_guild_report(session: GameSession, reward: Dictionary, title: String = "Первое задание", echo_flag: String = GameSession.GROVE_ECHOES_GRANTED, skill: String = "Точный выпад I") -> void:
 	_session = session
 	_show_summary(claim_button)
 	claim_button.text = "Получить награды"
-	_line(rows, "Первое задание", AppTheme.COLOR_TEXT, 10)
+	_line(rows, title, AppTheme.COLOR_TEXT, 10)
 	var xp: int = int(reward["xp"])
-	var echoes: int = int(reward["echoes"]) if not session.memory_flags.get(GameSession.GROVE_ECHOES_GRANTED, false) else 0
+	var echoes: int = int(reward["echoes"]) if not session.memory_flags.get(echo_flag, false) else 0
 	_line(rows, "+%d XP   ·   +%d Эхо" % [xp, echoes], AppTheme.COLOR_MAGIC)
 	_line(rows, UiText.astra(int(reward["silver"]), GameSession.SILVER) + " астр", AppTheme.COLOR_ACCENT)
 	var preview: Dictionary = session.hero.preview_level_gain(xp)
 	_line(rows, "Уровень · %d" % int(preview["level"]), XP_COLOR)
-	_line(rows, "Точный выпад I", AppTheme.COLOR_TEXT)
+	if not skill.is_empty():
+		_line(rows, skill, AppTheme.COLOR_TEXT)
 
 func present_next(result: Dictionary) -> bool:
 	_reset_input()
