@@ -12,7 +12,7 @@ var _restoring: bool = false
 var _claim_commit_active: bool = false
 var _checkpoint_commit_active: bool = false
 var _shop_commit_active: bool = false
-var _grove_commit_active: bool = false
+var _expedition_commit_active: bool = false
 var _observed_inventory: InventoryService
 
 @onready var screen_host: Control = %ScreenHost
@@ -114,6 +114,8 @@ func _on_screen_added(screen: Control) -> void:
 		screen.connect("grove_command_requested", _on_grove_command_requested)
 	if screen.has_signal("hollow_command_requested"):
 		screen.connect("hollow_command_requested", _on_hollow_command_requested)
+	if screen.has_signal("outpost_command_requested"):
+		screen.connect("outpost_command_requested", _on_outpost_command_requested)
 	if screen.has_signal("open_bag_requested"):
 		screen.connect("open_bag_requested", _on_open_bag_requested)
 
@@ -236,22 +238,33 @@ func _on_hollow_command_requested(command: String) -> void:
 func commit_hollow_command(command: String) -> bool:
 	return _commit_expedition_command(command, GameSession.LOCATION_HOLLOW)
 
+func _on_outpost_command_requested(command: String) -> void:
+	var screen: Control = router.current_screen
+	if _commit_expedition_command(command, GameSession.LOCATION_OUTPOST):
+		screen.call("outpost_command_committed", command)
+	else:
+		screen.call("outpost_command_rejected", command)
+
 func _commit_expedition_command(command: String, route_id: String) -> bool:
-	if _restoring or _grove_commit_active or _claim_commit_active or _checkpoint_commit_active or _shop_commit_active:
+	if _restoring or _expedition_commit_active or _claim_commit_active or _checkpoint_commit_active or _shop_commit_active:
 		return false
 	if session.in_combat or session.checkpoints.channel_active or session.checkpoints.has_pending_completion():
 		return false
-	_grove_commit_active = true
+	_expedition_commit_active = true
 	var candidate := GameSession.new()
 	candidate.apply_state_dto(save_service.capture(session))
-	var applied: bool = candidate.apply_hollow_command(command) if route_id == GameSession.LOCATION_HOLLOW else candidate.apply_grove_command(command)
+	var applied: bool = false
+	match route_id:
+		GameSession.LOCATION_GROVE: applied = candidate.apply_grove_command(command)
+		GameSession.LOCATION_HOLLOW: applied = candidate.apply_hollow_command(command)
+		GameSession.LOCATION_OUTPOST: applied = candidate.apply_outpost_command(command)
 	if not applied or not save_service.save(candidate, save_path):
-		_grove_commit_active = false
+		_expedition_commit_active = false
 		return false
 	_restoring = true
 	session.apply_state_dto(save_service.capture(candidate))
 	_restoring = false
-	_grove_commit_active = false
+	_expedition_commit_active = false
 	_connect_session_signals()
 	notice_bar.hide()
 	return true

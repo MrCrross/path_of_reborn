@@ -45,6 +45,10 @@ const BACKGROUNDS := {
 	"world_hollow": "environments/blue_hollow_quarry_background.png",
 	"hollow_basin": "environments/crystal_toad_basin_background.png",
 	"hollow_cloth": "environments/story/haruto_finds_grey_cloth_story.png",
+	"world_outpost": "environments/winds_edge_outpost_background.png",
+	"outpost_contact": "environments/story/akari_first_contact_story.png",
+	"outpost_key": "environments/story/akari_key_fragment_story.png",
+	"outpost_letter": "environments/story/letter_epilogue_story.png",
 	"world_lioren": "environments/lioren_south_gate_background.png",
 	"shop_cricket_twilight": "environments/cricket_twilight_interior_background.png",
 	"shop_appraisal": "environments/story/daijiro_crystal_appraisal_story.png",
@@ -89,6 +93,19 @@ const HOLLOW_STILLS := {
 	"crystal_toad": {"path": "enemies/crystal_toad_idle.png", "crop": Rect2(28, 24, 70, 60), "size": Vector2(62, 53)},
 }
 
+const OUTPOST_PROPS := {
+	"bowl": "environments/props/outpost_signal_bowl_prop.png",
+	"sign": "environments/props/old_watch_three_lines_icon.png",
+	"fire": "effects/akari_fire_seal_01.png",
+	"akari": "characters/akari_spear_idle.png",
+}
+
+const WARDEN_STILL := {"path": "enemies/bone_warden_idle.png", "crop": Rect2(28, 26, 70, 118), "size": Vector2(42, 71)}
+const AKARI_SHEETS := {
+	"idle": {"path": "characters/animations/akari_spear_idle_sheet.png", "count": 2, "frame": Vector2i(128, 128), "offset": Vector2(0, -48), "scale": 0.62},
+	"thrust": {"path": "characters/animations/akari_thrust_sheet.png", "count": 6, "frame": Vector2i(192, 128), "offset": Vector2(16, -48), "scale": 0.62},
+}
+
 static func world_background(location_id: String) -> Texture2D:
 	match location_id:
 		GameSession.LOCATION_LIOREN:
@@ -97,6 +114,8 @@ static func world_background(location_id: String) -> Texture2D:
 			return texture(BACKGROUNDS["world_grove"])
 		GameSession.LOCATION_HOLLOW:
 			return texture(BACKGROUNDS["world_hollow"])
+		GameSession.LOCATION_OUTPOST:
+			return texture(BACKGROUNDS["world_outpost"])
 		_:
 			return texture(BACKGROUNDS["world_forest_edge"])
 
@@ -166,6 +185,8 @@ const EMPTY_SLOT_ICONS := {
 # Иконки предметов по item_id (+аспект для echo_crystal).
 # slime_residue: утверждённой иконки нет — карточка без иконки, пробел зафиксирован в отчёте.
 const ITEM_ICONS := {
+	"old_watch_badge": "equipment/old_watch_badge_icon.png",
+	"shoma_key_fragment": "equipment/shoma_key_fragment_icon.png",
 	"moon_flax_bandage": "equipment/moon_flax_bandage_icon.png",
 	"needle_hound_quills": "equipment/needle_hound_quills_icon.png",
 	"moth_pollen_jar": "equipment/moth_pollen_jar_icon.png",
@@ -279,6 +300,12 @@ const GOBLIN_SCOUT_SHEETS := {
 ## solid-силуэта высотой 32 logical px (ENEMY_SOLID_HEIGHT), не в пустоте
 ## прозрачного canvas старого logical-размера.
 const ENEMY_SHEETS := {
+	"bone_warden": {
+		"idle": {"path": "enemies/animations/bone_warden_idle_sheet.png", "count": 2, "frame": Vector2i(128, 160), "offset": Vector2(0, -64), "scale": 0.6, "head": Vector2(0, -71)},
+		"attack": {"path": "enemies/animations/bone_warden_sweep_sheet.png", "count": 8, "frame": Vector2i(128, 160), "offset": Vector2(0, -64), "scale": 0.6, "contact_frame": 4},
+		"summon": {"path": "enemies/animations/bone_warden_summon_sheet.png", "count": 6, "frame": Vector2i(128, 160), "offset": Vector2(0, -64), "scale": 0.6, "contact_frame": 3},
+		"stunned": {"path": "enemies/animations/bone_warden_stagger_sheet.png", "count": 4, "frame": Vector2i(128, 160), "offset": Vector2(0, -64), "scale": 0.6},
+	},
 	"river_shieldback": {
 		"idle": {"path": "enemies/animations/river_shieldback_guard_sheet.png", "count": 2, "frame": Vector2i(96, 64), "offset": Vector2(0, -24), "scale": 0.74, "head": Vector2(0, -38)},
 		"attack": {"path": "enemies/animations/river_shieldback_claw_attack_sheet.png", "count": 6, "frame": Vector2i(96, 64), "offset": Vector2(0, -24), "scale": 0.74, "contact_frame": 3},

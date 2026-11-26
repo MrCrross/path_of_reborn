@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://domain/definitions/item_definition.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = "shoma_key_fragment"
+display_name = "Обломок ключа Сёмы"
+description = "Акари узнала ключ наставника и доверила обломок Харуто до встречи с Мидори. Метка напоминает Печать Пути."
+type_id = "quest"
+stack_limit = 1
+sellable = false

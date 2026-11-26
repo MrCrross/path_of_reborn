@@ -51,3 +51,16 @@ static func hollow_enemy_anchor(size: Vector2, index: int, count: int) -> Vector
 		0: return Vector2(size.x * 0.48, floor + 9.0)
 		1: return Vector2(size.x * 0.79, floor + 9.0)
 		_: return Vector2(size.x * 0.67, floor - 52.0)
+
+
+static func outpost_enemy_anchor(size: Vector2, index: int, warden: bool) -> Vector2:
+	var floor: float = floor_y(size.y)
+	if warden and index == 0:
+		return Vector2(size.x * 0.70, floor + 8.0)
+	if index == 0:
+		return Vector2(size.x * 0.58, floor - 33.0)
+	return Vector2(size.x * 0.81, floor - (87.0 if warden else 63.0))
+
+
+static func outpost_ally_anchor(size: Vector2) -> Vector2:
+	return Vector2(size.x * 0.44, floor_y(size.y) - 9.0)

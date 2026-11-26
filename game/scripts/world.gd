@@ -3,6 +3,7 @@ extends Control
 signal navigate_requested(destination: String)
 signal grove_command_requested(command: String)
 signal hollow_command_requested(command: String)
+signal outpost_command_requested(command: String)
 
 var session: GameSession
 
@@ -36,6 +37,7 @@ var gates_dialogue: DialogueOverlay
 var guild_button: Button
 var grove_route: GroveRouteView
 var hollow_route: HollowRouteView
+var outpost_route: OutpostRouteView
 var focus_guild_on_entry: bool = false
 var _travel_actions: HBoxContainer
 var _tutorial: ConfirmDialog
@@ -56,6 +58,8 @@ func handle_back() -> bool:
 		return true
 	if hollow_route != null and hollow_route.close_dialogue():
 		return true
+	if outpost_route != null and outpost_route.close_dialogue():
+		return true
 	if gates_dialogue != null and gates_dialogue.is_active():
 		return true
 	if details_layer != null and details_layer.visible:
@@ -69,6 +73,9 @@ func handle_back() -> bool:
 		return true
 	if hollow_route != null:
 		hollow_route.leave()
+		return true
+	if outpost_route != null:
+		outpost_route.leave()
 		return true
 	return false
 
@@ -151,7 +158,7 @@ func _ready() -> void:
 	gates_dialogue.command_requested.connect(_on_dialogue_command)
 	gates_dialogue.finished.connect(_on_gates_finished)
 	add_child(gates_dialogue)
-	if session.location_id in [GameSession.LOCATION_GROVE, GameSession.LOCATION_HOLLOW]:
+	if session.location_id in GameSession.EXPEDITION_LOCATIONS:
 		settings_button.reparent(nav_bar, false)
 		settings_button.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 		settings_button.custom_minimum_size = Vector2(24, 24)
@@ -171,6 +178,14 @@ func _ready() -> void:
 		hollow_route.encounter_requested.connect(_on_grove_encounter)
 		hollow_route.shot_changed.connect(_show_grove_dialogue_shot)
 		hollow_route.refresh.call_deferred()
+	elif session.location_id == GameSession.LOCATION_OUTPOST:
+		outpost_route = OutpostRouteView.new()
+		add_child(outpost_route)
+		outpost_route.configure(session, self, bottom, _top_left, art_background)
+		outpost_route.command_requested.connect(func(command: String) -> void: outpost_command_requested.emit(command))
+		outpost_route.encounter_requested.connect(_on_grove_encounter)
+		outpost_route.shot_changed.connect(_show_grove_dialogue_shot)
+		outpost_route.refresh.call_deferred()
 	_refresh()
 	session.profile_changed.connect(_refresh_hero_art)
 	_refresh_hero_art()
@@ -254,7 +269,7 @@ func _refresh_hero_art() -> void:
 
 func _layout_scene() -> void:
 	var view := Rect2(Vector2.ZERO, size)
-	var anchor: Vector2 = SceneStaging.grove_hero_anchor(size) if grove_route != null or hollow_route != null else SceneStaging.hero_anchor(size)
+	var anchor: Vector2 = SceneStaging.grove_hero_anchor(size) if session.location_id in GameSession.EXPEDITION_LOCATIONS else SceneStaging.hero_anchor(size)
 	var scale: float = ArtMap.still_scale(_hero_still_id)
 	var pivot: Vector2 = ArtMap.SOURCE_STILLS[_hero_still_id]["pivot"]
 	if hero_sprite.texture != null:
@@ -326,6 +341,16 @@ func hollow_command_committed(command: String) -> void:
 func hollow_command_rejected(command: String) -> void:
 	if hollow_route != null:
 		hollow_route.rejected(command)
+
+func outpost_command_committed(command: String) -> void:
+	if command == "leave":
+		navigate_requested.emit("world_from_guild")
+	else:
+		_refresh()
+		outpost_route.refresh()
+
+func outpost_command_rejected(command: String) -> void:
+	outpost_route.rejected(command)
 
 func _on_repeats_pressed() -> void:
 	if _navigating:
@@ -442,7 +467,7 @@ func _gui_input(event: InputEvent) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if _sheet_open or details_layer.visible or gates_dialogue.is_active() or ConfirmDialog.has_open(self) or (grove_route != null and grove_route.dialogue.is_active()) or (hollow_route != null and hollow_route.dialogue.is_active()):
+	if _sheet_open or details_layer.visible or gates_dialogue.is_active() or ConfirmDialog.has_open(self) or (grove_route != null and grove_route.dialogue.is_active()) or (hollow_route != null and hollow_route.dialogue.is_active()) or (outpost_route != null and outpost_route.dialogue.is_active()):
 		return
 	if event.is_action_pressed("primary"):
 		get_viewport().set_input_as_handled()
@@ -552,7 +577,7 @@ func _refresh() -> void:
 	repeats_button.tooltip_text = "Повторы и испытание"
 	repeats_button.accessibility_name = repeats_button.tooltip_text
 	var in_city: bool = session.location_id == GameSession.LOCATION_LIOREN
-	var in_expedition: bool = grove_route != null or hollow_route != null
+	var in_expedition: bool = session.location_id in GameSession.EXPEDITION_LOCATIONS
 	equipment_strip.set_suppressed(in_city or in_expedition)
 	checkpoint_button.visible = session.can_place_expedition_checkpoint()
 	repeats_button.visible = not in_city and not in_expedition and not combat_blocked and not session.route_repeat_enemy_ids().is_empty()

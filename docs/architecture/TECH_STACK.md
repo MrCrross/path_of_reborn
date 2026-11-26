@@ -30,7 +30,7 @@
 - **UI:** `Control` scenes с anchors/safe area; UI подписывается на состояние, а не меняет доменные правила напрямую.
 - **Input:** abstract actions (`primary`, `secondary`, `inventory`, `checkpoint`) с touch mapping; keyboard mapping только для desktop smoke test.
 - **Rendering:** nearest filter, integer scaling, portrait base viewport, performance budget на старом Android.
-- **Save** хранит локальный профиль v7 в `user://` с миграциями v0–v6 и резервной копией. Награда остаётся в корневом `pending_battle_result` до успешной записи. Один результат относится ко всей встрече. Вехи Рощи и Синего Оврага входят в снимок Печати. Эхо и память о репликах хранятся в `meta`. [Границы записи Рощи](../reviews/grove_stage_2026_11_22/README.md#маршрут-сохранение-и-баланс) · [Команды Синего Оврага](../design/MVP_BLUE_HOLLOW.md#состояние-и-запись)
+- **Save** хранит локальный профиль v7 в `user://` с миграциями v0–v6 и резервной копией. Награда остаётся в корневом `pending_battle_result` до успешной записи. Один результат относится ко всей встрече. Вехи Рощи, Синего Оврага и Края Ветров входят в снимок Печати. Эхо и память о репликах хранятся в `meta`. [Границы записи Рощи](../reviews/grove_stage_2026_11_22/README.md#маршрут-сохранение-и-баланс) · [Команды Оврага](../design/MVP_BLUE_HOLLOW.md#состояние-и-запись) · [Состояние поста](../design/MVP_WINDS_EDGE.md#состояние-и-запись)
 - **Networking:** отсутствует в MVP; не добавлять multiplayer SDK или серверный backend.
 
 ## Инструменты графики

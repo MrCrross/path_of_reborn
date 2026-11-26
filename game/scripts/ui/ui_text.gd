@@ -23,6 +23,7 @@ const TYPE_LABELS: Dictionary = {
 	"armor": "Доспех",
 	"charm": "Амулет",
 	"material": "Материал",
+	"quest": "Сюжетный предмет",
 	"echo": "Кристалл Эха",
 	"consumable": "Расходник",
 }
@@ -46,6 +47,7 @@ const LOCATION_LABELS: Dictionary = {
 	"lioren": "Лиорен",
 	"whispering_grass_grove": "Роща Шелестящих Трав",
 	"blue_hollow": "Синий Овраг",
+	"winds_edge": "Край Ветров",
 	"forest_edge": "Граница леса",
 }
 const ENEMY_LABELS: Dictionary = {

@@ -21,6 +21,7 @@ class GroveEnemyView:
 	var body_width: float
 	var body_bottom: float
 	var phase: int = -1
+	var stunned: bool = false
 	var defeated: bool = false
 
 var arena: Control
@@ -47,6 +48,11 @@ var _last_phase: int = -1
 var _battle_tweens: Array[Tween] = []
 var _grove_enemies: Array[GroveEnemyView] = []
 var _pollen_cloud: Sprite2D
+var _akari: AnimatedSprite2D
+var _akari_clips: Dictionary = {}
+var _ally_cue: Label
+var _ally_notice: Tween
+var _ally_fire: Sprite2D
 
 func configure(target_session: GameSession, arena_node: Control, hero: AnimatedSprite2D, enemy: AnimatedSprite2D, telegraph_node: Sprite2D, cue: Label) -> void:
 	session = target_session
@@ -75,6 +81,9 @@ func bind_resolver(next_resolver: CombatResolver) -> void:
 		_build_grove_enemies()
 		resolver.enemy_phase_changed.connect(_on_grove_actor_changed)
 		resolver.target_changed.connect(_on_grove_actor_changed)
+		if session.location_id == GameSession.LOCATION_OUTPOST:
+			_build_outpost_ally()
+			resolver.ally_action.connect(_on_ally_action)
 	else:
 		resolver.phase_changed.connect(_on_phase_changed)
 	resolver.damage_dealt.connect(_on_damage_dealt)
@@ -101,6 +110,8 @@ func layout() -> void:
 		return
 	var hero_anchor: Vector2 = SceneStaging.hero_anchor(arena_size) if _grove_enemies.is_empty() else SceneStaging.grove_hero_anchor(arena_size)
 	hero_sprite.position = hero_anchor.round()
+	if _akari != null:
+		_akari.position = SceneStaging.outpost_ally_anchor(arena_size).round()
 	if not (intro_active and _intro_tween != null and _intro_tween.is_valid()):
 		if _grove_enemies.is_empty():
 			enemy_sprite.position = SceneStaging.enemy_anchor(arena_size).round()
@@ -140,6 +151,8 @@ func set_pause(open: bool) -> void:
 	if open:
 		hero_sprite.pause()
 		enemy_sprite.pause()
+		if _akari != null:
+			_akari.pause()
 		for enemy_view: GroveEnemyView in _grove_enemies:
 			enemy_view.sprite.pause()
 		if _intro_tween != null and _intro_tween.is_valid():
@@ -151,6 +164,8 @@ func set_pause(open: bool) -> void:
 				tween.pause()
 	else:
 		hero_sprite.play()
+		if _akari != null:
+			_akari.play()
 		if _grove_enemies.is_empty():
 			enemy_sprite.play()
 		for enemy_view: GroveEnemyView in _grove_enemies:
@@ -181,6 +196,9 @@ func finish(player_won: bool) -> void:
 			enemy_view.warning.hide()
 			enemy_view.cue.hide()
 		_pollen_cloud.hide()
+		if _ally_cue != null:
+			_ally_cue.hide()
+			_ally_fire.hide()
 		return
 	telegraph.hide()
 	_stop_telegraph_pulse()
@@ -333,7 +351,64 @@ func _setup_art() -> void:
 		enemy_sprite.animation_finished.connect(_on_enemy_clip_finished)
 
 func uses_expedition_art() -> bool:
-	return session.location_id in [GameSession.LOCATION_GROVE, GameSession.LOCATION_HOLLOW]
+	return session.location_id in GameSession.EXPEDITION_LOCATIONS
+
+func _build_outpost_ally() -> void:
+	_akari = AnimatedSprite2D.new()
+	_akari.name = "Akari"
+	_akari.z_index = 1
+	arena.add_child(_akari)
+	_akari.position = SceneStaging.outpost_ally_anchor(arena.size).round()
+	for clip_name: String in ArtMap.AKARI_SHEETS:
+		_akari_clips[clip_name] = _build_clip(ArtMap.AKARI_SHEETS[clip_name], clip_name != "idle")
+	_akari.animation_finished.connect(_play_akari_idle)
+	_play_akari_idle()
+	_ally_fire = Sprite2D.new()
+	_ally_fire.name = "AkariSeal"
+	_ally_fire.z_index = 1
+	_ally_fire.texture = ArtMap.crop(ArtMap.OUTPOST_PROPS["fire"], Rect2(12, 58, 72, 28))
+	_ally_fire.scale = Vector2.ONE * 0.65
+	_ally_fire.hide()
+	arena.add_child(_ally_fire)
+	_ally_cue = Label.new()
+	_ally_cue.name = "AllyCue"
+	_ally_cue.z_index = 4
+	_ally_cue.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_ally_cue.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_ally_cue.add_theme_font_size_override("font_size", 8)
+	_ally_cue.add_theme_color_override("font_color", Color("ffdea0"))
+	_ally_cue.add_theme_color_override("font_outline_color", Color("171a12"))
+	_ally_cue.add_theme_constant_override("outline_size", 4)
+	arena.add_child(_ally_cue)
+	_ally_cue.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	_ally_cue.hide()
+
+func _play_akari_idle() -> void:
+	_apply_clip(_akari, _akari_clips["idle"])
+	_akari.play(&"default")
+
+func _on_ally_action(action: String) -> void:
+	var thrust: bool = action in ["hold", "joint_break"]
+	if thrust:
+		_apply_clip(_akari, _akari_clips["thrust"])
+		_akari.play(&"default")
+		_ally_fire.position = _grove_anchor(1 if action == "hold" else 0) + Vector2(0, 1)
+	_ally_fire.visible = thrust
+	_ally_cue.text = {
+		"hold": "Акари · Одного держу я!",
+		"dive_warning": "Акари · Берегись пикирования!",
+		"summon_warning": "Акари · Он зовёт воронов!",
+		"joint_break": "Акари · Сейчас! По колену!",
+	}[action]
+	_ally_cue.show()
+	if _ally_notice != null and _ally_notice.is_valid():
+		_battle_tweens.erase(_ally_notice)
+		_ally_notice.kill()
+	_ally_notice = create_tween()
+	_ally_notice.tween_interval(1.8 / float(session.auto_speed if resolver.combat_format == "auto" else 1))
+	_ally_notice.tween_callback(_ally_cue.hide)
+	_ally_notice.tween_callback(_ally_fire.hide)
+	_track_tween(_ally_notice)
 
 func _build_grove_enemies() -> void:
 	_pollen_cloud = Sprite2D.new()
@@ -374,14 +449,16 @@ func _build_grove_enemies() -> void:
 		var species: String = slot.actor.definition.id
 		var sheets: Dictionary = ArtMap.ENEMY_SHEETS[species]
 		view.head = sheets["idle"]["head"]
-		var stills: Dictionary = ArtMap.HOLLOW_STILLS if session.location_id == GameSession.LOCATION_HOLLOW else ArtMap.GROVE_STILLS
-		view.body_width = float(stills[species]["size"].x)
+		var still: Dictionary = ArtMap.WARDEN_STILL if species == "bone_warden" else ArtMap.HOLLOW_STILLS.get(species, ArtMap.GROVE_STILLS.get(species, {}))
+		view.body_width = float(still["size"].x)
 		view.body_bottom = 17.0 if slot.pollen_slow_ticks > 0 else 5.0
 		for clip_name: String in sheets:
 			view.clips[clip_name] = _build_clip(sheets[clip_name], clip_name not in ["idle", "stunned"])
 		_grove_enemies.append(view)
 
 func _grove_anchor(index: int) -> Vector2:
+	if session.location_id == GameSession.LOCATION_OUTPOST:
+		return SceneStaging.outpost_enemy_anchor(arena.size, index, resolver.enemy_slots[0].actor.definition.id == "bone_warden").round()
 	if session.location_id == GameSession.LOCATION_HOLLOW:
 		return SceneStaging.hollow_enemy_anchor(arena.size, index, resolver.enemy_slots.size()).round()
 	return SceneStaging.grove_enemy_anchor(arena.size, index, resolver.enemy_slots[index].pollen_slow_ticks > 0).round()
@@ -389,13 +466,18 @@ func _grove_anchor(index: int) -> Vector2:
 func _update_grove_positions() -> void:
 	var bounds := Rect2(Vector2.ZERO, arena.size)
 	hero_health.follow(hero_sprite.position + Vector2(ArtMap.HERO_EXILED["idle"]["head"]), bounds)
+	if _ally_cue != null:
+		_ally_cue.position.y = roundf(SceneStaging.floor_y(arena.size.y) + 32.0)
 	for index: int in range(_grove_enemies.size()):
 		var slot: CombatResolver.EnemySlot = resolver.enemy_slots[index]
 		var view: GroveEnemyView = _grove_enemies[index]
 		view.health.follow(view.sprite.position + view.head, bounds)
-		if not view.defeated:
+		if not view.defeated and not slot.dormant:
 			_update_grove_attack_frame(view, slot)
-		view.warning.position = (hero_sprite.position if slot.pollen_slow_ticks > 0 else view.sprite.position) + Vector2(0, 1)
+		var hazard_at_hero: bool = slot.pollen_slow_ticks > 0 or (slot.actor.definition.id == "bone_warden" and resolver.warden_move == "void")
+		view.warning.position = (hero_sprite.position if hazard_at_hero else view.sprite.position) + Vector2(0, 1)
+		if hazard_at_hero and slot.actor.definition.id == "bone_warden":
+			view.warning.position.x = maxf(44.0, view.warning.position.x)
 		var cue_x: float = clampf(view.sprite.position.x - view.cue.size.x * 0.5, 0.0, maxf(0.0, arena.size.x - view.cue.size.x))
 		view.cue.position = Vector2(cue_x, view.health.position.y - 15.0).round()
 	if _pollen_cloud.visible:
@@ -411,11 +493,18 @@ func _refresh_grove_enemies() -> void:
 		var view: GroveEnemyView = _grove_enemies[index]
 		if view.defeated:
 			continue
+		view.sprite.visible = not slot.dormant
+		if slot.dormant:
+			view.health.hide()
+			view.warning.hide()
+			view.cue.hide()
+			continue
 		var alive: bool = not slot.actor.is_dead()
 		view.health.visible = alive
 		view.health.set_hp(slot.actor.current_hp, slot.actor.max_hp)
 		view.health.set_targeted(resolver.combat_format == "active" and resolver.target == slot)
-		view.warning.visible = alive and slot.phase in [CombatResolver.Phase.TELEGRAPH, CombatResolver.Phase.STARTUP]
+		var is_void: bool = slot.actor.definition.id == "bone_warden" and resolver.warden_move == "void"
+		view.warning.visible = alive and (slot.phase in [CombatResolver.Phase.TELEGRAPH, CombatResolver.Phase.STARTUP] or (is_void and slot.phase == CombatResolver.Phase.ACTIVE))
 		view.cue.visible = alive and (view.warning.visible or slot.stunned or (slot.actor.definition.guarded_damage_multiplier < 1.0 and slot.phase == CombatResolver.Phase.VULNERABILITY))
 		if not alive:
 			view.defeated = true
@@ -425,14 +514,15 @@ func _refresh_grove_enemies() -> void:
 			continue
 		if slot.pollen_slow_ticks > 0 and slot.phase == CombatResolver.Phase.ACTIVE:
 			_pollen_cloud.show()
-		if view.phase == slot.phase:
+		if view.phase == slot.phase and view.stunned == slot.stunned:
 			continue
 		view.phase = slot.phase
+		view.stunned = slot.stunned
 		var species: String = slot.actor.definition.id
 		var attack: bool = slot.phase in [CombatResolver.Phase.STARTUP, CombatResolver.Phase.ACTIVE, CombatResolver.Phase.RECOVERY]
 		var clip_name: String = _attack_clip(slot) if attack else "idle"
 		if slot.stunned:
-			clip_name = "stunned"
+			clip_name = "stunned" if view.clips.has("stunned") else "idle"
 		_apply_clip(view.sprite, view.clips[clip_name])
 		view.sprite.modulate = Color(1.16, 1.05, 0.76) if slot.phase == CombatResolver.Phase.VULNERABILITY else Color.WHITE
 		if not attack:
@@ -440,12 +530,17 @@ func _refresh_grove_enemies() -> void:
 		else:
 			view.sprite.pause()
 		view.warning.modulate = Color(1.0, 0.8, 0.35, 0.8) if species == "dust_moth" else Color(1.0, 0.55, 0.45, 0.8)
-		view.warning.scale = Vector2.ONE * 0.76
+		if is_void:
+			view.warning.modulate = Color(0.81, 0.50, 1.0, 0.9)
+		view.warning.scale = Vector2.ONE * (0.98 if is_void else 0.76)
+		view.cue.add_theme_color_override("font_color", Color("e8c2ff") if is_void else Color("ffe3a2"))
 		view.cue.text = _grove_warning(slot)
 		view.cue.reset_size()
 	_update_grove_positions()
 
 func _update_grove_attack_frame(view: GroveEnemyView, slot: CombatResolver.EnemySlot) -> void:
+	if slot.phase not in [CombatResolver.Phase.STARTUP, CombatResolver.Phase.ACTIVE, CombatResolver.Phase.RECOVERY]:
+		return
 	var definition: ActorDefinition = slot.actor.definition
 	var spec: Dictionary = ArtMap.ENEMY_SHEETS[definition.id][_attack_clip(slot)]
 	var contact: int = int(spec["contact_frame"])
@@ -466,13 +561,15 @@ func _update_grove_attack_frame(view: GroveEnemyView, slot: CombatResolver.Enemy
 		view.sprite.set_frame_and_progress(frame, 0.0)
 
 func _attack_clip(slot: CombatResolver.EnemySlot) -> String:
+	if slot.actor.definition.id == "bone_warden":
+		return "attack" if resolver.warden_move == "attack" else "summon"
 	if slot.actor.definition.id == "crystal_toad" and slot.strike_index == 1:
 		return "leap"
 	return slot.attack_id
 
 func _grove_warning(slot: CombatResolver.EnemySlot) -> String:
 	if slot.stunned:
-		return "Оглушён"
+		return "Сустав открыт" if slot.actor.definition.id == "bone_warden" else "Оглушён"
 	match slot.actor.definition.id:
 		"dust_moth": return "Пыльца"
 		"root_weaver": return "Захват"
@@ -480,6 +577,10 @@ func _grove_warning(slot: CombatResolver.EnemySlot) -> String:
 		"stone_rodent": return "Бросок"
 		"ash_raven": return "Пикирование"
 		"crystal_toad": return "Прыжок" if slot.strike_index == 1 else "Удар языком"
+		"bone_warden":
+			if slot.phase == CombatResolver.Phase.VULNERABILITY:
+				return "Уязвим"
+			return {"attack": "Широкий взмах", "summon": "Призыв ворона", "void": "Зона Пустоты"}[resolver.warden_move]
 		_: return "Прыжок" if slot.attack_id == "leap" else "Иглы"
 
 func target_at(position: Vector2) -> String:
@@ -487,7 +588,7 @@ func target_at(position: Vector2) -> String:
 	var nearest_distance: float = INF
 	for index: int in range(_grove_enemies.size()):
 		var view: GroveEnemyView = _grove_enemies[index]
-		if view.defeated:
+		if view.defeated or resolver.enemy_slots[index].dormant:
 			continue
 		var instance_id: String = resolver.enemy_slots[index].instance_id
 		if view.health.get_rect().grow(2.0).has_point(position):

@@ -47,9 +47,21 @@ func _run() -> void:
 			sprite.free()
 			clips += 1
 	_check(clips == 19 and total_frames == 62, "all 19 source-resolution clips and 62 frames covered")
-	var grove: Vector2i = _grove_sheet_contracts()
+	var grove: Vector2i = _grid_sheet_contracts({
+		"needle_hound": ArtMap.ENEMY_SHEETS["needle_hound"],
+		"dust_moth": ArtMap.ENEMY_SHEETS["dust_moth"],
+		"root_weaver": ArtMap.ENEMY_SHEETS["root_weaver"],
+	})
+	_check(grove == Vector2i(7, 28), "Seven Grove clips include all 28 frames")
 	clips += grove.x
 	total_frames += grove.y
+	var outpost: Vector2i = _grid_sheet_contracts({
+		"akari": ArtMap.AKARI_SHEETS,
+		"bone_warden": ArtMap.ENEMY_SHEETS["bone_warden"],
+	})
+	_check(outpost == Vector2i(6, 28), "Six Outpost clips include all 28 frames")
+	clips += outpost.x
+	total_frames += outpost.y
 	var centered_actor := AnimatedSprite2D.new()
 	ArtMap.apply_animation_transform(centered_actor, ArtMap.YUI["wait"], true)
 	_check(absf(centered_actor.offset.y * centered_actor.scale.y) < 0.15, "prologue centered canvas preserved")
@@ -87,22 +99,22 @@ func _run() -> void:
 	print("ANIMATION RESULT: clips=%d frames=%d checks=%d failed=%d" % [clips, total_frames, checks, failures])
 	quit(1 if failures > 0 else 0)
 
-func _grove_sheet_contracts() -> Vector2i:
+func _grid_sheet_contracts(families: Dictionary) -> Vector2i:
 	var totals := Vector2i.ZERO
-	for species: String in ["needle_hound", "dust_moth", "root_weaver"]:
-		for clip: String in ArtMap.ENEMY_SHEETS[species]:
-			var definition: Dictionary = ArtMap.ENEMY_SHEETS[species][clip]
+	for species: String in families:
+		for clip: String in families[species]:
+			var definition: Dictionary = families[species][clip]
 			var bounds: Rect2 = Rect2(Vector2.ZERO, ArtMap.texture(definition["path"]).get_size())
 			var frames: SpriteFrames = ArtMap.sprite_frames(definition, 10.0, clip != "idle")
 			var count: int = frames.get_frame_count(&"default")
 			_check(count == definition["count"], "%s %s frame count" % [species, clip])
 			_check(frames.get_animation_loop(&"default") == (clip == "idle"), "%s %s loop contract" % [species, clip])
-			_check(int(definition["contact_frame"]) < count, "%s %s contact frame fits" % [species, clip])
+			if definition.has("contact_frame"):
+				_check(int(definition["contact_frame"]) < count, "%s %s contact frame fits" % [species, clip])
 			for index: int in range(count):
 				var frame: AtlasTexture = frames.get_frame_texture(&"default", index)
 				_check(bounds.encloses(frame.region), "%s %s frame %d fits its sheet" % [species, clip, index])
 			totals += Vector2i(1, count)
-	_check(totals == Vector2i(7, 28), "Seven Grove clips include all 28 frames")
 	return totals
 
 

@@ -1,0 +1,42 @@
+{
+  "nodes": {
+    "ravens": {
+      "enemy_id": "ash_raven",
+      "cleared_flag": "outpost_ravens_won",
+      "cues": ["DIA_AKARI_001", "DIA_AKARI_002", "DIA_AKARI_004", "DIA_AKARI_005"],
+      "enemies": [
+        {"id": "raven_free", "actor_id": "ash_raven"},
+        {"id": "raven_held", "actor_id": "ash_raven", "initial_stun_ticks": 115}
+      ],
+      "ally_warning_ticks": [1, 44],
+      "xp": 4
+    },
+    "warden": {
+      "enemy_id": "bone_warden",
+      "cleared_flag": "outpost_warden_won",
+      "cues": ["DIA_AKARI_011", "DIA_AKARI_012", "DIA_AKARI_015", "DIA_AKARI_016", "DIA_AKARI_017", "DIA_AKARI_019", "DIA_WARDEN_001"],
+      "enemies": [
+        {"actor_id": "bone_warden"},
+        {"id": "warden_raven", "actor_id": "ash_raven", "dormant": true}
+      ],
+      "warden_pattern": {
+        "phase_two_hp": 16,
+        "joint_break_hp": 8,
+        "joint_break_ticks": 115,
+        "raven_offset_ticks": 29,
+        "void_multiplier": 1.25
+      },
+      "xp": 9,
+      "rewards": [
+        {"item_id": "old_watch_badge", "quantity": 1},
+        {"item_id": "shoma_key_fragment", "quantity": 1}
+      ]
+    },
+    "alliance": {
+      "cues": ["DIA_AKARI_022", "DIA_AKARI_024", "DIA_AKARI_025", "DIA_AKARI_026", "DIA_AKARI_027", "DIA_AKARI_028", "DIA_AKARI_029"]
+    }
+  },
+  "report": {"silver": 60, "echoes": 3},
+  "report_cues": ["DIA_EPILOGUE_001", "DIA_EPILOGUE_002", "DIA_EPILOGUE_003", "DIA_EPILOGUE_005"],
+  "epilogue_cues": ["DIA_EPILOGUE_006", "DIA_EPILOGUE_007", "DIA_EPILOGUE_010", "DIA_EPILOGUE_011", "DIA_EPILOGUE_012", "DIA_EPILOGUE_014", "DIA_EPILOGUE_015", "DIA_OUTPOST_MAP"]
+}

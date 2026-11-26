@@ -87,9 +87,10 @@ func present_guild_report(session: GameSession, reward: Dictionary, title: Strin
 	_show_summary(claim_button)
 	claim_button.text = "Получить награды"
 	_line(rows, title, AppTheme.COLOR_TEXT, 10)
-	var xp: int = int(reward["xp"])
+	var xp: int = int(reward.get("xp", 0))
 	var echoes: int = int(reward["echoes"]) if not session.memory_flags.get(echo_flag, false) else 0
-	_line(rows, "+%d XP   ·   +%d Эхо" % [xp, echoes], AppTheme.COLOR_MAGIC)
+	if xp > 0 or echoes > 0:
+		_line(rows, "+%d XP   ·   +%d Эхо" % [xp, echoes] if xp > 0 else "+%d Эхо" % echoes, AppTheme.COLOR_MAGIC)
 	_line(rows, UiText.astra(int(reward["silver"]), GameSession.SILVER) + " астр", AppTheme.COLOR_ACCENT)
 	var preview: Dictionary = session.hero.preview_level_gain(xp)
 	_line(rows, "Уровень · %d" % int(preview["level"]), XP_COLOR)
@@ -186,8 +187,11 @@ func _build_card() -> void:
 	stats.add_theme_constant_override("separation", 0)
 	item_row.add_child(stats)
 	if not _can_equip:
-		var total: int = int(_entry.get("sale_price_copper", definition.sale_price_copper)) * quantity
-		_line(stats, "Цена: %s" % UiText.astra(total), AppTheme.COLOR_TEXT, 9, HORIZONTAL_ALIGNMENT_LEFT)
+		var description: String = UiText.item_type(definition.type_id)
+		if bool(model["sellable"]):
+			var total: int = int(model["sale_price_copper"]) * quantity
+			description = "Цена: %s" % UiText.astra(total)
+		_line(stats, description, AppTheme.COLOR_TEXT, 9, HORIZONTAL_ALIGNMENT_LEFT)
 	elif model.get("current_item") == null:
 		for bonus: Dictionary in model.get("bonuses", []):
 			_line(stats, "%s %+d" % [bonus["label"], int(bonus["amount"])], AppTheme.COLOR_TEXT, 9, HORIZONTAL_ALIGNMENT_LEFT)

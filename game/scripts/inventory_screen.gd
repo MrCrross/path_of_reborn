@@ -59,6 +59,7 @@ func _ready() -> void:
 	type_filter.add_item("Амулеты")
 	type_filter.add_item("Материалы")
 	type_filter.add_item("Кристаллы Эха")
+	type_filter.add_item("Сюжетные")
 	stats_text.hide()
 	upgrade_row.hide()
 	format_option.hide()
@@ -71,7 +72,7 @@ func _ready() -> void:
 
 func _on_filter_selected(index: int) -> void:
 	_close_details()
-	filter_id = ["", "weapon", "charm", "material", "echo"][index]
+	filter_id = ["", "weapon", "charm", "material", "echo", "quest"][index]
 	_built_signature = ""
 	_refresh_list()
 	_refresh_details()

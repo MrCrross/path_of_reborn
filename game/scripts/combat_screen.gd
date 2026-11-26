@@ -75,7 +75,7 @@ func _ready() -> void:
 	if session == null:
 		session = GameSession.new()
 		session.select_encounter("moss_slime")
-	if session.location_id in [GameSession.LOCATION_GROVE, GameSession.LOCATION_HOLLOW]:
+	if session.location_id in GameSession.EXPEDITION_LOCATIONS:
 		$Arena/ArenaBackground.texture = ArtMap.world_background(session.location_id)
 		if session.location_id == GameSession.LOCATION_HOLLOW and session.hollow_stage() == "elite":
 			$Arena/ArenaBackground.texture = ArtMap.texture(ArtMap.BACKGROUNDS["hollow_basin"])

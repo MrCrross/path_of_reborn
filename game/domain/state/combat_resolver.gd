@@ -13,6 +13,7 @@ signal dodge_begun(source: String)
 signal hero_attack_begun(run_id: String)
 signal hero_attack_landed(run_id: String, target_id: String, amount: int)
 signal ability_used(ability_id: String)
+signal ally_action(action: String)
 signal finished(won: bool)
 
 enum Phase {
@@ -32,12 +33,14 @@ class EnemySlot:
 	var strike_index: int = 0
 	var pollen_slow_ticks: int = 0
 	var stunned: bool = false
+	var dormant: bool = false
 
 	func _init(definition: ActorDefinition, options: Dictionary) -> void:
 		instance_id = String(options.get("id", definition.id))
 		actor = CharacterState.new(definition)
 		attack_id = String(options.get("attack", "attack"))
 		pollen_slow_ticks = int(options.get("pollen_slow_ticks", 0))
+		dormant = bool(options.get("dormant", false))
 
 ## Политика автозащиты полного автобоя (гипотеза для сравнения, не готовый
 ## баланс): попытка на входе в первую STARTUP-фазу цикла, если защита готова.
@@ -76,6 +79,14 @@ var dodge_cooldown: int = 0
 var tick_count: int = 0
 var is_finished: bool = false
 var won: bool = false
+var ally_warnings: PackedInt32Array = PackedInt32Array()
+var warden_pattern: Dictionary = {}
+var warden_phase: int = 1
+var warden_move: String = "attack"
+var _warden_swept: bool = false
+var _warden_summoned: bool = false
+var _warden_void_struck: bool = false
+var _warden_opened: bool = false
 
 ## Замах героя в полёте: контакт наступит через столько тиков. Урон наносится
 ## только на контакте, не в момент начала замаха.
@@ -103,6 +114,8 @@ func _init(hero_state: CharacterState, enemy_definition: ActorDefinition, combat
 func _add_enemy(definition: ActorDefinition, options: Dictionary) -> void:
 	var slot := EnemySlot.new(definition, options)
 	enemy_slots.append(slot)
+	if slot.dormant:
+		return
 	_enter_phase(slot, Phase.TELEGRAPH)
 	slot.remaining = maxi(1, slot.remaining + int(options.get("telegraph_offset", 0)))
 	var stun_ticks: int = int(options.get("initial_stun_ticks", 0))
@@ -119,7 +132,7 @@ func select_target(instance_id: String) -> bool:
 	if not is_active or is_finished or combat_format != "active":
 		return false
 	for slot: EnemySlot in enemy_slots:
-		if slot.instance_id == instance_id and not slot.actor.is_dead():
+		if slot.instance_id == instance_id and not slot.dormant and not slot.actor.is_dead():
 			_set_target(slot)
 			return true
 	return false
@@ -171,11 +184,13 @@ func advance_ticks(count: int) -> void:
 		if not is_active or is_finished:
 			return
 		tick_count += 1
+		if tick_count in ally_warnings:
+			ally_action.emit("hold" if tick_count == ally_warnings[0] else "dive_warning")
 		_tick_hero_strike()
 		if not is_active or is_finished:
 			return
 		for slot: EnemySlot in enemy_slots:
-			if slot.actor.is_dead():
+			if slot.dormant or slot.actor.is_dead():
 				continue
 			slot.remaining -= 1
 			if slot.remaining <= 0:
@@ -231,32 +246,44 @@ func _tick_hero_strike() -> void:
 	else:
 		strike_multiplier *= slot.actor.definition.guarded_damage_multiplier
 	var damage: int = CharacterState.calculate_damage(hero.strength, slot.actor.defense, strike_multiplier)
+	var warden: bool = _is_warden(slot)
+	if warden and not _warden_opened:
+		var gate: String = "phase_two_hp" if warden_phase == 1 else "joint_break_hp"
+		damage = clampi(damage, 0, slot.actor.current_hp - int(warden_pattern[gate]))
 	var applied_damage: int = slot.actor.take_damage(damage)
-	damage_dealt.emit(slot.instance_id, applied_damage)
+	if warden:
+		_update_warden_after_hit(slot)
+	if applied_damage > 0:
+		damage_dealt.emit(slot.instance_id, applied_damage)
 	hero_attack_landed.emit(run_id, slot.instance_id, applied_damage)
 	if not slot.actor.is_dead():
 		return
 	for survivor: EnemySlot in enemy_slots:
-		if not survivor.actor.is_dead():
+		if not survivor.dormant and not survivor.actor.is_dead():
 			if target == slot:
 				_set_target(survivor)
 			return
 	_finish(true)
 
 func _advance_phase(slot: EnemySlot) -> void:
+	var warden: bool = _is_warden(slot)
 	match slot.phase:
 		Phase.TELEGRAPH:
 			_enter_phase(slot, Phase.STARTUP)
 		Phase.STARTUP:
 			_enter_phase(slot, Phase.ACTIVE)
 		Phase.ACTIVE:
-			if slot.strike_index + 1 < slot.actor.definition.attacks_per_cycle:
+			var strikes: int = warden_phase if warden else slot.actor.definition.attacks_per_cycle
+			if slot.strike_index + 1 < strikes:
 				slot.strike_index += 1
 				_enter_phase(slot, Phase.STARTUP)
 			else:
 				_enter_phase(slot, Phase.RECOVERY)
 		Phase.RECOVERY:
-			_enter_phase(slot, Phase.VULNERABILITY)
+			if warden and _try_begin_warden_phase_two(slot):
+				return
+			if not warden or not _try_open_warden(slot):
+				_enter_phase(slot, Phase.VULNERABILITY)
 		Phase.VULNERABILITY:
 			slot.strike_index = 0
 			_enter_phase(slot, Phase.TELEGRAPH)
@@ -265,6 +292,8 @@ func _enter_phase(slot: EnemySlot, next_phase: int) -> void:
 	slot.phase = next_phase
 	slot.stunned = false
 	var definition: ActorDefinition = slot.actor.definition
+	if _is_warden(slot) and slot.phase in [Phase.TELEGRAPH, Phase.STARTUP]:
+		warden_move = "void" if slot.strike_index == 1 else ("summon" if warden_phase == 2 and not _warden_summoned else "attack")
 	match slot.phase:
 		Phase.TELEGRAPH:
 			slot.remaining = definition.telegraph_ticks
@@ -276,7 +305,7 @@ func _enter_phase(slot: EnemySlot, next_phase: int) -> void:
 			slot.remaining = definition.recovery_ticks
 		Phase.VULNERABILITY:
 			slot.remaining = definition.vulnerability_ticks
-	if slot.phase == Phase.STARTUP and slot.strike_index == 0 and auto_dodge_enabled:
+	if slot.phase == Phase.STARTUP and auto_dodge_enabled and (slot.strike_index == 0 or (_is_warden(slot) and warden_move == "void")) and not (_is_warden(slot) and warden_move == "summon"):
 		_try_auto_dodge()
 	if slot == enemy_slots[0]:
 		phase_changed.emit(slot.phase, slot.remaining)
@@ -295,6 +324,16 @@ func _begin_dodge(source: String) -> void:
 	dodge_begun.emit(source)
 
 func _resolve_enemy_strike(slot: EnemySlot) -> void:
+	var attack_multiplier: float = slot.actor.definition.attack_multiplier
+	if _is_warden(slot):
+		if warden_move == "summon":
+			_summon_warden_raven()
+			return
+		if warden_move == "void":
+			_warden_void_struck = true
+			attack_multiplier = float(warden_pattern["void_multiplier"])
+		else:
+			_warden_swept = true
 	if slot.pollen_slow_ticks > 0:
 		var avoided: bool = dodge_ticks_remaining > 0
 		if avoided:
@@ -312,12 +351,53 @@ func _resolve_enemy_strike(slot: EnemySlot) -> void:
 	var damage: int = CharacterState.calculate_damage(
 		slot.actor.strength,
 		hero.defense,
-		slot.actor.definition.attack_multiplier
+		attack_multiplier
 	)
 	var applied_damage: int = hero.take_damage(damage)
 	damage_dealt.emit("hero", applied_damage)
 	if hero.is_dead():
 		_finish(false)
+
+func _is_warden(slot: EnemySlot) -> bool:
+	return not warden_pattern.is_empty() and slot == enemy_slots[0]
+
+func _update_warden_after_hit(slot: EnemySlot) -> void:
+	if _try_begin_warden_phase_two(slot):
+		return
+	if _warden_void_struck:
+		_try_open_warden(slot)
+
+func _try_begin_warden_phase_two(slot: EnemySlot) -> bool:
+	if warden_phase != 1 or not _warden_swept or slot.actor.current_hp > int(warden_pattern["phase_two_hp"]):
+		return false
+	if slot.phase == Phase.ACTIVE:
+		return false
+	warden_phase = 2
+	slot.strike_index = 0
+	_enter_phase(slot, Phase.TELEGRAPH)
+	ally_action.emit("summon_warning")
+	return true
+
+func _summon_warden_raven() -> void:
+	_warden_summoned = true
+	for slot: EnemySlot in enemy_slots:
+		if slot.dormant:
+			slot.dormant = false
+			_enter_phase(slot, Phase.TELEGRAPH)
+			slot.remaining += int(warden_pattern["raven_offset_ticks"])
+			if combat_format == "auto":
+				_set_target(slot)
+
+func _try_open_warden(slot: EnemySlot) -> bool:
+	if _warden_opened or not _warden_void_struck or slot.actor.current_hp > int(warden_pattern["joint_break_hp"]):
+		return false
+	_warden_opened = true
+	_enter_phase(slot, Phase.VULNERABILITY)
+	slot.stunned = true
+	slot.remaining = int(warden_pattern["joint_break_ticks"])
+	enemy_phase_changed.emit(slot.instance_id)
+	ally_action.emit("joint_break")
+	return true
 
 func _finish(player_won: bool) -> void:
 	if not is_active or is_finished:

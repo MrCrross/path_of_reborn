@@ -40,4 +40,4 @@ godot --headless --path game --script res://tests/test_runner.gd
 godot --path game --fixed-fps 60 --disable-vsync --script res://tests/hollow_acceptance_runner.gd
 ```
 
-Улучшение оружия у Дайдзиро, карта элитных целей и игровой маршрут к посту относятся к последующим работам. Физический Android и человеческий playtest остаются открыты.
+Принятый отчёт открывает [маршрут на пост «Край Ветров»](MVP_WINDS_EDGE.md). Улучшение оружия у Дайдзиро и карта элитных целей относятся к последующим работам. Физический Android и человеческий playtest остаются открыты.

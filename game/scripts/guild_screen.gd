@@ -4,6 +4,7 @@ signal navigate_requested(destination: String)
 signal guild_registration_requested
 signal grove_command_requested(command: String)
 signal hollow_command_requested(command: String)
+signal outpost_command_requested(command: String)
 
 const REGISTRATION_PATH := "res://data/narrative/guild_registration.json"
 const HALL_PLAN := Vector2(180, 320)
@@ -14,6 +15,10 @@ var _report_button: Button
 var _grove_button: Button
 var _hollow_button: Button
 var _hollow_report_button: Button
+var _outpost_button: Button
+var _outpost_report_button: Button
+var _outpost_epilogue_button: Button
+var _epilogue_map: Line2D
 var _report_view: CombatResultView
 var _dialogue_kind: String = ""
 var _route_map: TextureRect
@@ -42,6 +47,12 @@ func _ready() -> void:
 	_hollow_button.pressed.connect(_start_hollow_departure)
 	_hollow_report_button = _order_button(desk, "ReportHollow", "Сдать отчёт об Овраге")
 	_hollow_report_button.pressed.connect(_start_hollow_report)
+	_outpost_button = _order_button(desk, "EnterOutpost", "На Край Ветров")
+	_outpost_button.pressed.connect(_start_outpost_departure)
+	_outpost_report_button = _order_button(desk, "ReportOutpost", "Сдать отчёт о посте")
+	_outpost_report_button.pressed.connect(_start_outpost_report)
+	_outpost_epilogue_button = _order_button(desk, "OutpostEpilogue", "Прочитать письмо")
+	_outpost_epilogue_button.pressed.connect(_start_outpost_epilogue)
 	_report_view = CombatResultView.new()
 	_report_view.name = "GroveReportReward"
 	_report_view.claim_requested.connect(_claim_report)
@@ -54,6 +65,13 @@ func _ready() -> void:
 	_route_map.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_route_map.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	%Badge.get_parent().add_child(_route_map)
+	_epilogue_map = Line2D.new()
+	_epilogue_map.name = "EpilogueMap"
+	_epilogue_map.points = PackedVector2Array([Vector2(114, 102), Vector2(124, 96), Vector2(124, 87), Vector2(133, 80), Vector2(145, 78)])
+	_epilogue_map.width = 2.0
+	_epilogue_map.default_color = Color("41978e")
+	_epilogue_map.hide()
+	add_child(_epilogue_map)
 	$Merchant.texture = ArtMap.texture(ArtMap.DAIJIRO_MERCHANT_STILL)
 	$Kenta.texture = ArtMap.texture(ArtMap.GUILD_ART["kenta"])
 	$Midori.texture = ArtMap.texture(ArtMap.GUILD_ART["midori"])
@@ -98,19 +116,46 @@ func registration_committed() -> void:
 
 func _on_dialogue_finished(_destination: String) -> void:
 	match _dialogue_kind:
-		"report", "hollow_report":
+		"report", "hollow_report", "outpost_report":
 			_present_report()
 		"hollow_departure":
 			_show_desk()
 			hollow_command_requested.emit("enter")
+		"outpost_departure":
+			_show_desk()
+			outpost_command_requested.emit("enter")
+		"outpost_epilogue":
+			_show_desk()
+			outpost_command_requested.emit("finish")
 		_:
 			_show_desk()
 
 func _claim_report() -> void:
-	if _dialogue_kind == "hollow_report":
-		hollow_command_requested.emit("report")
-	else:
-		grove_command_requested.emit("report")
+	match _dialogue_kind:
+		"hollow_report": hollow_command_requested.emit("report")
+		"outpost_report": outpost_command_requested.emit("report")
+		_: grove_command_requested.emit("report")
+
+func outpost_command_committed(command: String) -> void:
+	if command == "enter":
+		navigate_requested.emit("world")
+		return
+	_show_desk()
+	if command == "report":
+		_start_outpost_epilogue()
+
+func outpost_command_rejected(command: String) -> void:
+	match command:
+		"report":
+			_report_view.claim_button.text = "Повторить запись"
+			_report_view.claim_button.grab_focus()
+		"finish":
+			%Error.show()
+			_outpost_epilogue_button.text = "Повторить запись"
+			_outpost_epilogue_button.grab_focus()
+		_:
+			%Error.show()
+			_outpost_button.grab_focus()
 
 func hollow_command_committed(command: String) -> void:
 	if command == "enter":
@@ -165,10 +210,40 @@ func _start_report() -> void:
 func _present_report() -> void:
 	$SafeArea.show()
 	$SafeArea/Column/Order.hide()
-	if _dialogue_kind == "hollow_report":
-		_report_view.present_guild_report(session, GameSession.hollow_definition()["report"], "Синий Овраг", GameSession.HOLLOW_ECHOES_GRANTED, "")
-	else:
-		_report_view.present_guild_report(session, GameSession.grove_definition()["report"])
+	match _dialogue_kind:
+		"hollow_report":
+			_report_view.present_guild_report(session, GameSession.hollow_definition()["report"], "Синий Овраг", GameSession.HOLLOW_ECHOES_GRANTED, "")
+		"outpost_report":
+			_report_view.present_guild_report(session, GameSession.outpost_definition()["report"], "Край Ветров", GameSession.OUTPOST_ECHOES_GRANTED, "")
+		_:
+			_report_view.present_guild_report(session, GameSession.grove_definition()["report"])
+
+func _start_outpost_departure() -> void:
+	if not session.can_enter_outpost():
+		return
+	if not _play_outpost_dialogue("outpost_departure", "На Край Ветров", [GameSession.OUTPOST_ORDER_CUE]):
+		outpost_command_requested.emit("enter")
+
+func _start_outpost_report() -> void:
+	if not session.can_report_outpost():
+		return
+	if not _play_outpost_dialogue("outpost_report", "Проверить награды", GameSession.outpost_definition()["report_cues"]):
+		_present_report()
+
+func _start_outpost_epilogue() -> void:
+	if not _play_outpost_dialogue("outpost_epilogue", "Закрыть главу", GameSession.outpost_definition()["epilogue_cues"]):
+		outpost_command_requested.emit("finish")
+
+func _play_outpost_dialogue(kind: String, caption: String, cue_ids: Array) -> bool:
+	_dialogue_kind = kind
+	var cues: Array[String] = []
+	cues.assign(cue_ids)
+	if not dialogue.play(GameSession.OUTPOST_NARRATIVE_PATH, caption, false, {}, cues):
+		return false
+	$SafeArea.hide()
+	dialogue.runner.changed.connect(_show_dialogue_shot)
+	_show_dialogue_shot()
+	return true
 
 func _start_hollow_departure() -> void:
 	if not session.can_enter_hollow():
@@ -198,7 +273,11 @@ func _play_hollow_dialogue(kind: String, caption: String, cues: Array[String]) -
 func _resume_story() -> void:
 	if not is_inside_tree():
 		return
-	if session.can_report_hollow() and session.seen_cue_ids.has("DIA_HOLLOW_011"):
+	if _outpost_epilogue_button.visible:
+		_start_outpost_epilogue()
+	elif session.can_report_outpost() and session.seen_cue_ids.has("DIA_EPILOGUE_001"):
+		_start_outpost_report()
+	elif session.can_report_hollow() and session.seen_cue_ids.has("DIA_HOLLOW_011"):
 		_start_hollow_report()
 	elif session.can_report_grove() and session.seen_cue_ids.has("DIA_GROVE_016"):
 		_start_report()
@@ -266,6 +345,20 @@ func _show_desk() -> void:
 				"✓ Найдена серая ткань" if session.quest_flags.get(GameSession.HOLLOW_CLOTH, false) else "• Следы у маркеров",
 			]
 		_route_map.texture = ArtMap.texture(ArtMap.HOLLOW_PROPS["cloth"] if session.quest_flags.get(GameSession.HOLLOW_CLOTH, false) else ArtMap.GROVE_PROPS["map"])
+	var outpost_reported: bool = session.quest_flags.get(GameSession.OUTPOST_REPORTED, false)
+	var outpost_finished: bool = session.quest_flags.get(GameSession.OUTPOST_FINISHED, false)
+	_outpost_button.visible = hollow_reported and not session.quest_flags.get(GameSession.OUTPOST_ALLIANCE, false)
+	_outpost_button.disabled = not session.can_enter_outpost()
+	_outpost_report_button.visible = session.can_report_outpost()
+	_outpost_epilogue_button.visible = outpost_reported and not outpost_finished
+	if _outpost_report_button.visible:
+		%OrderTitle.text = "Можно сдать отчёт о посте"
+		%Objectives.text = "✓ Сигнальная чаша осмотрена\n✓ Костяной дозорный побеждён"
+	elif outpost_reported:
+		%OrderTitle.text = "Глава завершена" if outpost_finished else "Отчёт о посте принят"
+		%Objectives.text = "Путь продолжается\nСледующая цель · архив Гильдии" if outpost_finished else "Дайдзиро принёс письмо"
+	if _outpost_report_button.visible or outpost_reported:
+		_route_map.texture = ArtMap.item_icon("old_watch_badge")
 	register_button.visible = session.can_register_with_guild()
 	if register_button.visible:
 		register_button.grab_focus()
@@ -273,6 +366,12 @@ func _show_desk() -> void:
 		_report_button.grab_focus()
 	elif _hollow_report_button.visible:
 		_hollow_report_button.grab_focus()
+	elif _outpost_report_button.visible:
+		_outpost_report_button.grab_focus()
+	elif _outpost_epilogue_button.visible:
+		_outpost_epilogue_button.grab_focus()
+	elif _outpost_button.visible and not _outpost_button.disabled:
+		_outpost_button.grab_focus()
 	elif _hollow_button.visible and not _hollow_button.disabled:
 		_hollow_button.grab_focus()
 	elif _grove_button.visible and not _grove_button.disabled:
@@ -285,18 +384,23 @@ func _show_dialogue_shot() -> void:
 		_show_shot(dialogue.runner.current_shot())
 
 func _show_shot(shot: String) -> void:
-	var background_key: String = "guild_registration" if shot == "guild_registration" else "guild_hall"
+	var background_key: String = shot if shot in ["guild_registration", "outpost_letter"] else "guild_hall"
+	if shot == "outpost_map":
+		background_key = "outpost_letter"
 	backdrop.texture = ArtMap.texture(ArtMap.BACKGROUNDS[background_key])
 	$Merchant.visible = shot in ["guild_opening", "hollow_daijiro"]
 	$Kenta.visible = shot == "guild_opening"
-	$Midori.visible = shot != "guild_registration"
+	$Midori.visible = shot not in ["guild_registration", "outpost_letter", "outpost_map"]
 	$Goro.visible = shot == "guild_mentor"
+	_epilogue_map.visible = shot == "outpost_map"
 	_layout_actors()
 
 func _layout_actors() -> void:
 	# Match the floor and counter to the backdrop's cover transform.
 	var art_scale: float = maxf(size.x / HALL_PLAN.x, size.y / HALL_PLAN.y)
 	var origin: Vector2 = (size - HALL_PLAN * art_scale) * 0.5
+	_epilogue_map.position = origin.round()
+	_epilogue_map.scale = Vector2.ONE * art_scale
 	# Keep the two foreground figures inside the narrower crop on tall screens.
 	var pair_scale: float = minf(art_scale, size.x / HALL_PLAN.x * 1.16)
 	$Merchant.position = Vector2(size.x * (60.0 / HALL_PLAN.x), origin.y + 231.0 * art_scale).round()

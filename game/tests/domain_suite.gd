@@ -74,7 +74,7 @@ func _test_actor_definitions(context: TestContext) -> void:
 		context.check(hero.strength == 3, "Haruto starts with 3 strength")
 		context.check(hero.defense == 2, "Haruto starts with 2 defense")
 		context.check(hero.mana == 1, "Haruto starts with 1 mana")
-		context.check(hero.xp_thresholds == [4, 8, 12, 18], "Haruto uses the slice XP table up to narrative level 5")
+		context.check(hero.xp_thresholds == [4, 8, 12, 44], "Haruto uses the chapter XP table up to level 5")
 
 func _test_item_contract(context: TestContext) -> void:
 	var modifier := StatModifierDefinition.new()

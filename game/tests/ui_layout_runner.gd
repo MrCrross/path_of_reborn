@@ -729,7 +729,7 @@ func _result_text(view: CombatResultView) -> String:
 func _test_battle_result_without_loot() -> void:
 	for capped: bool in [false, true]:
 		var session := GameSession.new()
-		session.hero.gain_xp(42 if capped else 4)
+		session.hero.gain_xp(68 if capped else 4)
 		session.select_encounter("moss_slime")
 		var resolver: CombatResolver = session.start_combat("moss_slime")
 		resolver.advance_ticks(600)

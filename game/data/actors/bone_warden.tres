@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ActorDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://domain/definitions/actor_definition.gd" id="1_actor"]
+
+[resource]
+script = ExtResource("1_actor")
+id = "bone_warden"
+display_name = "Костяной дозорный"
+max_hp = 29
+strength = 5
+defense = 1
+telegraph_ticks = 54
+startup_ticks = 19
+active_ticks = 14
+recovery_ticks = 22
+vulnerability_ticks = 40
+guarded_damage_multiplier = 0.78
+vulnerability_multiplier = 1.5

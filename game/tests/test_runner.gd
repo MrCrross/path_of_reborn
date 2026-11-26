@@ -9,7 +9,8 @@ const DialogueSuite = preload("res://tests/dialogue_suite.gd")
 const UxSuite = preload("res://tests/ux_suite.gd")
 const GroveSuite = preload("res://tests/grove_suite.gd")
 const HollowSuite = preload("res://tests/hollow_suite.gd")
-const EXPECTED_TEST_CASES: int = 106
+const OutpostSuite = preload("res://tests/outpost_suite.gd")
+const EXPECTED_TEST_CASES: int = 109
 
 var _passed: int = 0
 var _failed: int = 0
@@ -28,6 +29,7 @@ func _run() -> void:
 	results.append_array(UxSuite.new().run())
 	results.append_array(GroveSuite.new().run())
 	results.append_array(HollowSuite.new().run())
+	results.append_array(OutpostSuite.new().run())
 	for result: Dictionary in results:
 		_report_case(result)
 	var unfinished: int = maxi(0, EXPECTED_TEST_CASES - results.size())

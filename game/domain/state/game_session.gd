@@ -18,8 +18,26 @@ const ENCOUNTER_REPEAT: String = "repeat"
 const ENCOUNTER_TRIAL: String = "trial"
 const ENCOUNTER_GROVE: String = "grove"
 const ENCOUNTER_HOLLOW: String = "hollow"
+const ENCOUNTER_OUTPOST: String = "outpost"
 const LOCATION_GROVE: String = "whispering_grass_grove"
 const LOCATION_HOLLOW: String = "blue_hollow"
+const LOCATION_OUTPOST: String = "winds_edge"
+const EXPEDITION_LOCATIONS: Array[String] = [LOCATION_GROVE, LOCATION_HOLLOW, LOCATION_OUTPOST]
+const EXPEDITION_ROUTES: Dictionary = {
+	ENCOUNTER_GROVE: LOCATION_GROVE,
+	ENCOUNTER_HOLLOW: LOCATION_HOLLOW,
+	ENCOUNTER_OUTPOST: LOCATION_OUTPOST,
+}
+const OUTPOST_NARRATIVE_PATH: String = "res://data/narrative/winds_edge.json"
+const OUTPOST_ORDER_CUE: String = "DIA_OUTPOST_ORDER"
+const OUTPOST_BOWL: String = "outpost_bowl_checked"
+const OUTPOST_SEAL: String = "outpost_seal_triggered"
+const OUTPOST_RAVENS_WON: String = "outpost_ravens_won"
+const OUTPOST_WARDEN_WON: String = "outpost_warden_won"
+const OUTPOST_ALLIANCE: String = "outpost_alliance"
+const OUTPOST_REPORTED: String = "outpost_reported"
+const OUTPOST_FINISHED: String = "outpost_finished"
+const OUTPOST_ECHOES_GRANTED: String = "outpost_report_echoes"
 const HOLLOW_NARRATIVE_PATH: String = "res://data/narrative/blue_hollow.json"
 const HOLLOW_WATER_MARKER: String = "hollow_water_marker"
 const HOLLOW_STARTED: String = "hollow_started"
@@ -61,6 +79,7 @@ const ACTOR_PATHS: Dictionary = {
 	"stone_rodent": "res://data/actors/stone_rodent.tres",
 	"ash_raven": "res://data/actors/ash_raven.tres",
 	"crystal_toad": "res://data/actors/crystal_toad.tres",
+	"bone_warden": "res://data/actors/bone_warden.tres",
 }
 const COMPANION_ACTOR_PATHS: Dictionary = {
 	"road_companion": "res://data/actors/road_companion.tres",
@@ -82,6 +101,8 @@ const ITEM_PATHS: Dictionary = {
 	"moth_pollen_jar": "res://data/items/moth_pollen_jar.tres",
 	"river_shieldback_shell": "res://data/items/river_shieldback_shell.tres",
 	"old_masonry_shard": "res://data/items/old_masonry_shard.tres",
+	"old_watch_badge": "res://data/items/old_watch_badge.tres",
+	"shoma_key_fragment": "res://data/items/shoma_key_fragment.tres",
 }
 const LOCATION_FOREST_EDGE: String = "forest_edge"
 const LOCATION_LIOREN: String = "lioren"
@@ -115,6 +136,7 @@ const ROUTE_PATH: String = "res://data/route/forest_slice.json"
 static var _route_definition_cache: Dictionary = {}
 static var _grove_definition_cache: Dictionary = {}
 static var _hollow_definition_cache: Dictionary = {}
+static var _outpost_definition_cache: Dictionary = {}
 
 var hero: CharacterState
 var inventory: InventoryService
@@ -307,6 +329,8 @@ func start_combat(enemy_id: String, repeat: bool = false) -> CombatResolver:
 		var slot: Dictionary = slots[index]
 		var definition: ActorDefinition = load(ACTOR_PATHS[slot["actor_id"]])
 		resolver.add_encounter_enemy(definition, slot)
+	resolver.warden_pattern = encounter.get("warden_pattern", {})
+	resolver.ally_warnings = PackedInt32Array(encounter.get("ally_warning_ticks", []))
 	if quest_flags.get(GROVE_REPORTED, false):
 		resolver.vulnerable_ability_bonus = float(grove_definition()["report"]["vulnerable_ability_multiplier"])
 	if quest_flags.get(HOLLOW_TEMPO, false):
@@ -530,17 +554,18 @@ func _encounter_context_for(enemy_id: String, repeat: bool) -> Dictionary:
 		if enemy_id == "dust_moth" and not seen_cue_ids.has("DIA_GROVE_011"):
 			return {}
 		return {"enemy_id": enemy_id, "encounter_mode": ENCOUNTER_GROVE, "route_id": LOCATION_GROVE, "route_node_id": grove["node_id"]}
-	if location_id == LOCATION_HOLLOW:
-		var stage: String = hollow_stage()
-		var hollow: Dictionary = hollow_node(stage)
-		if repeat or not quest_flags.get(GROVE_REPORTED, false) or hollow.get("enemy_id", "") != enemy_id:
+	if location_id in [LOCATION_HOLLOW, LOCATION_OUTPOST]:
+		var at_outpost: bool = location_id == LOCATION_OUTPOST
+		var stage: String = outpost_stage() if at_outpost else hollow_stage()
+		var node: Dictionary = outpost_node(stage) if at_outpost else hollow_node(stage)
+		var prerequisite: String = HOLLOW_REPORTED if at_outpost else GROVE_REPORTED
+		if repeat or not quest_flags.get(prerequisite, false) or node.get("enemy_id", "") != enemy_id:
 			return {}
-		for cue: String in hollow.get("cues", []):
-			if not seen_cue_ids.has(cue):
-				return {}
+		if not seen_cue_ids.has_all(node.get("cues", [])):
+			return {}
 		if stage == "elite" and not seen_cue_ids.has("DIA_HOLLOW_009"):
 			return {}
-		return {"enemy_id": enemy_id, "encounter_mode": ENCOUNTER_HOLLOW, "route_id": LOCATION_HOLLOW, "route_node_id": stage}
+		return {"enemy_id": enemy_id, "encounter_mode": ENCOUNTER_OUTPOST if at_outpost else ENCOUNTER_HOLLOW, "route_id": location_id, "route_node_id": stage}
 	var route_id: String = String(route_definition().get("route_id", ""))
 	var node: Dictionary = next_route_node()
 	if not repeat and not node.is_empty() and String(node.get("enemy_id", "")) == enemy_id:
@@ -908,7 +933,7 @@ func travel_to(location_id: String) -> bool:
 		return false
 	if location_id not in [LOCATION_FOREST_EDGE, LOCATION_LIOREN]:
 		return false
-	if self.location_id in [LOCATION_GROVE, LOCATION_HOLLOW]:
+	if self.location_id in EXPEDITION_LOCATIONS:
 		return false
 	if location_id == self.location_id:
 		return true
@@ -1099,11 +1124,94 @@ static func hollow_stage_for(quests: Dictionary) -> String:
 		return "elite"
 	return "ledge"
 
+static func outpost_definition() -> Dictionary:
+	if _outpost_definition_cache.is_empty():
+		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/route/winds_edge.json"))
+		if parsed is Dictionary:
+			_outpost_definition_cache = parsed
+	return _outpost_definition_cache
+
+static func outpost_node(node_id: String) -> Dictionary:
+	return outpost_definition().get("nodes", {}).get(node_id, {})
+
+func outpost_stage() -> String:
+	return outpost_stage_for(quest_flags)
+
+static func outpost_stage_for(quests: Dictionary) -> String:
+	if not quests.get(OUTPOST_BOWL, false):
+		return "bowl"
+	if not quests.get(OUTPOST_SEAL, false):
+		return "seal"
+	if not quests.get(OUTPOST_RAVENS_WON, false):
+		return "ravens"
+	if not quests.get(OUTPOST_WARDEN_WON, false):
+		return "warden"
+	if not quests.get(OUTPOST_ALLIANCE, false):
+		return "alliance"
+	return "return"
+
+func can_enter_outpost() -> bool:
+	return guild_visit_active() and guild_rank() == "E" and quest_flags.get(HOLLOW_REPORTED, false) and not quest_flags.get(OUTPOST_ALLIANCE, false) and traces < 3
+
+func can_report_outpost() -> bool:
+	return guild_visit_active() and guild_rank() == "E" and quest_flags.get(OUTPOST_ALLIANCE, false) and not quest_flags.get(OUTPOST_REPORTED, false)
+
+func apply_outpost_command(command: String) -> bool:
+	if in_combat or has_pending_reward() or awaiting_return or checkpoints.channel_active:
+		return false
+	match command:
+		"enter":
+			if not can_enter_outpost() or not seen_cue_ids.has(OUTPOST_ORDER_CUE):
+				return false
+			location_id = LOCATION_OUTPOST
+			world_flags.erase(WORLD_FLAG_GUILD_VISIT)
+			return true
+		"report":
+			if not can_report_outpost() or not seen_cue_ids.has_all(outpost_definition()["report_cues"]):
+				return false
+			var report: Dictionary = outpost_definition()["report"]
+			var silver: int = int(report["silver"])
+			if wallet[SILVER] > MAX_ASTRAS - silver:
+				return false
+			wallet[SILVER] += silver
+			if not memory_flags.get(OUTPOST_ECHOES_GRANTED, false):
+				echoes += int(report["echoes"])
+				memory_flags[OUTPOST_ECHOES_GRANTED] = true
+			quest_flags[OUTPOST_REPORTED] = true
+			return true
+		"finish":
+			if not guild_visit_active() or not quest_flags.get(OUTPOST_REPORTED, false) or quest_flags.get(OUTPOST_FINISHED, false):
+				return false
+			if not seen_cue_ids.has_all(outpost_definition()["epilogue_cues"]):
+				return false
+			quest_flags[OUTPOST_FINISHED] = true
+			return true
+	if location_id != LOCATION_OUTPOST or not quest_flags.get(HOLLOW_REPORTED, false):
+		return false
+	if command == "leave":
+		location_id = LOCATION_LIOREN
+		return true
+	if traces >= 3 or command != outpost_stage():
+		return false
+	match command:
+		"bowl":
+			quest_flags[OUTPOST_BOWL] = true
+		"seal":
+			quest_flags[OUTPOST_SEAL] = true
+		"alliance":
+			if not seen_cue_ids.has_all(outpost_node("alliance")["cues"]):
+				return false
+			quest_flags[OUTPOST_ALLIANCE] = true
+		_:
+			return false
+	return true
+
 static func expedition_battle_node(context: Dictionary) -> Dictionary:
 	var node_id: String = String(context.get("route_node_id", ""))
 	match context.get("encounter_mode", ""):
 		ENCOUNTER_GROVE: return grove_node(node_id)
 		ENCOUNTER_HOLLOW: return hollow_node(node_id)
+		ENCOUNTER_OUTPOST: return outpost_node(node_id)
 		_: return {}
 
 static func expedition_battle_matches(result: Dictionary, location: String, quests: Dictionary, npcs: Dictionary) -> bool:
@@ -1112,6 +1220,8 @@ static func expedition_battle_matches(result: Dictionary, location: String, ques
 			return location == LOCATION_GROVE and result["route_node_id"] == grove_stage_for(quests, npcs)
 		ENCOUNTER_HOLLOW:
 			return location == LOCATION_HOLLOW and quests.get(GROVE_REPORTED, false) and result["route_node_id"] == hollow_stage_for(quests)
+		ENCOUNTER_OUTPOST:
+			return location == LOCATION_OUTPOST and quests.get(HOLLOW_REPORTED, false) and result["route_node_id"] == outpost_stage_for(quests)
 		_:
 			return true
 
@@ -1126,6 +1236,8 @@ func can_place_expedition_checkpoint() -> bool:
 		return grove_stage() == "clearing"
 	if location_id == LOCATION_HOLLOW:
 		return hollow_stage() == "ledge"
+	if location_id == LOCATION_OUTPOST:
+		return outpost_stage() in ["bowl", "warden", "alliance", "return"]
 	return true
 
 ## Сюжетные команды Оврага проходят через ту же запись кандидата, что и Роща.
@@ -1475,7 +1587,7 @@ func _invalidate_active_resolver() -> void:
 	active_encounter_context = {}
 
 func _advance_route(result: Dictionary) -> bool:
-	if result["encounter_mode"] in [ENCOUNTER_GROVE, ENCOUNTER_HOLLOW]:
+	if EXPEDITION_ROUTES.has(result["encounter_mode"]):
 		var node: Dictionary = expedition_battle_node(result)
 		if not expedition_battle_matches(result, location_id, quest_flags, npc_flags):
 			return false
@@ -1540,18 +1652,18 @@ static func is_valid_pending_battle_result(result: Dictionary) -> bool:
 		return false
 	if typeof(result.get("enemy_id", null)) != TYPE_STRING or not GameSession.ACTOR_PATHS.has(result["enemy_id"]) or result["enemy_id"] == "haruto":
 		return false
-	if typeof(result.get("encounter_mode", null)) != TYPE_STRING or result["encounter_mode"] not in [ENCOUNTER_ROUTE, ENCOUNTER_REPEAT, ENCOUNTER_TRIAL, ENCOUNTER_GROVE, ENCOUNTER_HOLLOW]:
+	if typeof(result.get("encounter_mode", null)) != TYPE_STRING:
 		return false
 	if typeof(result.get("route_node_id", null)) != TYPE_STRING or typeof(result.get("route_id", null)) != TYPE_STRING:
 		return false
 	var enemy_id: String = String(result["enemy_id"])
 	var mode: String = String(result["encounter_mode"])
-	var is_expedition: bool = mode in [ENCOUNTER_GROVE, ENCOUNTER_HOLLOW]
+	var is_expedition: bool = EXPEDITION_ROUTES.has(mode)
 	if is_expedition:
-		var expected_route: String = LOCATION_GROVE if mode == ENCOUNTER_GROVE else LOCATION_HOLLOW
+		var expected_route: String = EXPEDITION_ROUTES[mode]
 		if result["route_id"] != expected_route or expedition_battle_node(result).get("enemy_id", "") != enemy_id:
 			return false
-	elif result["route_id"] != route_definition().get("route_id", "") or not LOOT_PATHS.has(enemy_id):
+	elif mode not in [ENCOUNTER_ROUTE, ENCOUNTER_REPEAT, ENCOUNTER_TRIAL] or result["route_id"] != route_definition().get("route_id", "") or not LOOT_PATHS.has(enemy_id):
 		return false
 	if mode == ENCOUNTER_TRIAL and enemy_id != TRIAL_ENEMY_ID:
 		return false

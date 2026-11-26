@@ -106,10 +106,12 @@ func present(next_model: Dictionary) -> bool:
 	compare_label.text = ""
 	_comparison_box.visible = true
 	if definition.slot_id.is_empty():
-		var total: int = int(model["sale_price_copper"]) * int(model["quantity"])
-		compare_label.text = "Цена продажи: %s" % UiText.astra(total)
-		if int(model["quantity"]) > 1:
-			compare_label.text += "\n%s за штуку" % UiText.astra(int(model["sale_price_copper"]))
+		compare_label.text = "Продажа недоступна"
+		if bool(model["sellable"]):
+			var total: int = int(model["sale_price_copper"]) * int(model["quantity"])
+			compare_label.text = "Цена продажи: %s" % UiText.astra(total)
+			if int(model["quantity"]) > 1:
+				compare_label.text += "\n%s за штуку" % UiText.astra(int(model["sale_price_copper"]))
 	elif model["current_item"] == null or bool(model["equipped"]):
 		compare_label.text = "Параметры предмета"
 		for bonus: Dictionary in model["bonuses"]:
