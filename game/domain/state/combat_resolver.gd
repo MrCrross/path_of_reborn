@@ -2,6 +2,9 @@ class_name CombatResolver
 extends RefCounted
 
 signal phase_changed(phase: int, ticks_remaining: int)
+signal enemy_phase_changed(instance_id: String)
+signal target_changed(instance_id: String)
+signal pollen_resolved(avoided: bool)
 signal damage_dealt(target_id: String, amount: int)
 signal dodge_resolved(success: bool)
 ## Один источник индикации защиты для любого режима: "auto" (полный автобой)
@@ -20,6 +23,21 @@ enum Phase {
 	VULNERABILITY,
 }
 
+class EnemySlot:
+	var instance_id: String
+	var actor: CharacterState
+	var attack_id: String
+	var phase: int = Phase.TELEGRAPH
+	var remaining: int = 0
+	var strike_index: int = 0
+	var pollen_slow_ticks: int = 0
+
+	func _init(definition: ActorDefinition, options: Dictionary) -> void:
+		instance_id = String(options.get("id", definition.id))
+		actor = CharacterState.new(definition)
+		attack_id = String(options.get("attack", "attack"))
+		pollen_slow_ticks = int(options.get("pollen_slow_ticks", 0))
+
 ## Политика автозащиты полного автобоя (гипотеза для сравнения, не готовый
 ## баланс): попытка на входе в первую STARTUP-фазу цикла, если защита готова.
 ## Длительный cooldown не даёт защите покрыть все циклы — автобой не становится
@@ -34,14 +52,23 @@ var run_token: String = ""
 var combat_format: String = "auto"
 var is_active: bool = true
 var hero: CharacterState
-var enemy: CharacterState
-var enemy_phase: int = Phase.TELEGRAPH
-var phase_ticks_remaining: int = 0
+var enemy_slots: Array[EnemySlot] = []
+# Каким бы ни был текущий выбор, ссылки старых одиночных встреч стабильны.
+var enemy: CharacterState:
+	get: return enemy_slots[0].actor
+var enemy_phase: int:
+	get: return enemy_slots[0].phase
+var phase_ticks_remaining: int:
+	get: return enemy_slots[0].remaining
+var strike_index: int:
+	get: return enemy_slots[0].strike_index
+var target: EnemySlot
+var vulnerable_ability_bonus: float = 1.0
+var slowed_ticks: int = 0
 var hero_attack_cooldown: int = 0
 var hero_ability_cooldown: int = 0
 var dodge_ticks_remaining: int = 0
 var dodge_cooldown: int = 0
-var strike_index: int = 0
 var tick_count: int = 0
 var is_finished: bool = false
 var won: bool = false
@@ -51,6 +78,8 @@ var won: bool = false
 var _hero_strike_ticks_remaining: int = 0
 var _hero_strike_started: bool = false
 var _hero_strike_multiplier: float = 1.0
+var _hero_strike_target: EnemySlot
+var _hero_strike_is_ability: bool = false
 ## Автоматические базовые атаки (подтверждённый режим по умолчанию). Ручной
 ## запрос через request_attack() использует тот же путь и общий cooldown.
 var auto_attack_enabled: bool = true
@@ -59,11 +88,33 @@ var auto_attack_enabled: bool = true
 var auto_dodge_enabled: bool = false
 var auto_dodge_cooldown: int = 0
 
-func _init(hero_state: CharacterState, enemy_definition: ActorDefinition, combat_run_id: String = "") -> void:
+func _init(hero_state: CharacterState, enemy_definition: ActorDefinition, combat_run_id: String = "", first_options: Dictionary = {}, second_definition: ActorDefinition = null, second_options: Dictionary = {}) -> void:
 	run_id = combat_run_id
 	hero = hero_state
-	enemy = CharacterState.new(enemy_definition)
-	_enter_phase(Phase.TELEGRAPH)
+	_add_enemy(enemy_definition, first_options)
+	if second_definition != null:
+		_add_enemy(second_definition, second_options)
+	target = enemy_slots[0]
+
+func _add_enemy(definition: ActorDefinition, options: Dictionary) -> void:
+	var slot := EnemySlot.new(definition, options)
+	enemy_slots.append(slot)
+	_enter_phase(slot, Phase.TELEGRAPH)
+	slot.remaining = maxi(1, slot.remaining + int(options.get("telegraph_offset", 0)))
+
+func select_target(instance_id: String) -> bool:
+	if not is_active or is_finished or combat_format != "active":
+		return false
+	for slot: EnemySlot in enemy_slots:
+		if slot.instance_id == instance_id and not slot.actor.is_dead():
+			_set_target(slot)
+			return true
+	return false
+
+func _set_target(slot: EnemySlot) -> void:
+	if target != slot:
+		target = slot
+		target_changed.emit(slot.instance_id)
 
 ## Ручной запрос атаки (тесты/режимы без автоатаки). Доменный путь тот же, что
 ## у автоатаки: двойной удар в один тик невозможен, cooldown общий.
@@ -80,7 +131,7 @@ func request_ability() -> bool:
 		return false
 	_hero_strike_multiplier = ability.damage_multiplier
 	hero_ability_cooldown = ability.cooldown_ticks
-	_begin_hero_strike()
+	_begin_hero_strike(true)
 	ability_used.emit(ability.id)
 	return true
 
@@ -110,11 +161,15 @@ func advance_ticks(count: int) -> void:
 		_tick_hero_strike()
 		if not is_active or is_finished:
 			return
-		phase_ticks_remaining -= 1
-		if phase_ticks_remaining <= 0:
-			_advance_phase()
-		if not is_active or is_finished:
-			return
+		for slot: EnemySlot in enemy_slots:
+			if slot.actor.is_dead():
+				continue
+			slot.remaining -= 1
+			if slot.remaining <= 0:
+				_advance_phase(slot)
+			if not is_active or is_finished:
+				return
+		slowed_ticks = maxi(0, slowed_ticks - 1)
 		hero_attack_cooldown = maxi(0, hero_attack_cooldown - 1)
 		hero_ability_cooldown = maxi(0, hero_ability_cooldown - 1)
 		dodge_ticks_remaining = maxi(0, dodge_ticks_remaining - 1)
@@ -126,12 +181,17 @@ func advance_ticks(count: int) -> void:
 			_begin_hero_strike()
 
 func is_vulnerable() -> bool:
-	return enemy_phase == Phase.VULNERABILITY
+	return target.phase == Phase.VULNERABILITY
 
-func _begin_hero_strike() -> void:
+func _begin_hero_strike(ability: bool = false) -> void:
 	_hero_strike_started = true
+	_hero_strike_target = target
+	_hero_strike_is_ability = ability
 	_hero_strike_ticks_remaining = maxi(0, hero.definition.attack_startup_ticks)
 	hero_attack_cooldown = hero.definition.attack_cooldown_ticks
+	if slowed_ticks > 0:
+		_hero_strike_ticks_remaining += ceili(hero.definition.attack_startup_ticks * 0.5)
+		hero_attack_cooldown += ceili(hero.definition.attack_cooldown_ticks * 0.5)
 	hero_attack_begun.emit(run_id)
 
 func _tick_hero_strike() -> void:
@@ -141,59 +201,68 @@ func _tick_hero_strike() -> void:
 	if _hero_strike_ticks_remaining > 0:
 		return
 	_hero_strike_started = false
-	if is_finished or enemy.is_dead():
-		return
-	# Множитель уязвимости считается в момент контакта.
-	var multiplier: float = 1.0
-	if enemy_phase == Phase.VULNERABILITY:
-		multiplier = enemy.definition.vulnerability_multiplier
-	multiplier *= _hero_strike_multiplier
+	var slot: EnemySlot = _hero_strike_target
+	var strike_multiplier: float = _hero_strike_multiplier
 	_hero_strike_multiplier = 1.0
-	var damage: int = CharacterState.calculate_damage(hero.strength, enemy.defense, multiplier)
-	var applied_damage: int = enemy.take_damage(damage)
-	damage_dealt.emit(enemy.definition.id, applied_damage)
-	hero_attack_landed.emit(run_id, enemy.definition.id, applied_damage)
-	if enemy.is_dead():
-		_finish(true)
+	if is_finished or slot.actor.is_dead():
+		return
+	# Умение и уязвимость оцениваются на контакте с целью замаха.
+	if slot.phase == Phase.VULNERABILITY:
+		strike_multiplier *= slot.actor.definition.vulnerability_multiplier
+		if _hero_strike_is_ability:
+			strike_multiplier *= vulnerable_ability_bonus
+	var damage: int = CharacterState.calculate_damage(hero.strength, slot.actor.defense, strike_multiplier)
+	var applied_damage: int = slot.actor.take_damage(damage)
+	damage_dealt.emit(slot.instance_id, applied_damage)
+	hero_attack_landed.emit(run_id, slot.instance_id, applied_damage)
+	if not slot.actor.is_dead():
+		return
+	for survivor: EnemySlot in enemy_slots:
+		if not survivor.actor.is_dead():
+			if target == slot:
+				_set_target(survivor)
+			return
+	_finish(true)
 
-func _advance_phase() -> void:
-	match enemy_phase:
+func _advance_phase(slot: EnemySlot) -> void:
+	match slot.phase:
 		Phase.TELEGRAPH:
-			_enter_phase(Phase.STARTUP)
+			_enter_phase(slot, Phase.STARTUP)
 		Phase.STARTUP:
-			_enter_phase(Phase.ACTIVE)
+			_enter_phase(slot, Phase.ACTIVE)
 		Phase.ACTIVE:
-			if strike_index + 1 < enemy.definition.attacks_per_cycle:
-				strike_index += 1
-				_enter_phase(Phase.STARTUP)
+			if slot.strike_index + 1 < slot.actor.definition.attacks_per_cycle:
+				slot.strike_index += 1
+				_enter_phase(slot, Phase.STARTUP)
 			else:
-				_enter_phase(Phase.RECOVERY)
+				_enter_phase(slot, Phase.RECOVERY)
 		Phase.RECOVERY:
-			_enter_phase(Phase.VULNERABILITY)
+			_enter_phase(slot, Phase.VULNERABILITY)
 		Phase.VULNERABILITY:
-			strike_index = 0
-			_enter_phase(Phase.TELEGRAPH)
+			slot.strike_index = 0
+			_enter_phase(slot, Phase.TELEGRAPH)
 
-func _enter_phase(next_phase: int) -> void:
-	enemy_phase = next_phase
-	match enemy_phase:
+func _enter_phase(slot: EnemySlot, next_phase: int) -> void:
+	slot.phase = next_phase
+	var definition: ActorDefinition = slot.actor.definition
+	match slot.phase:
 		Phase.TELEGRAPH:
-			phase_ticks_remaining = enemy.definition.telegraph_ticks
+			slot.remaining = definition.telegraph_ticks
 		Phase.STARTUP:
-			phase_ticks_remaining = enemy.definition.startup_ticks
+			slot.remaining = definition.startup_ticks
 		Phase.ACTIVE:
-			phase_ticks_remaining = enemy.definition.active_ticks
+			slot.remaining = definition.active_ticks
 		Phase.RECOVERY:
-			phase_ticks_remaining = enemy.definition.recovery_ticks
+			slot.remaining = definition.recovery_ticks
 		Phase.VULNERABILITY:
-			phase_ticks_remaining = enemy.definition.vulnerability_ticks
-	# Автозащита полного автобоя: одна попытка на цикл (первая STARTUP),
-	# только при готовности; повторный удар гоблина бесплатной попытки не даёт.
-	if enemy_phase == Phase.STARTUP and strike_index == 0 and auto_dodge_enabled:
+			slot.remaining = definition.vulnerability_ticks
+	if slot.phase == Phase.STARTUP and slot.strike_index == 0 and auto_dodge_enabled:
 		_try_auto_dodge()
-	phase_changed.emit(enemy_phase, phase_ticks_remaining)
-	if enemy_phase == Phase.ACTIVE:
-		_resolve_enemy_strike()
+	if slot == enemy_slots[0]:
+		phase_changed.emit(slot.phase, slot.remaining)
+	enemy_phase_changed.emit(slot.instance_id)
+	if slot.phase == Phase.ACTIVE:
+		_resolve_enemy_strike(slot)
 
 func _try_auto_dodge() -> void:
 	if not is_active or is_finished or auto_dodge_cooldown > 0 or dodge_cooldown > 0 or dodge_ticks_remaining > 0:
@@ -205,15 +274,22 @@ func _begin_dodge(source: String) -> void:
 	dodge_ticks_remaining = hero.definition.dodge_duration_ticks
 	dodge_begun.emit(source)
 
-func _resolve_enemy_strike() -> void:
+func _resolve_enemy_strike(slot: EnemySlot) -> void:
+	if slot.pollen_slow_ticks > 0:
+		var avoided: bool = dodge_ticks_remaining > 0
+		if not avoided:
+			slowed_ticks = maxi(slowed_ticks, slot.pollen_slow_ticks)
+		dodge_resolved.emit(avoided)
+		pollen_resolved.emit(avoided)
+		return
 	if dodge_ticks_remaining > 0:
 		dodge_resolved.emit(true)
 		return
 	dodge_resolved.emit(false)
 	var damage: int = CharacterState.calculate_damage(
-		enemy.strength,
+		slot.actor.strength,
 		hero.defense,
-		enemy.definition.attack_multiplier
+		slot.actor.definition.attack_multiplier
 	)
 	var applied_damage: int = hero.take_damage(damage)
 	damage_dealt.emit("hero", applied_damage)

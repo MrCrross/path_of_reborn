@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://domain/definitions/item_definition.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = "needle_hound_quills"
+display_name = "Иглы иглопса"
+description = "Жёсткие иглы с загнутыми кончиками."
+type_id = "material"
+stack_limit = 20
+sale_price_copper = 8
+sellable = true

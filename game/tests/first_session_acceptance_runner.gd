@@ -581,6 +581,9 @@ func _verify_shop_exchange() -> void:
 		DisplayServer.window_set_size(window_size)
 		await _frames(8)
 		var row: Button = shop.rows_box.get_child(row_indices[index])
+		row.grab_focus()
+		await _frames(3)
+		_check(shop._catalog_scroll.get_global_rect().encloses(row.get_global_rect()), "Exchange reveals a focused rate at %s" % window_size)
 		await _click(row)
 		_check(DisplayServer.window_get_size() == window_size and shop.deal_layer.visible and _out_of_window_control(shop).is_empty(), "Exchange card fits the real %s window" % window_size)
 		_check(rates[index] in shop.deal_summary.text and "После обмена" in shop.deal_summary.text, "The card shows the rate and both resulting balances")
@@ -835,8 +838,10 @@ func _measure_windows(label: String) -> void:
 		_check(offender.is_empty(), "%s has no visible out-of-window controls at %s%s" % [label, window_size, ": " + offender if not offender.is_empty() else ""])
 		if label == "world" and window_size == Vector2i(390, 844):
 			await _capture("16_tall_view")
-		if label == "shop" and window_size == Vector2i(412, 915):
-			await _capture("26b_shop_welcome_tall")
+		if label == "shop":
+			_check_shop_portrait(screen, window_size)
+			if window_size == Vector2i(412, 915):
+				await _capture("26b_shop_welcome_tall")
 		if label in ["slime_approach", "cart_lookout", "backpack"]:
 			await _capture("%s_%dx%d" % [label, window_size.x, window_size.y])
 		if label.begins_with("guild_"):
@@ -845,6 +850,19 @@ func _measure_windows(label: String) -> void:
 			_check_guild_actor_framing(screen, window_size)
 	DisplayServer.window_set_size(Vector2i(360, 640))
 	await _frames(8)
+
+func _check_shop_portrait(shop: Control, window_size: Vector2i) -> void:
+	var portrait: TextureRect = shop.merchant_still
+	var texture_size: Vector2 = portrait.texture.get_size()
+	var rect: Rect2 = portrait.get_global_rect()
+	var scale_factor: float = minf(rect.size.x / texture_size.x, rect.size.y / texture_size.y)
+	var offset_y: float = rect.position.y + (rect.size.y - texture_size.y * scale_factor) * 0.5
+	var solid: Rect2 = Rect2(portrait.texture.get_image().get_used_rect())
+	var head_top: float = offset_y + solid.position.y * scale_factor
+	var head_bottom: float = head_top + solid.size.y * scale_factor * 0.27
+	var counter_y: float = portrait.get_parent_control().get_global_rect().end.y
+	var catalog_y: float = shop._catalog_scroll.get_global_rect().position.y
+	_check(shop.buy_tab.get_global_rect().end.y <= head_top and catalog_y >= maxf(head_bottom, counter_y), "The face stays clear and the catalog starts below the counter at %s" % window_size)
 
 func _check_guild_actor_framing(guild: Control, window_size: Vector2i) -> void:
 	var dialogue_top: float = guild.dialogue.next_button.get_global_rect().position.y
@@ -869,7 +887,14 @@ func _out_of_window_control(screen: Control) -> String:
 		var control: Control = node
 		if not control.is_visible_in_tree() or not (control is Button or control is Label):
 			continue
-		if not screen.get_global_rect().grow(0.5).encloses(control.get_global_rect()):
+		var visible_rect: Rect2 = control.get_global_rect()
+		var ancestor: Control = control.get_parent_control()
+		while ancestor != null and ancestor != screen:
+			if ancestor is ScrollContainer:
+				visible_rect = visible_rect.intersection(ancestor.get_global_rect())
+				break
+			ancestor = ancestor.get_parent_control()
+		if visible_rect.has_area() and not screen.get_global_rect().grow(0.5).encloses(visible_rect):
 			return "%s rect=%s screen=%s" % [control.name, control.get_global_rect(), screen.get_global_rect()]
 	return ""
 

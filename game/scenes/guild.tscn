@@ -126,9 +126,10 @@ theme_override_font_sizes/font_size = 10
 text = "Первое задание"
 
 [node name="Objectives" type="Label" parent="SafeArea/Column/Order/Margin/Details"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 9
-text = "В Роще Шепчущих Трав:\n• Собрать лунный лён.\n• Проверить восточный маркер."
+text = "Роща Шелестящих Трав\n• Собрать лунный лён.\n• Проверить восточный маркер."
 autowrap_mode = 2
 
 [node name="Error" type="Label" parent="SafeArea/Column/Order/Margin/Details"]

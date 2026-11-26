@@ -211,10 +211,7 @@ func _refresh_all() -> void:
 
 ## Фон — та же локация, что видел игрок в World: по session.location_id.
 func _refresh_background() -> void:
-	var background_key: String = (
-		"world_lioren" if session.location_id == "lioren" else "world_forest_edge"
-	)
-	background_art.texture = ArtMap.texture(ArtMap.BACKGROUNDS[background_key])
+	background_art.texture = ArtMap.world_background(session.location_id)
 
 func _refresh_contract() -> void:
 	var service: CheckpointService = session.checkpoints

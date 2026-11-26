@@ -11,6 +11,18 @@ const GOBLIN_PREPARE_FRAMES: Array[int] = [0, 3]
 const GOBLIN_CONTACT_FRAMES: Array[int] = [1, 4]
 const GOBLIN_RECOVER_FRAME: int = 5
 
+class GroveEnemyView:
+	var sprite: AnimatedSprite2D
+	var health: ActorHealthDisplay
+	var warning: Sprite2D
+	var cue: Label
+	var clips: Dictionary = {}
+	var head: Vector2
+	var body_width: float
+	var body_bottom: float
+	var phase: int = -1
+	var defeated: bool = false
+
 var arena: Control
 var telegraph: Sprite2D
 var phase_cue: Label
@@ -33,6 +45,8 @@ var _hero_contact_frame: int = UNARMED_CONTACT_FRAME
 var _enemy_busy: bool = false
 var _last_phase: int = -1
 var _battle_tweens: Array[Tween] = []
+var _grove_enemies: Array[GroveEnemyView] = []
+var _pollen_cloud: Sprite2D
 
 func configure(target_session: GameSession, arena_node: Control, hero: AnimatedSprite2D, enemy: AnimatedSprite2D, telegraph_node: Sprite2D, cue: Label) -> void:
 	session = target_session
@@ -57,7 +71,12 @@ func configure(target_session: GameSession, arena_node: Control, hero: AnimatedS
 func bind_resolver(next_resolver: CombatResolver) -> void:
 	resolver = next_resolver
 	_last_phase = -1
-	resolver.phase_changed.connect(_on_phase_changed)
+	if resolver.enemy_slots.size() == 2:
+		_build_grove_enemies()
+		resolver.enemy_phase_changed.connect(_on_grove_actor_changed)
+		resolver.target_changed.connect(_on_grove_actor_changed)
+	else:
+		resolver.phase_changed.connect(_on_phase_changed)
 	resolver.damage_dealt.connect(_on_damage_dealt)
 	resolver.dodge_begun.connect(_on_dodge_begun)
 	resolver.hero_attack_begun.connect(_on_hero_attack_begun)
@@ -65,6 +84,9 @@ func bind_resolver(next_resolver: CombatResolver) -> void:
 	refresh()
 
 func update_positions() -> void:
+	if not _grove_enemies.is_empty():
+		_update_grove_positions()
+		return
 	telegraph.position = enemy_sprite.position + Vector2(0, 1)
 	var cue_position := (enemy_sprite.position + Vector2(_enemy_head.x - 12.0, _enemy_head.y - 37.0)).round()
 	cue_position.x = clampf(cue_position.x, 0.0, maxf(0.0, arena.size.x - phase_cue.size.x))
@@ -77,10 +99,16 @@ func layout() -> void:
 	var arena_size: Vector2 = arena.size
 	if arena_size.x < 32.0 or arena_size.y < 32.0:
 		return
-	hero_sprite.position = SceneStaging.hero_anchor(arena_size).round()
+	var hero_anchor: Vector2 = SceneStaging.hero_anchor(arena_size) if _grove_enemies.is_empty() else SceneStaging.grove_hero_anchor(arena_size)
+	hero_sprite.position = hero_anchor.round()
 	if not (intro_active and _intro_tween != null and _intro_tween.is_valid()):
-		enemy_sprite.position = SceneStaging.enemy_anchor(arena_size).round()
-	telegraph.scale = Vector2.ONE
+		if _grove_enemies.is_empty():
+			enemy_sprite.position = SceneStaging.enemy_anchor(arena_size).round()
+		else:
+			for index: int in range(_grove_enemies.size()):
+				_grove_enemies[index].sprite.position = _grove_anchor(index)
+	if _grove_enemies.is_empty():
+		telegraph.scale = Vector2.ONE
 	update_positions()
 
 func start_intro() -> void:
@@ -88,7 +116,16 @@ func start_intro() -> void:
 	var target: Vector2 = SceneStaging.enemy_anchor(arena.size)
 	enemy_sprite.position = target + Vector2(maxf(48.0, arena.size.x * 0.4), 0)
 	_intro_tween = create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
-	_intro_tween.tween_property(enemy_sprite, "position", target, INTRO_SECONDS)
+	if _grove_enemies.is_empty():
+		_intro_tween.tween_property(enemy_sprite, "position", target, INTRO_SECONDS)
+	else:
+		_intro_tween.set_parallel(true)
+		for index: int in range(_grove_enemies.size()):
+			var sprite: AnimatedSprite2D = _grove_enemies[index].sprite
+			var end: Vector2 = _grove_anchor(index)
+			sprite.position = end + Vector2(maxf(48.0, arena.size.x * 0.4), 0)
+			_intro_tween.tween_property(sprite, "position", end, INTRO_SECONDS)
+		_intro_tween.chain()
 	_intro_tween.tween_callback(_finish_intro)
 
 func _finish_intro() -> void:
@@ -103,6 +140,8 @@ func set_pause(open: bool) -> void:
 	if open:
 		hero_sprite.pause()
 		enemy_sprite.pause()
+		for enemy_view: GroveEnemyView in _grove_enemies:
+			enemy_view.sprite.pause()
 		if _intro_tween != null and _intro_tween.is_valid():
 			_intro_tween.pause()
 		if _telegraph_pulse != null and _telegraph_pulse.is_valid():
@@ -112,7 +151,11 @@ func set_pause(open: bool) -> void:
 				tween.pause()
 	else:
 		hero_sprite.play()
-		enemy_sprite.play()
+		if _grove_enemies.is_empty():
+			enemy_sprite.play()
+		for enemy_view: GroveEnemyView in _grove_enemies:
+			if not enemy_view.defeated and enemy_view.phase in [CombatResolver.Phase.TELEGRAPH, CombatResolver.Phase.VULNERABILITY]:
+				enemy_view.sprite.play(&"default")
 		if _intro_tween != null and _intro_tween.is_valid():
 			_intro_tween.play()
 		if _telegraph_pulse != null and _telegraph_pulse.is_valid():
@@ -125,11 +168,20 @@ func refresh() -> void:
 	if resolver == null:
 		return
 	hero_health.set_hp(resolver.hero.current_hp, resolver.hero.max_hp)
+	if not _grove_enemies.is_empty():
+		_refresh_grove_enemies()
+		return
 	enemy_health.set_hp(resolver.enemy.current_hp, resolver.enemy.max_hp)
 	_update_enemy_clip()
 	_update_phase_cue()
 
 func finish(player_won: bool) -> void:
+	if not _grove_enemies.is_empty():
+		for enemy_view: GroveEnemyView in _grove_enemies:
+			enemy_view.warning.hide()
+			enemy_view.cue.hide()
+		_pollen_cloud.hide()
+		return
 	telegraph.hide()
 	_stop_telegraph_pulse()
 	phase_cue.text = ""
@@ -153,8 +205,16 @@ func _on_phase_changed(_phase: int, _ticks_remaining: int) -> void:
 func _on_damage_dealt(target_id: String, amount: int) -> void:
 	if target_id == "hero":
 		_play_hero_clip("hit")
-	else:
+	elif _grove_enemies.is_empty():
 		_play_enemy_clip("hit", true)
+	else:
+		var enemy_view: GroveEnemyView = _grove_enemy_view(target_id)
+		if enemy_view != null and not enemy_view.defeated:
+			var sprite: AnimatedSprite2D = enemy_view.sprite
+			sprite.self_modulate = Color(1.65, 1.36, 1.22)
+			var flash := create_tween()
+			flash.tween_property(sprite, "self_modulate", Color.WHITE, 0.16)
+			_track_tween(flash)
 	spawn_damage_number(target_id, amount)
 	refresh()
 
@@ -166,11 +226,11 @@ func _on_hero_attack_begun(_run_id: String) -> void:
 	if _hero_clip_name == "attack":
 		hero_sprite.set_frame_and_progress(0, 0.0)
 
-func _on_hero_attack_landed(_run_id: String, _target_id: String, _amount: int) -> void:
+func _on_hero_attack_landed(_run_id: String, target_id: String, _amount: int) -> void:
 	if _hero_clip_name == "attack":
 		hero_sprite.set_frame_and_progress(_hero_contact_frame, 0.0)
-	if _hero_clip_name != "attack" or _hero_unarmed:
-		_spawn_contact_flash()
+	if _hero_clip_name != "attack" or _hero_unarmed or not _grove_enemies.is_empty():
+		_spawn_contact_flash(target_id)
 
 func _update_phase_cue() -> void:
 	if resolver == null or resolver.is_finished or _last_phase == resolver.enemy_phase:
@@ -201,10 +261,12 @@ func _stop_telegraph_pulse() -> void:
 func spawn_damage_number(target_id: String, amount: int) -> void:
 	var label := Label.new()
 	label.text = "-%d" % amount
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.z_index = 4
 	label.add_theme_font_size_override("font_size", 10)
 	label.add_theme_color_override("font_color", Color("f2e3c9") if target_id != "hero" else Color("e89a86"))
 	var side := Vector2(-16, -30) if target_id == "hero" else Vector2(12, -30)
-	label.position = ((hero_sprite.position if target_id == "hero" else enemy_sprite.position) + side).round()
+	label.position = (_actor_position(target_id) + side).round()
 	arena.add_child(label)
 	label.reset_size()
 	label.position.x = clampf(label.position.x, 0.0, maxf(0.0, arena.size.x - label.size.x))
@@ -215,12 +277,16 @@ func spawn_damage_number(target_id: String, amount: int) -> void:
 	tween.chain().tween_callback(label.queue_free)
 	_track_tween(tween)
 
-func _spawn_contact_flash() -> void:
+func _spawn_contact_flash(target_id: String) -> void:
 	var label := Label.new()
 	label.text = "◆"
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.z_index = 4
 	label.add_theme_font_size_override("font_size", 9)
 	label.add_theme_color_override("font_color", AppTheme.COLOR_ACCENT)
-	label.position = (enemy_sprite.position + Vector2(-5, -30)).round()
+	var enemy_view: GroveEnemyView = _grove_enemy_view(target_id)
+	var body_offset: float = enemy_view.head.y * 0.5 if enemy_view != null else -30.0
+	label.position = (_actor_position(target_id) + Vector2(-5, body_offset)).round()
 	arena.add_child(label)
 	label.reset_size()
 	label.position.x = clampf(label.position.x, 0.0, maxf(0.0, arena.size.x - label.size.x))
@@ -263,7 +329,171 @@ func _setup_art() -> void:
 	_apply_clip(enemy_sprite, _enemy_frames["idle"])
 	enemy_sprite.play(&"default")
 	hero_sprite.animation_finished.connect(_reset_hero_to_idle)
-	enemy_sprite.animation_finished.connect(_on_enemy_clip_finished)
+	if session.location_id != GameSession.LOCATION_GROVE:
+		enemy_sprite.animation_finished.connect(_on_enemy_clip_finished)
+
+func _build_grove_enemies() -> void:
+	_pollen_cloud = Sprite2D.new()
+	_pollen_cloud.name = "PollenCloud"
+	_pollen_cloud.texture = ArtMap.crop(ArtMap.FX["moth_pollen"], Rect2(28, 38, 40, 22))
+	_pollen_cloud.scale = Vector2.ONE * 1.4
+	_pollen_cloud.z_index = 2
+	_pollen_cloud.hide()
+	arena.add_child(_pollen_cloud)
+	for index: int in range(resolver.enemy_slots.size()):
+		var slot: CombatResolver.EnemySlot = resolver.enemy_slots[index]
+		var view := GroveEnemyView.new()
+		if index == 0:
+			view.sprite = enemy_sprite
+			view.health = enemy_health
+			view.warning = telegraph
+			view.cue = phase_cue
+		else:
+			view.sprite = AnimatedSprite2D.new()
+			view.sprite.name = "SecondEnemySprite"
+			view.health = ActorHealthDisplay.new()
+			view.health.name = "SecondEnemyHealth"
+			view.health.setup("enemy", true)
+			view.warning = Sprite2D.new()
+			view.warning.texture = telegraph.texture
+			view.cue = Label.new()
+			view.cue.name = "SecondPhaseCue"
+			for control: Node in [view.warning, view.sprite, view.health, view.cue]:
+				arena.add_child(control)
+		view.sprite.z_index = 2
+		view.health.z_index = 3
+		view.cue.z_index = 3
+		view.cue.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		view.cue.add_theme_font_size_override("font_size", 8)
+		view.cue.add_theme_color_override("font_color", Color("ffe3a2"))
+		view.cue.add_theme_color_override("font_outline_color", Color("171a12"))
+		view.cue.add_theme_constant_override("outline_size", 4)
+		var species: String = slot.actor.definition.id
+		var sheets: Dictionary = ArtMap.ENEMY_SHEETS[species]
+		view.head = sheets["idle"]["head"]
+		view.body_width = float(ArtMap.GROVE_STILLS[species]["size"].x)
+		view.body_bottom = 17.0 if slot.pollen_slow_ticks > 0 else 5.0
+		for clip_name: String in sheets:
+			view.clips[clip_name] = _build_clip(sheets[clip_name], clip_name != "idle")
+		_grove_enemies.append(view)
+
+func _grove_anchor(index: int) -> Vector2:
+	return SceneStaging.grove_enemy_anchor(arena.size, index, resolver.enemy_slots[index].pollen_slow_ticks > 0).round()
+
+func _update_grove_positions() -> void:
+	var bounds := Rect2(Vector2.ZERO, arena.size)
+	hero_health.follow(hero_sprite.position + Vector2(ArtMap.HERO_EXILED["idle"]["head"]), bounds)
+	for index: int in range(_grove_enemies.size()):
+		var slot: CombatResolver.EnemySlot = resolver.enemy_slots[index]
+		var view: GroveEnemyView = _grove_enemies[index]
+		view.health.follow(view.sprite.position + view.head, bounds)
+		if not view.defeated:
+			_update_grove_attack_frame(view, slot)
+		view.warning.position = (hero_sprite.position if slot.pollen_slow_ticks > 0 else view.sprite.position) + Vector2(0, 1)
+		view.cue.position = (Vector2(view.sprite.position.x - view.cue.size.x * 0.5, view.health.position.y - 15.0)).round()
+	if _pollen_cloud.visible:
+		_pollen_cloud.position = hero_sprite.position + Vector2(19, -12)
+
+func _on_grove_actor_changed(_instance_id: String) -> void:
+	_refresh_grove_enemies()
+
+func _refresh_grove_enemies() -> void:
+	_pollen_cloud.hide()
+	for index: int in range(_grove_enemies.size()):
+		var slot: CombatResolver.EnemySlot = resolver.enemy_slots[index]
+		var view: GroveEnemyView = _grove_enemies[index]
+		if view.defeated:
+			continue
+		var alive: bool = not slot.actor.is_dead()
+		view.health.visible = alive
+		view.health.set_hp(slot.actor.current_hp, slot.actor.max_hp)
+		view.health.set_targeted(resolver.combat_format == "active" and resolver.target == slot)
+		view.warning.visible = alive and slot.phase in [CombatResolver.Phase.TELEGRAPH, CombatResolver.Phase.STARTUP]
+		view.cue.visible = view.warning.visible
+		if not alive:
+			view.defeated = true
+			var fade := create_tween()
+			fade.tween_property(view.sprite, "modulate:a", 0.0, 0.4)
+			_track_tween(fade)
+			continue
+		if slot.pollen_slow_ticks > 0 and slot.phase == CombatResolver.Phase.ACTIVE:
+			_pollen_cloud.show()
+		if view.phase == slot.phase:
+			continue
+		view.phase = slot.phase
+		var species: String = slot.actor.definition.id
+		var attack: bool = slot.phase in [CombatResolver.Phase.STARTUP, CombatResolver.Phase.ACTIVE, CombatResolver.Phase.RECOVERY]
+		var clip_name: String = slot.attack_id if attack else "idle"
+		_apply_clip(view.sprite, view.clips[clip_name])
+		view.sprite.modulate = Color(1.16, 1.05, 0.76) if slot.phase == CombatResolver.Phase.VULNERABILITY else Color.WHITE
+		if not attack:
+			view.sprite.play(&"default")
+		else:
+			view.sprite.pause()
+		view.warning.modulate = Color(1.0, 0.8, 0.35, 0.8) if species == "dust_moth" else Color(1.0, 0.55, 0.45, 0.8)
+		view.warning.scale = Vector2.ONE * 0.76
+		view.cue.text = _grove_warning(slot)
+		view.cue.reset_size()
+	_update_grove_positions()
+
+func _update_grove_attack_frame(view: GroveEnemyView, slot: CombatResolver.EnemySlot) -> void:
+	var definition: ActorDefinition = slot.actor.definition
+	var spec: Dictionary = ArtMap.ENEMY_SHEETS[definition.id][slot.attack_id]
+	var contact: int = int(spec["contact_frame"])
+	var last: int = int(spec["count"]) - 1
+	var frame: int
+	match slot.phase:
+		CombatResolver.Phase.STARTUP:
+			var progress: float = 1.0 - float(slot.remaining) / definition.startup_ticks
+			frame = mini(contact - 1, floori(progress * contact))
+		CombatResolver.Phase.ACTIVE:
+			var progress: float = 1.0 - float(slot.remaining) / definition.active_ticks
+			frame = mini(last - 1, contact + floori(progress * (last - contact)))
+		CombatResolver.Phase.RECOVERY:
+			frame = last
+		_:
+			return
+	if view.sprite.frame != frame:
+		view.sprite.set_frame_and_progress(frame, 0.0)
+
+func _grove_warning(slot: CombatResolver.EnemySlot) -> String:
+	match slot.actor.definition.id:
+		"dust_moth": return "Пыльца"
+		"root_weaver": return "Захват"
+		_: return "Прыжок" if slot.attack_id == "leap" else "Иглы"
+
+func target_at(position: Vector2) -> String:
+	var nearest_id: String = ""
+	var nearest_distance: float = INF
+	for index: int in range(_grove_enemies.size()):
+		var view: GroveEnemyView = _grove_enemies[index]
+		if view.defeated:
+			continue
+		var instance_id: String = resolver.enemy_slots[index].instance_id
+		if view.health.get_rect().grow(2.0).has_point(position):
+			return instance_id
+		var anchor: Vector2 = view.sprite.position
+		var body := Rect2(
+			Vector2(anchor.x - view.body_width * 0.5, anchor.y + view.head.y),
+			Vector2(view.body_width, view.body_bottom - view.head.y)
+		)
+		var distance: float = position.distance_squared_to(body.get_center())
+		if body.has_point(position) and distance < nearest_distance:
+			nearest_id = instance_id
+			nearest_distance = distance
+	return nearest_id
+
+func _grove_enemy_view(instance_id: String) -> GroveEnemyView:
+	for index: int in range(_grove_enemies.size()):
+		if resolver.enemy_slots[index].instance_id == instance_id:
+			return _grove_enemies[index]
+	return null
+
+func _actor_position(instance_id: String) -> Vector2:
+	if instance_id == "hero":
+		return hero_sprite.position
+	var view: GroveEnemyView = _grove_enemy_view(instance_id)
+	return view.sprite.position if view != null else enemy_sprite.position
 
 func _setup_unarmed_art(still_id: String) -> void:
 	# Until there are unarmed pose sheets, move the empty-handed stance on the

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ActorDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://domain/definitions/actor_definition.gd" id="1_actor"]
+
+[resource]
+script = ExtResource("1_actor")
+id = "dust_moth"
+display_name = "Пыльный мотылёк"
+max_hp = 7
+strength = 2
+defense = 0
+behavior_id = "dust_moth"
+telegraph_ticks = 34
+startup_ticks = 12
+active_ticks = 18
+recovery_ticks = 16
+vulnerability_ticks = 40
+vulnerability_multiplier = 1.6

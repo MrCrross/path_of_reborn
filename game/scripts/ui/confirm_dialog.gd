@@ -25,13 +25,24 @@ static func open(
 
 
 static func dismiss_from(screen: Control) -> bool:
+	var dialog := _top_from(screen)
+	if dialog == null:
+		return false
+	dialog._on_cancel_pressed()
+	return true
+
+
+static func has_open(screen: Control) -> bool:
+	return _top_from(screen) != null
+
+
+static func _top_from(screen: Control) -> ConfirmDialog:
 	var dialogs := screen.get_tree().get_nodes_in_group(MODAL_GROUP)
 	for index: int in range(dialogs.size() - 1, -1, -1):
 		var dialog := dialogs[index] as ConfirmDialog
 		if screen.is_ancestor_of(dialog) and dialog.is_visible_in_tree():
-			dialog._on_cancel_pressed()
-			return true
-	return false
+			return dialog
+	return null
 
 
 static func tutorial(parent: Node, session: GameSession, id: String, title: String, message: String) -> ConfirmDialog:

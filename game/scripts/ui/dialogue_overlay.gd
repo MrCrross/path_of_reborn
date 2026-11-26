@@ -75,7 +75,7 @@ func configure(game_session: GameSession) -> void:
 	session = game_session
 
 ## Timeline scenes can replay their completion cue if Checkpoint rolled back its flag.
-func play(narrative_path: String, last_caption: String = "", timeline_scene: bool = false, substitutions: Dictionary = {}) -> bool:
+func play(narrative_path: String, last_caption: String = "", timeline_scene: bool = false, substitutions: Dictionary = {}, cue_ids: Array[String] = []) -> bool:
 	stop()
 	if session == null:
 		return false
@@ -85,13 +85,14 @@ func play(narrative_path: String, last_caption: String = "", timeline_scene: boo
 	if not runner.load_file(narrative_path):
 		runner = null
 		return false
+	if not cue_ids.is_empty():
+		runner.entries = runner.entries.filter(func(entry: Dictionary) -> bool: return cue_ids.has(entry["id"]))
 	for entry: Dictionary in runner.entries:
 		for token: String in substitutions:
 			entry["text"] = String(entry.get("text", "")).replace(token, String(substitutions[token]))
 	_measured_width = 0.0
 	_caption_at_last = last_caption
-	runner.start()
-	if runner.is_finished:
+	if not runner.start() or runner.is_finished:
 		runner = null
 		return false
 	runner.command_requested.connect(func(command: Dictionary) -> void: command_requested.emit(command))

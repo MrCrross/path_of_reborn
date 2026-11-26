@@ -1,6 +1,7 @@
 extends Control
 
 signal navigate_requested(destination: String)
+signal grove_command_requested(command: String)
 
 var session: GameSession
 
@@ -10,6 +11,7 @@ var session: GameSession
 @onready var location_label: Label = %LocationLabel
 @onready var settings_button: Button = %SettingsButton
 @onready var balance_button: Button = %BalanceButton
+@onready var _top_left: Control = settings_button.get_parent_control()
 @onready var hero_sprite: TextureRect = %HeroSprite
 @onready var main_action_button: Button = %MainActionButton
 @onready var upgrade_button: Button = %UpgradeButton
@@ -31,6 +33,7 @@ var details_layer: Control
 var details_view: ItemDetailsView
 var gates_dialogue: DialogueOverlay
 var guild_button: Button
+var grove_route: GroveRouteView
 var focus_guild_on_entry: bool = false
 var _travel_actions: HBoxContainer
 var _tutorial: ConfirmDialog
@@ -47,6 +50,8 @@ func configure(game_session: GameSession) -> void:
 	session = game_session
 
 func handle_back() -> bool:
+	if grove_route != null and grove_route.close_dialogue():
+		return true
 	if gates_dialogue != null and gates_dialogue.is_active():
 		return true
 	if details_layer != null and details_layer.visible:
@@ -54,6 +59,9 @@ func handle_back() -> bool:
 		return true
 	if _sheet_open:
 		_close_encounter_sheet()
+		return true
+	if grove_route != null:
+		grove_route.leave()
 		return true
 	return false
 
@@ -136,6 +144,17 @@ func _ready() -> void:
 	gates_dialogue.command_requested.connect(_on_dialogue_command)
 	gates_dialogue.finished.connect(_on_gates_finished)
 	add_child(gates_dialogue)
+	if session.location_id == GameSession.LOCATION_GROVE:
+		settings_button.reparent(nav_bar, false)
+		settings_button.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+		settings_button.custom_minimum_size = Vector2(24, 24)
+		grove_route = GroveRouteView.new()
+		add_child(grove_route)
+		grove_route.configure(session, self, bottom, _top_left, art_background)
+		grove_route.command_requested.connect(func(command: String) -> void: grove_command_requested.emit(command))
+		grove_route.encounter_requested.connect(_on_grove_encounter)
+		grove_route.dialogue_visibility_changed.connect(_show_grove_dialogue_shot)
+		grove_route.refresh.call_deferred()
 	_refresh()
 	session.profile_changed.connect(_refresh_hero_art)
 	_refresh_hero_art()
@@ -219,7 +238,7 @@ func _refresh_hero_art() -> void:
 
 func _layout_scene() -> void:
 	var view := Rect2(Vector2.ZERO, size)
-	var anchor := SceneStaging.hero_anchor(size)
+	var anchor: Vector2 = SceneStaging.grove_hero_anchor(size) if grove_route != null else SceneStaging.hero_anchor(size)
 	var scale: float = ArtMap.still_scale(_hero_still_id)
 	var pivot: Vector2 = ArtMap.SOURCE_STILLS[_hero_still_id]["pivot"]
 	if hero_sprite.texture != null:
@@ -238,7 +257,7 @@ func _on_main_action_pressed() -> void:
 	if _navigating or _sheet_open or gates_dialogue.is_active() or is_instance_valid(_tutorial):
 		return
 	# Лиорен — безопасная зона: свободное касание по городу не начинает бой.
-	if session.location_id == GameSession.LOCATION_LIOREN:
+	if session.location_id != GameSession.LOCATION_FOREST_EDGE:
 		return
 	if not session.pending_story_reward.is_empty():
 		navigate_requested.emit("merchant")
@@ -256,6 +275,30 @@ func _on_main_action_pressed() -> void:
 		_navigating = true
 		main_action_button.disabled = true
 		navigate_requested.emit("combat")
+
+func _show_grove_dialogue_shot(active: bool, bridge_shot: bool) -> void:
+	$Margin.visible = not active
+	hero_label.get_parent_control().visible = not bridge_shot
+	balance_button.get_parent_control().visible = not bridge_shot
+	traces_label.visible = not bridge_shot and (_balance_exact or session.traces > 0 or session.echoes > 0)
+	hero_sprite.visible = not bridge_shot
+	hero_health.visible = not bridge_shot and session.hero.current_hp < session.hero.max_hp
+
+func _on_grove_encounter(enemy_id: String) -> void:
+	if not _navigating and session.select_encounter(enemy_id):
+		_navigating = true
+		navigate_requested.emit("combat")
+
+func grove_command_committed(command: String) -> void:
+	if command == "leave":
+		navigate_requested.emit("world_from_guild")
+	elif grove_route != null:
+		_refresh()
+		grove_route.committed(command)
+
+func grove_command_rejected(command: String) -> void:
+	if grove_route != null:
+		grove_route.rejected(command)
 
 func _on_repeats_pressed() -> void:
 	if _navigating:
@@ -351,6 +394,8 @@ func _on_hero_profile_pressed() -> void:
 	navigate_requested.emit("hero_profile")
 
 func _on_checkpoint_pressed() -> void:
+	if grove_route != null and session.grove_stage() != "clearing":
+		return
 	session.checkpoints.notify_movement()
 	navigate_requested.emit("checkpoint")
 
@@ -370,7 +415,7 @@ func _gui_input(event: InputEvent) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if _sheet_open or details_layer.visible or gates_dialogue.is_active() or is_instance_valid(_tutorial):
+	if _sheet_open or details_layer.visible or gates_dialogue.is_active() or ConfirmDialog.has_open(self) or (grove_route != null and grove_route.dialogue.is_active()):
 		return
 	if event.is_action_pressed("primary"):
 		get_viewport().set_input_as_handled()
@@ -430,22 +475,22 @@ func _on_sheet_dismiss(event: InputEvent) -> void:
 		_close_encounter_sheet()
 
 func _refresh() -> void:
-	var background_key: String = "world_lioren" if session.location_id == "lioren" else "world_forest_edge"
-	if background_key != _shown_background:
-		_shown_background = background_key
-		art_background.texture = ArtMap.texture(ArtMap.BACKGROUNDS[background_key])
+	if session.location_id != _shown_background:
+		_shown_background = session.location_id
+		art_background.texture = ArtMap.world_background(session.location_id)
 	hero_label.text = "Ур. %d" % session.hero.level
 	balance_button.text = UiText.astra_compact(session.wallet[GameSession.COPPER])
 	var balance_width: float = ceilf(balance_button.get_combined_minimum_size().x)
 	var side_width: float = maxf(48.0, balance_width)
 	balance_button.offset_left = -balance_width
 	balance_button.get_parent_control().custom_minimum_size.x = side_width
-	settings_button.get_parent_control().custom_minimum_size.x = side_width
+	_top_left.custom_minimum_size.x = side_width
 	balance_button.tooltip_text = UiText.wallet(session.wallet)
 	balance_button.accessibility_name = "Баланс: " + balance_button.tooltip_text
 	traces_label.text = balance_button.tooltip_text if _balance_exact else "Следы %d/3 · Эхо %d" % [session.traces, session.echoes]
 	traces_label.visible = _balance_exact or session.traces > 0 or session.echoes > 0
-	location_label.text = UiText.location(session.location_id)
+	location_label.text = "Роща" if grove_route != null else UiText.location(session.location_id)
+	location_label.tooltip_text = UiText.location(session.location_id)
 	var combat_blocked: bool = session.awaiting_return or session.traces == 3
 
 	# HP героя на пути: полоса появляется после урона, при полном здоровье скрыта.
@@ -480,10 +525,12 @@ func _refresh() -> void:
 	repeats_button.tooltip_text = "Повторы и испытание"
 	repeats_button.accessibility_name = repeats_button.tooltip_text
 	var in_city: bool = session.location_id == GameSession.LOCATION_LIOREN
-	equipment_strip.visible = not in_city
-	repeats_button.visible = not in_city and not combat_blocked and not session.route_repeat_enemy_ids().is_empty()
+	var in_grove: bool = grove_route != null
+	equipment_strip.set_suppressed(in_city or in_grove)
+	checkpoint_button.visible = not in_grove or session.grove_stage() == "clearing"
+	repeats_button.visible = not in_city and not in_grove and not combat_blocked and not session.route_repeat_enemy_ids().is_empty()
 	var has_daijiro_sword: bool = session.story_rewards.has(GameSession.DAIJIRO_SWORD_REWARD_ID)
-	travel_button.visible = (in_city or has_daijiro_sword) and not session.awaiting_return
+	travel_button.visible = not in_grove and (in_city or has_daijiro_sword) and not session.awaiting_return
 	travel_button.disabled = in_city and session.traces == 3
 	travel_button.text = "На Тропу" if in_city else "В Лиорен"
 	travel_button.accessibility_name = travel_button.text
@@ -494,5 +541,5 @@ func _refresh() -> void:
 	_travel_actions.visible = travel_button.visible or shop_button.visible or guild_button.visible
 	rest_button.visible = session.location_id == "lioren" and session.traces > 0
 	_inventory_badge.visible = session.hero.pending_upgrade_choices > 0 or session.pending_receive_fx
-	upgrade_button.visible = session.hero.pending_upgrade_choices > 0 and not combat_blocked
+	upgrade_button.visible = not in_grove and session.hero.pending_upgrade_choices > 0 and not combat_blocked
 	upgrade_button.text = "Выбрать улучшение · %d" % session.hero.pending_upgrade_choices

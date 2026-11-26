@@ -52,6 +52,10 @@ func setup(role: String, show_numbers: bool = false) -> void:
 	_label.visible = show_numbers
 
 
+func set_targeted(targeted: bool) -> void:
+	_fill.color = AppTheme.COLOR_ACCENT if targeted else AppTheme.COLOR_ENEMY_HP
+	_underlay.color = Color("83623de8") if targeted else Color(0.06, 0.1, 0.08, 0.92)
+
 func set_hp(current: int, max_hp: int) -> void:
 	# max_hp <= 0 — только защита от некорректных данных: показываем пустую полосу.
 	_max_hp = maxi(1, max_hp)

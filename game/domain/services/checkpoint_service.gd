@@ -54,6 +54,7 @@ func can_begin() -> bool:
 		and pending_completion.is_empty()
 		and manual_snapshots.size() < MANUAL_LIMIT
 		and session.traces < 3
+		and (session.location_id != GameSession.LOCATION_GROVE or session.grove_stage() == "clearing")
 		and not session.in_combat
 		and session.pending_battle_result.is_empty()
 		and session.pending_story_reward.is_empty()
@@ -102,6 +103,9 @@ func has_pending_completion() -> bool:
 func apply_completion() -> bool:
 	if pending_completion.is_empty():
 		return false
+	if session.location_id == GameSession.LOCATION_GROVE:
+		session.world_flags[GameSession.GROVE_SEALED] = true
+		pending_completion["profile"]["world_flags"][GameSession.GROVE_SEALED] = true
 	manual_snapshots.append(pending_completion.duplicate(true))
 	pending_completion = {}
 	changed.emit()

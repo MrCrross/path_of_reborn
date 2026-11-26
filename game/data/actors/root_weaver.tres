@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ActorDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://domain/definitions/actor_definition.gd" id="1_actor"]
+
+[resource]
+script = ExtResource("1_actor")
+id = "root_weaver"
+display_name = "Корневой плетун"
+max_hp = 12
+strength = 4
+defense = 1
+behavior_id = "root_weaver"
+telegraph_ticks = 36
+startup_ticks = 12
+active_ticks = 8
+recovery_ticks = 20
+vulnerability_ticks = 44
+vulnerability_multiplier = 1.6

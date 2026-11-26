@@ -75,6 +75,8 @@ func _ready() -> void:
 	if session == null:
 		session = GameSession.new()
 		session.select_encounter("moss_slime")
+	if session.location_id == GameSession.LOCATION_GROVE:
+		$Arena/ArenaBackground.texture = ArtMap.world_background(session.location_id)
 	arena_presenter = CombatArenaPresenter.new()
 	arena_presenter.name = "ArenaPresenter"
 	add_child(arena_presenter)
@@ -90,7 +92,7 @@ func _ready() -> void:
 	result_panel.item_requested.connect(_open_details)
 	equipment_strip.configure(session, "combat")
 	UiIcons.apply(attack_button, "attack", "Атака")
-	UiIcons.apply(ability_button, "attack", "Точный удар")
+	UiIcons.apply(ability_button, "attack", "Точный выпад I" if session.quest_flags.get(GameSession.GROVE_REPORTED, false) else "Точный удар")
 	UiIcons.apply(dodge_button, "dodge", "Уклонение")
 	# Короткая подпись режима поверх яркого фона арены: тёмная компактная
 	# подложка, чтобы текст не сливался со светлой листвой.
@@ -152,6 +154,12 @@ func _unhandled_input(event: InputEvent) -> void:
 			_on_ability_pressed()
 			return
 	if _is_press(event):
+		if resolver != null and not _intro_active and not _pause_open and not _result_visible and not _details_open and _current_combat_format() == GameSession.COMBAT_FORMAT_ACTIVE:
+			if event is InputEventScreenTouch or event is InputEventMouseButton:
+				var relative: Vector2 = arena.get_global_transform_with_canvas().affine_inverse() * event.position
+				if resolver.select_target(arena_presenter.target_at(relative)):
+					get_viewport().set_input_as_handled()
+					return
 		get_viewport().set_input_as_handled()
 		_on_press_began(event)
 	elif _is_release(event):
@@ -263,7 +271,7 @@ func _finish_intro() -> void:
 	arena_presenter.layout()
 	_refresh_actions_visibility()
 	if _current_combat_format() == GameSession.COMBAT_FORMAT_ACTIVE:
-		_show_feedback("Атакуйте и уклоняйтесь вручную")
+		_show_feedback("Коснитесь врага для выбора цели" if resolver.enemy_slots.size() > 1 else "Атакуйте и уклоняйтесь вручную")
 		_feedback_ticks = 90
 	if attack_button.visible:
 		attack_button.grab_focus()
@@ -275,6 +283,7 @@ func _finish_intro() -> void:
 func _set_resolver(next_resolver: CombatResolver) -> void:
 	resolver = next_resolver
 	resolver.dodge_resolved.connect(_on_dodge_resolved)
+	resolver.pollen_resolved.connect(_on_pollen_resolved)
 	resolver.finished.connect(_on_finished)
 	arena_presenter.bind_resolver(next_resolver)
 
@@ -385,6 +394,9 @@ func _set_pause(open: bool) -> void:
 func _on_dodge_resolved(success: bool) -> void:
 	if success:
 		_show_feedback("Уклонение")
+
+func _on_pollen_resolved(avoided: bool) -> void:
+	_show_feedback("Пыльца рассеялась" if avoided else "Пыльца · замедление")
 
 func _show_feedback(text: String) -> void:
 	hint_label.text = text

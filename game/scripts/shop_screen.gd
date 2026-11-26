@@ -8,6 +8,7 @@ const TAB_BUY: String = "buy"
 const TAB_SELL: String = "sell"
 const TAB_EXCHANGE: String = "exchange"
 const COUNTER_EDGE: float = 463.0 / 960.0
+const MERCHANT_PORTRAIT_SPACE: float = 58.0
 
 var session: GameSession
 var _tab: String = TAB_BUY
@@ -183,9 +184,18 @@ func _build_scene() -> void:
 	tabs.add_child(sell_tab)
 	exchange_tab = _tab_button("Обмен", TAB_EXCHANGE)
 	tabs.add_child(exchange_tab)
+	var portrait_space := Control.new()
+	portrait_space.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	column.add_child(portrait_space)
+	var resize_portrait_space := func() -> void:
+		var extra_height: float = maxf(0.0, size.y - 320.0)
+		portrait_space.custom_minimum_size.y = MERCHANT_PORTRAIT_SPACE + extra_height * COUNTER_EDGE
+	resized.connect(resize_portrait_space)
+	resize_portrait_space.call()
 	_catalog_scroll = ScrollContainer.new()
 	_catalog_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_catalog_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_catalog_scroll.follow_focus = true
 	column.add_child(_catalog_scroll)
 	rows_box = VBoxContainer.new()
 	rows_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL

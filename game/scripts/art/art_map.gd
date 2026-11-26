@@ -40,6 +40,8 @@ static func apply_animation_transform(sprite: AnimatedSprite2D, sheet: Dictionar
 const BACKGROUNDS := {
 	"title": "environments/white_threshold_background.png",
 	"world_forest_edge": "environments/first_breath_trail_background.png",
+	"world_grove": "environments/whispering_grass_grove_background.png",
+	"grove_bridge": "environments/story/kenta_root_bridge_story.png",
 	"world_lioren": "environments/lioren_south_gate_background.png",
 	"shop_cricket_twilight": "environments/cricket_twilight_interior_background.png",
 	"shop_appraisal": "environments/story/daijiro_crystal_appraisal_story.png",
@@ -47,6 +49,39 @@ const BACKGROUNDS := {
 	"guild_registration": "environments/story/midori_registers_haruto_story.png",
 	"combat": "environments/first_breath_trail_background.png",
 }
+
+const GROVE_PROPS := {
+	"marker": "environments/props/grove_route_marker_broken_prop.png",
+	"flax": "environments/props/moon_flax_gatherable_prop.png",
+	"map": "equipment/grove_route_map_icon.png",
+}
+
+const GROVE_PROP_CROPS := {
+	"environments/props/grove_route_marker_broken_prop.png": Rect2(10, 24, 28, 32),
+	"environments/props/moon_flax_gatherable_prop.png": Rect2(4, 18, 20, 26),
+}
+
+static func crop(path: String, bounds: Rect2) -> AtlasTexture:
+	var atlas := AtlasTexture.new()
+	atlas.atlas = texture(path)
+	atlas.region = bounds
+	atlas.filter_clip = true
+	return atlas
+
+const GROVE_STILLS := {
+	"needle_hound": {"path": "enemies/needle_hound_idle.png", "crop": Rect2(6, 18, 82, 38), "size": Vector2(60, 28)},
+	"dust_moth": {"path": "enemies/dust_moth_idle.png", "crop": Rect2(20, 24, 54, 48), "size": Vector2(43, 38)},
+	"root_weaver": {"path": "enemies/root_weaver_idle.png", "crop": Rect2(6, 32, 82, 52), "size": Vector2(53, 34)},
+}
+
+static func world_background(location_id: String) -> Texture2D:
+	match location_id:
+		GameSession.LOCATION_LIOREN:
+			return texture(BACKGROUNDS["world_lioren"])
+		GameSession.LOCATION_GROVE:
+			return texture(BACKGROUNDS["world_grove"])
+		_:
+			return texture(BACKGROUNDS["world_forest_edge"])
 
 const GUILD_ART := {
 	"badge": "equipment/dawn_trail_guild_badge_icon.png",
@@ -82,6 +117,7 @@ const FX := {
 	"void_trace": "effects/void_trace_icon.png",
 	"inventory_receive": "effects/inventory_receive_01.png",
 	"attack_telegraph": "effects/attack_zone_telegraph_01.png",
+	"moth_pollen": "effects/moth_pollen_cloud_01.png",
 	"headlight_flash": "effects/headlight_flash_overlay.png",
 }
 
@@ -113,6 +149,9 @@ const EMPTY_SLOT_ICONS := {
 # Иконки предметов по item_id (+аспект для echo_crystal).
 # slime_residue: утверждённой иконки нет — карточка без иконки, пробел зафиксирован в отчёте.
 const ITEM_ICONS := {
+	"moon_flax_bandage": "equipment/moon_flax_bandage_icon.png",
+	"needle_hound_quills": "equipment/needle_hound_quills_icon.png",
+	"moth_pollen_jar": "equipment/moth_pollen_jar_icon.png",
 	"broken_wanderer_branch": "equipment/broken_wanderer_branch_icon.png",
 	"training_sword": "equipment/novice_short_sword_icon.png",
 	"moss_charm": "equipment/moss_core_icon.png",
@@ -219,6 +258,19 @@ const GOBLIN_SCOUT_SHEETS := {
 ## solid-силуэта высотой 32 logical px (ENEMY_SOLID_HEIGHT), не в пустоте
 ## прозрачного canvas старого logical-размера.
 const ENEMY_SHEETS := {
+	"needle_hound": {
+		"idle": {"path": "enemies/animations/needle_hound_idle_sheet.png", "count": 2, "frame": Vector2i(96, 64), "offset": Vector2(0, -24), "scale": 0.72, "head": Vector2(0, -40), "contact_frame": 0},
+		"attack": {"path": "enemies/animations/needle_hound_quill_shot_sheet.png", "count": 4, "frame": Vector2i(96, 64), "offset": Vector2(0, -24), "scale": 0.72, "head": Vector2(0, -40), "contact_frame": 2},
+		"leap": {"path": "enemies/animations/needle_hound_leap_sheet.png", "count": 6, "frame": Vector2i(96, 64), "offset": Vector2(0, -24), "scale": 0.72, "head": Vector2(0, -40), "contact_frame": 3},
+	},
+	"dust_moth": {
+		"idle": {"path": "enemies/animations/dust_moth_hover_sheet.png", "count": 4, "frame": Vector2i(96, 96), "offset": Vector2(0, 0), "scale": 0.8, "head": Vector2(0, -31), "contact_frame": 0},
+		"attack": {"path": "enemies/animations/dust_moth_pollen_sheet.png", "count": 4, "frame": Vector2i(96, 96), "offset": Vector2(0, 0), "scale": 0.8, "head": Vector2(0, -31), "contact_frame": 2},
+	},
+	"root_weaver": {
+		"idle": {"path": "enemies/animations/root_weaver_idle_sheet.png", "count": 2, "frame": Vector2i(96, 96), "offset": Vector2(-15, -36), "scale": 0.8, "head": Vector2(0, -40), "contact_frame": 0},
+		"attack": {"path": "enemies/animations/root_weaver_grab_sheet.png", "count": 6, "frame": Vector2i(96, 96), "offset": Vector2(-15, -36), "scale": 0.8, "head": Vector2(0, -40), "contact_frame": 2},
+	},
 	"moss_slime": {
 		"idle": {"path": "enemies/animations/moss_slime_idle_sheet.png", "count": 2, "frame": Vector2i(64, 64), "offset": Vector2(0, -24), "head": Vector2(0, -36)},
 		"attack": {"path": "enemies/animations/moss_slime_jump_sheet.png", "count": 6, "frame": Vector2i(64, 64), "offset": Vector2(0, -24), "head": Vector2(0, -36)},
@@ -243,6 +295,7 @@ static func sprite_frames(sheet: Dictionary, fps: float = 8.0, one_shot: bool = 
 	var atlas: Texture2D = load(ROOT + sheet["path"])
 	var frame_size: Vector2i = sheet["frame"]
 	var count: int = sheet["count"]
+	var columns: int = maxi(1, floori(float(atlas.get_width()) / frame_size.x))
 	frames.add_animation(&"default")
 	frames.set_animation_speed(&"default", fps)
 	frames.set_animation_loop(&"default", not one_shot)
@@ -257,7 +310,11 @@ static func sprite_frames(sheet: Dictionary, fps: float = 8.0, one_shot: bool = 
 			region.region = Rect2(rect[0], rect[1], rect[2], rect[3])
 			region.margin = Rect2(margin[0], margin[1], margin[2], margin[3])
 		else:
-			region.region = Rect2(index * frame_size.x, 0, frame_size.x, frame_size.y)
+			region.region = Rect2(
+				(index % columns) * frame_size.x,
+				floori(float(index) / columns) * frame_size.y,
+				frame_size.x, frame_size.y
+			)
 		frames.add_frame(&"default", region)
 	return frames
 

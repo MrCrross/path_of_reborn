@@ -31,3 +31,13 @@ static func enemy_anchor(size: Vector2) -> Vector2:
 ## solid_height_px занимает target_logical высоту в logical px.
 static func still_scale(solid_height_px: float, target_logical: float) -> float:
 	return target_logical / maxf(1.0, solid_height_px)
+
+
+static func grove_hero_anchor(size: Vector2) -> Vector2:
+	return Vector2(size.x * 0.20, floor_y(size.y))
+
+
+static func grove_enemy_anchor(size: Vector2, index: int, airborne: bool) -> Vector2:
+	var fraction: float = 0.53 if index == 0 else 0.77
+	var depth: float = 0.0 if index == 0 else 19.0
+	return Vector2(size.x * fraction, floor_y(size.y) - depth - (28.0 if airborne else 0.0))

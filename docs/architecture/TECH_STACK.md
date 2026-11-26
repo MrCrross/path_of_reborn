@@ -30,7 +30,7 @@
 - **UI:** `Control` scenes с anchors/safe area; UI подписывается на состояние, а не меняет доменные правила напрямую.
 - **Input:** abstract actions (`primary`, `secondary`, `inventory`, `checkpoint`) с touch mapping; keyboard mapping только для desktop smoke test.
 - **Rendering:** nearest filter, integer scaling, portrait base viewport, performance budget на старом Android.
-- **Save:** один локальный профиль v4 в `user://`; canonical root `pending_battle_result`, неоткатываемые Echo/trial flag в `meta`, миграции v0–v3, defensive validation, `.tmp`/`.bak`; claim публикуется только после подтверждённой записи, autosave только на безопасных границах.
+- **Save** хранит локальный профиль v7 в `user://` с миграциями v0–v6 и резервной копией. Награда боя остаётся в корневом `pending_battle_result` до успешной записи. В Роще результат относится к паре, а её вехи входят в снимок Печати. Эхо и память о репликах хранятся в `meta`. [Границы записи Рощи](../reviews/grove_stage_2026_11_22/README.md#маршрут-сохранение-и-баланс)
 - **Networking:** отсутствует в MVP; не добавлять multiplayer SDK или серверный backend.
 
 ## Инструменты графики

@@ -16,12 +16,30 @@ const DAIJIRO_SWORD_REWARD_ID: String = "daijiro_first_training_sword"
 const ENCOUNTER_ROUTE: String = "route"
 const ENCOUNTER_REPEAT: String = "repeat"
 const ENCOUNTER_TRIAL: String = "trial"
+const ENCOUNTER_GROVE: String = "grove"
+const LOCATION_GROVE: String = "whispering_grass_grove"
+const GROVE_ROUTE_PATH: String = "res://data/route/whispering_grass_grove.json"
+const GROVE_NARRATIVE_PATH: String = "res://data/narrative/whispering_grass_grove.json"
+const GROVE_BANDAGE: String = "moon_flax_bandage"
+const GROVE_HOUNDS_WON: String = "grove_hounds_won"
+const GROVE_POLLEN_WON: String = "grove_pollen_won"
+const GROVE_FLAX: String = "grove_flax"
+const GROVE_MARKER: String = "grove_marker"
+const GROVE_REPORTED: String = "grove_reported"
+const GROVE_SEALED: String = "grove_sealed"
+const GROVE_DECLINED_SEAL: String = "grove_left_without_point"
+const GROVE_LEVEL_THREE: String = "grove_reached_level_three"
+const GROVE_ECHOES_GRANTED: String = "grove_report_echoes"
+const GROVE_KENTA_CHOICES: Array[String] = ["grove_kenta_safe", "grove_kenta_hint", "grove_kenta_bandage"]
 
 const ACTOR_PATHS: Dictionary = {
 	"haruto": "res://data/actors/haruto.tres",
 	"moss_slime": "res://data/actors/moss_slime.tres",
 	"goblin_scout": "res://data/actors/goblin_scout.tres",
 	TRIAL_ENEMY_ID: "res://data/actors/goblin_trial.tres",
+	"needle_hound": "res://data/actors/needle_hound.tres",
+	"dust_moth": "res://data/actors/dust_moth.tres",
+	"root_weaver": "res://data/actors/root_weaver.tres",
 }
 const COMPANION_ACTOR_PATHS: Dictionary = {
 	"road_companion": "res://data/actors/road_companion.tres",
@@ -38,6 +56,9 @@ const ITEM_PATHS: Dictionary = {
 	"echo_crystal": "res://data/items/echo_crystal.tres",
 	"slime_residue": "res://data/items/slime_residue.tres",
 	"wanderer_jacket": "res://data/items/wanderer_jacket.tres",
+	GROVE_BANDAGE: "res://data/items/moon_flax_bandage.tres",
+	"needle_hound_quills": "res://data/items/needle_hound_quills.tres",
+	"moth_pollen_jar": "res://data/items/moth_pollen_jar.tres",
 }
 const LOCATION_FOREST_EDGE: String = "forest_edge"
 const LOCATION_LIOREN: String = "lioren"
@@ -69,6 +90,7 @@ const LOOT_PATHS: Dictionary = {
 const ROUTE_PATH: String = "res://data/route/forest_slice.json"
 
 static var _route_definition_cache: Dictionary = {}
+static var _grove_definition_cache: Dictionary = {}
 
 var hero: CharacterState
 var inventory: InventoryService
@@ -249,7 +271,19 @@ func start_combat(enemy_id: String, repeat: bool = false) -> CombatResolver:
 	context["combat_format"] = combat_format
 	context["auto_speed"] = auto_speed if combat_format == COMBAT_FORMAT_AUTO else 1
 	var enemy_definition: ActorDefinition = load(ACTOR_PATHS[enemy_id])
-	var resolver := CombatResolver.new(hero, enemy_definition, run_id)
+	var resolver: CombatResolver
+	if context["encounter_mode"] == ENCOUNTER_GROVE:
+		var encounter: Dictionary = grove_node(String(context["route_node_id"]))
+		var first: Dictionary = encounter["enemies"][0].duplicate()
+		var second: Dictionary = encounter["enemies"][1]
+		if quest_flags.get("grove_noise", false) and encounter.has("noise_offset"):
+			first["telegraph_offset"] = int(encounter["noise_offset"])
+		var second_definition: ActorDefinition = load(ACTOR_PATHS[second["actor_id"]])
+		resolver = CombatResolver.new(hero, enemy_definition, run_id, first, second_definition, second)
+	else:
+		resolver = CombatResolver.new(hero, enemy_definition, run_id)
+	if quest_flags.get(GROVE_REPORTED, false):
+		resolver.vulnerable_ability_bonus = float(grove_definition()["report"]["vulnerable_ability_multiplier"])
 	resolver.run_token = context["run_token"]
 	resolver.combat_format = combat_format
 	resolver.auto_attack_enabled = combat_format == COMBAT_FORMAT_AUTO
@@ -460,6 +494,13 @@ func route_repeat_enemy_ids() -> Array[String]:
 func _encounter_context_for(enemy_id: String, repeat: bool) -> Dictionary:
 	if not _is_known_enemy(enemy_id):
 		return {}
+	if location_id == LOCATION_GROVE:
+		var grove: Dictionary = grove_node(grove_stage())
+		if repeat or String(grove.get("enemy_id", "")) != enemy_id:
+			return {}
+		if enemy_id == "dust_moth" and not seen_cue_ids.has("DIA_GROVE_011"):
+			return {}
+		return {"enemy_id": enemy_id, "encounter_mode": ENCOUNTER_GROVE, "route_id": LOCATION_GROVE, "route_node_id": grove["node_id"]}
 	var route_id: String = String(route_definition().get("route_id", ""))
 	var node: Dictionary = next_route_node()
 	if not repeat and not node.is_empty() and String(node.get("enemy_id", "")) == enemy_id:
@@ -497,11 +538,19 @@ func settle_combat(run_id: String, enemy_id: String) -> bool:
 	var context: Variant = _finished_run_contexts.get(run_id, null)
 	if typeof(context) != TYPE_DICTIONARY or String(context.get("enemy_id", "")) != enemy_id:
 		return false
-	if not LOOT_PATHS.has(enemy_id):
+	var grove: Dictionary = grove_node(String(context["route_node_id"])) if context["encounter_mode"] == ENCOUNTER_GROVE else {}
+	if grove.is_empty() and not LOOT_PATHS.has(enemy_id):
 		return false
 	_settled_run_ids[run_id] = true
 	var enemy_definition: ActorDefinition = load(ACTOR_PATHS[enemy_id])
-	var rewards: Array = loot_generator.generate(load(LOOT_PATHS[enemy_id]), loot_rng).duplicate(true)
+	var rewards: Array = grove.get("rewards", [])
+	var echo_available: bool = false
+	if grove.is_empty():
+		rewards = loot_generator.generate(load(LOOT_PATHS[enemy_id]), loot_rng).duplicate(true)
+		echo_available = not claimed_echo_enemy_ids.has(enemy_id)
+	else:
+		for slot: Dictionary in grove["enemies"]:
+			echo_available = echo_available or not claimed_echo_enemy_ids.has(slot["actor_id"])
 	if String(context.get("encounter_mode", "")) == ENCOUNTER_ROUTE:
 		for node: Dictionary in route_nodes():
 			if String(node.get("node_id", "")) == String(context.get("route_node_id", "")):
@@ -532,8 +581,8 @@ func settle_combat(run_id: String, enemy_id: String) -> bool:
 		"route_node_id": String(context.get("route_node_id", "")),
 		"items": items,
 		"choices": {},
-		"xp": enemy_definition.xp_reward,
-		"echo_gained": not claimed_echo_enemy_ids.has(enemy_id),
+		"xp": int(grove.get("xp", enemy_definition.xp_reward)),
+		"echo_gained": echo_available,
 		"trial_echo_gained": enemy_id == TRIAL_ENEMY_ID and not trial_echo_claimed,
 		"loot_seed": loot_seed,
 		"loot_state": str(loot_rng.state),
@@ -551,6 +600,8 @@ func claim_battle_result(result_id: String) -> bool:
 	if _claim_in_progress or result_id.is_empty() or pending_battle_result.is_empty() or awaiting_return or not reward_choices_complete():
 		return false
 	if String(pending_battle_result.get("result_id", "")) != result_id or not is_valid_pending_battle_result(pending_battle_result):
+		return false
+	if pending_battle_result["encounter_mode"] == ENCOUNTER_GROVE and (location_id != LOCATION_GROVE or grove_stage() != pending_battle_result["route_node_id"]):
 		return false
 	_claim_in_progress = true
 	_transaction_depth += 1
@@ -588,10 +639,19 @@ func claim_battle_result(result_id: String) -> bool:
 		})
 	hero.gain_xp(int(pending_battle_result.get("xp", 0)))
 	var echo_gained: bool = false
-	if bool(pending_battle_result.get("echo_gained", false)) and not claimed_echo_enemy_ids.has(enemy_id):
-		claimed_echo_enemy_ids[enemy_id] = true
-		echoes += 1
-		echo_gained = true
+	var encounter_species: Array[String] = [enemy_id]
+	if pending_battle_result["encounter_mode"] == ENCOUNTER_GROVE:
+		var grove: Dictionary = grove_node(String(pending_battle_result["route_node_id"]))
+		for slot: Dictionary in grove["enemies"]:
+			var species: String = String(slot["actor_id"])
+			if not encounter_species.has(species):
+				encounter_species.append(species)
+	for species: String in encounter_species:
+		_beaten_encounter_ids[species] = true
+		if bool(pending_battle_result["echo_gained"]) and not claimed_echo_enemy_ids.has(species):
+			claimed_echo_enemy_ids[species] = true
+			echoes += 1
+			echo_gained = true
 	var trial_echo_gained: bool = false
 	if bool(pending_battle_result.get("trial_echo_gained", false)) and not trial_echo_claimed:
 		trial_echo_claimed = true
@@ -601,7 +661,6 @@ func claim_battle_result(result_id: String) -> bool:
 	if pending_battle_result.get("encounter_mode", "") == ENCOUNTER_ROUTE and enemy_id == "goblin_scout":
 		world_flags["daijiro_scout_defeated"] = true
 	# Журнал побед — внутри транзакции, до единственного итогового сохранения.
-	_beaten_encounter_ids[enemy_id] = true
 	last_settlement = {
 		"result_id": result_id,
 		"run_id": String(pending_battle_result.get("run_id", "")),
@@ -809,7 +868,9 @@ func sell_item(instance_id: String, quantity: int = 1, expected_price: int = -1,
 func travel_to(location_id: String) -> bool:
 	if in_combat or has_pending_reward() or awaiting_return or _claim_in_progress:
 		return false
-	if location_id != LOCATION_FOREST_EDGE and location_id != LOCATION_LIOREN:
+	if location_id not in [LOCATION_FOREST_EDGE, LOCATION_LIOREN]:
+		return false
+	if self.location_id == LOCATION_GROVE:
 		return false
 	if location_id == self.location_id:
 		return true
@@ -852,6 +913,125 @@ func register_with_guild() -> bool:
 	world_flags[WORLD_FLAG_GUILD_REGISTERED] = true
 	quest_flags[FIRST_GUILD_ORDER_ID] = true
 	profile_changed.emit()
+	return true
+
+static func grove_definition() -> Dictionary:
+	if _grove_definition_cache.is_empty():
+		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(GROVE_ROUTE_PATH))
+		if parsed is Dictionary:
+			_grove_definition_cache = parsed
+	return _grove_definition_cache
+
+static func grove_node(node_id: String) -> Dictionary:
+	for node: Dictionary in grove_definition().get("nodes", []):
+		if node["node_id"] == node_id:
+			return node
+	return {}
+
+func grove_stage() -> String:
+	return grove_stage_for(quest_flags, npc_flags)
+
+static func grove_stage_for(quests: Dictionary, npcs: Dictionary) -> String:
+	if not quests.get("grove_approached", false):
+		return "approach"
+	if not quests.get(GROVE_HOUNDS_WON, false):
+		return "hound_pair"
+	for choice: String in GROVE_KENTA_CHOICES:
+		if npcs.get(choice, false):
+			return "clearing" if quests.get(GROVE_POLLEN_WON, false) else "pollen_pair"
+	return "root_bridge"
+
+func battle_echo_reward(result: Dictionary) -> int:
+	if result.get("encounter_mode", "") != ENCOUNTER_GROVE:
+		return int(result.get("echo_gained", false)) + int(result.get("trial_echo_gained", false))
+	if not result.get("echo_gained", false):
+		return 0
+	var new_species: Dictionary = {}
+	for slot: Dictionary in grove_node(String(result["route_node_id"])).get("enemies", []):
+		if not claimed_echo_enemy_ids.has(slot["actor_id"]):
+			new_species[slot["actor_id"]] = true
+	return new_species.size()
+
+func grove_kenta_outcome() -> String:
+	for choice: String in GROVE_KENTA_CHOICES:
+		if npc_flags.get(choice, false):
+			return choice
+	return ""
+
+func grove_bandage() -> ItemInstance:
+	for item: ItemInstance in inventory.filter("consumable"):
+		if item.definition_id == GROVE_BANDAGE:
+			return item
+	return null
+
+func can_enter_grove() -> bool:
+	return guild_visit_active() and guild_rank() == "E" and quest_flags.get(FIRST_GUILD_ORDER_ID, false) and traces < 3 and not checkpoints.channel_active
+
+func can_report_grove() -> bool:
+	return guild_visit_active() and guild_rank() == "E" and quest_flags.get(GROVE_FLAX, false) and quest_flags.get(GROVE_MARKER, false) and not quest_flags.get(GROVE_REPORTED, false)
+
+## GameRoot executes this on a copy and publishes only after SaveService commits.
+func apply_grove_command(command: String) -> bool:
+	if in_combat or has_pending_reward() or awaiting_return or checkpoints.channel_active:
+		return false
+	if command == "enter":
+		if not can_enter_grove():
+			return false
+		location_id = LOCATION_GROVE
+		world_flags.erase(WORLD_FLAG_GUILD_VISIT)
+		return true
+	if command == "report":
+		if not can_report_grove() or not seen_cue_ids.has("DIA_GROVE_021"):
+			return false
+		var reward: Dictionary = grove_definition()["report"]
+		var silver: int = int(reward["silver"])
+		if wallet[SILVER] > MAX_ASTRAS - silver:
+			return false
+		var previous_level: int = hero.level
+		hero.gain_xp(int(reward["xp"]))
+		wallet[SILVER] += silver
+		if not memory_flags.get(GROVE_ECHOES_GRANTED, false):
+			echoes += int(reward["echoes"])
+			memory_flags[GROVE_ECHOES_GRANTED] = true
+		quest_flags[GROVE_REPORTED] = true
+		if previous_level < 3 and hero.level == 3:
+			quest_flags[GROVE_LEVEL_THREE] = true
+		return true
+	if location_id != LOCATION_GROVE or traces >= 3:
+		return false
+	var stage: String = grove_stage()
+	match command:
+		"decline_point":
+			if stage != "clearing" or world_flags.get(GROVE_SEALED, false) or world_flags.get(GROVE_DECLINED_SEAL, false):
+				return false
+			world_flags[GROVE_DECLINED_SEAL] = true
+		"leave":
+			if stage == "clearing" and not world_flags.get(GROVE_SEALED, false):
+				if not world_flags.get(GROVE_DECLINED_SEAL, false) or not seen_cue_ids.has("DIA_GROVE_015"):
+					return false
+			location_id = LOCATION_LIOREN
+			world_flags.erase(GROVE_DECLINED_SEAL)
+		"approach", "noise":
+			if stage != "approach" or not seen_cue_ids.has("DIA_GROVE_004"):
+				return false
+			quest_flags["grove_approached"] = true
+			if command == "noise":
+				quest_flags["grove_noise"] = true
+		"flax", "marker":
+			var flag: String = GROVE_FLAX if command == "flax" else GROVE_MARKER
+			if stage != "clearing" or quest_flags.get(flag, false):
+				return false
+			quest_flags[flag] = true
+		_:
+			if command not in GROVE_KENTA_CHOICES or stage != "root_bridge" or not seen_cue_ids.has("DIA_GROVE_007"):
+				return false
+			if command == "grove_kenta_bandage":
+				var bandage: ItemInstance = grove_bandage()
+				if bandage == null or not inventory.remove(bandage.instance_id, 1):
+					return false
+			npc_flags[command] = true
+			if command != "grove_kenta_hint":
+				npc_flags["grove_kenta_trust"] = true
 	return true
 
 func coin_exchange_quote(from_coin: String, to_coin: String) -> Dictionary:
@@ -1130,6 +1310,12 @@ func _invalidate_active_resolver() -> void:
 	active_encounter_context = {}
 
 func _advance_route(result: Dictionary) -> bool:
+	if result.get("encounter_mode", "") == ENCOUNTER_GROVE:
+		var node: Dictionary = grove_node(String(result["route_node_id"]))
+		if location_id != LOCATION_GROVE or grove_stage() != node["node_id"]:
+			return false
+		quest_flags[node["cleared_flag"]] = true
+		return true
 	if result.get("encounter_mode", "") != ENCOUNTER_ROUTE or route_state.get("completed", false):
 		return false
 	if String(result.get("route_id", "")) != String(route_state.get("route_id", "")):
@@ -1184,14 +1370,18 @@ static func is_valid_pending_battle_result(result: Dictionary) -> bool:
 		return false
 	if typeof(result.get("enemy_id", null)) != TYPE_STRING or not GameSession.ACTOR_PATHS.has(result["enemy_id"]) or result["enemy_id"] == "haruto":
 		return false
-	if typeof(result.get("encounter_mode", null)) != TYPE_STRING or result["encounter_mode"] not in [ENCOUNTER_ROUTE, ENCOUNTER_REPEAT, ENCOUNTER_TRIAL]:
+	if typeof(result.get("encounter_mode", null)) != TYPE_STRING or result["encounter_mode"] not in [ENCOUNTER_ROUTE, ENCOUNTER_REPEAT, ENCOUNTER_TRIAL, ENCOUNTER_GROVE]:
 		return false
 	if typeof(result.get("route_node_id", null)) != TYPE_STRING or typeof(result.get("route_id", null)) != TYPE_STRING:
 		return false
-	if String(result["route_id"]) != String(route_definition().get("route_id", "")):
-		return false
 	var enemy_id: String = String(result["enemy_id"])
 	var mode: String = String(result["encounter_mode"])
+	if mode == ENCOUNTER_GROVE:
+		var grove: Dictionary = grove_node(String(result["route_node_id"]))
+		if result["route_id"] != LOCATION_GROVE or grove.get("enemy_id", "") != enemy_id:
+			return false
+	elif result["route_id"] != route_definition().get("route_id", "") or not LOOT_PATHS.has(enemy_id):
+		return false
 	if mode == ENCOUNTER_TRIAL and enemy_id != TRIAL_ENEMY_ID:
 		return false
 	if mode != ENCOUNTER_TRIAL and enemy_id == TRIAL_ENEMY_ID:
@@ -1204,7 +1394,7 @@ static func is_valid_pending_battle_result(result: Dictionary) -> bool:
 				break
 		if not matching_node:
 			return false
-	elif not String(result["route_node_id"]).is_empty():
+	elif mode != ENCOUNTER_GROVE and not String(result["route_node_id"]).is_empty():
 		return false
 	if typeof(result.get("xp", null)) == TYPE_NIL or not _is_intlike_number(result["xp"]) or int(result["xp"]) < 0:
 		return false

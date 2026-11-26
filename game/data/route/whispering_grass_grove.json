@@ -1,0 +1,96 @@
+{
+  "route_id": "whispering_grass_grove",
+  "nodes": [
+    {
+      "node_id": "approach",
+      "cues": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "node_id": "hound_pair",
+      "enemy_id": "needle_hound",
+      "cleared_flag": "grove_hounds_won",
+      "enemies": [
+        {
+          "id": "hound_quills",
+          "actor_id": "needle_hound",
+          "attack": "attack"
+        },
+        {
+          "id": "hound_leap",
+          "actor_id": "needle_hound",
+          "attack": "leap",
+          "telegraph_offset": 16
+        }
+      ],
+      "noise_offset": 12,
+      "xp": 6,
+      "rewards": [
+        {
+          "item_id": "needle_hound_quills",
+          "quantity": 2
+        },
+        {
+          "item_id": "moon_flax_bandage",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "node_id": "root_bridge",
+      "cues": [
+        5,
+        6,
+        7
+      ],
+      "help_cues": [
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "node_id": "pollen_pair",
+      "enemy_id": "dust_moth",
+      "cleared_flag": "grove_pollen_won",
+      "cues": [
+        11
+      ],
+      "enemies": [
+        {
+          "id": "dust_moth",
+          "actor_id": "dust_moth",
+          "pollen_slow_ticks": 90
+        },
+        {
+          "id": "root_weaver",
+          "actor_id": "root_weaver",
+          "telegraph_offset": 15
+        }
+      ],
+      "xp": 8,
+      "rewards": [
+        {
+          "item_id": "moth_pollen_jar",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "node_id": "clearing",
+      "cues": [
+        12
+      ]
+    }
+  ],
+  "report": {
+    "xp": 8,
+    "silver": 35,
+    "echoes": 2,
+    "vulnerable_ability_multiplier": 1.25
+  }
+}

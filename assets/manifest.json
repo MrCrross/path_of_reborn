@@ -1789,20 +1789,21 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        180,
-        320
+        540,
+        960
       ],
-      "sha256": "9b4c1a3357278befb54644f4459872fa14a754908ef8524aa1d37a2c759b3602",
-      "rgba_sha256": "9abfddcce11ac5c6d7866525b82e646ed9985161fe8654ad60e2b037d8f38cce",
+      "sha256": "2402986e67864abfa1ab9c6ca10fcd377c5c1681de7c154c5237e74d1bab9cff",
+      "rgba_sha256": "c6855a8cf360641106267e531dc7367bb6aa203ca0effe86effb1515b5f53bcd",
       "priority": "P0",
       "source": {
-        "export": "art_working/threshold_guild_routes_p0_2026_11_18/env_14/normalized/whispering_grass_grove_background_v01.png",
-        "export_sha256": "9b4c1a3357278befb54644f4459872fa14a754908ef8524aa1d37a2c759b3602",
+        "export": "art_working/grove_runtime_export/whispering_grass_grove_background.png",
+        "export_sha256": "2402986e67864abfa1ab9c6ca10fcd377c5c1681de7c154c5237e74d1bab9cff",
         "manifest": "art_working/threshold_guild_routes_p0_2026_11_18/manifest.json",
         "original": "art_working/threshold_guild_routes_p0_2026_11_18/env_14/source/whispering_grass_grove_background_v01.png",
         "original_sha256": "1512b5db9855c1b48e09c4d059fa7351d2bd0a2263c6d745cfb18529cf3b15ac",
         "prompt": "art_working/threshold_guild_routes_p0_2026_11_18/env_14/prompt_v01.txt",
-        "prompt_sha256": "bcd0118b7048b2d8bb14e960c883f0a66033397b3ea1f532900217c475550c49"
+        "prompt_sha256": "bcd0118b7048b2d8bb14e960c883f0a66033397b3ea1f532900217c475550c49",
+        "previous_export": "art_working/threshold_guild_routes_p0_2026_11_18/env_14/normalized/whispering_grass_grove_background_v01.png"
       }
     },
     {
@@ -3707,20 +3708,21 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        180,
-        320
+        540,
+        960
       ],
-      "sha256": "d03bc21b980ab324721c7b6d4a4d981ecd93bb0c3aa9b9d9a809d054b2c5768d",
-      "rgba_sha256": "61753afe946c87f6104b39168c74d6e1acde32cabb6e0865115a2e13036b8ed1",
+      "sha256": "d2d5ba9984466a3e66147c726bc8d4709e992c722b34799efe800a807176e1c2",
+      "rgba_sha256": "df0d74ee5be7f6aa80c5f54201da1e05ef2d9b636c75904cbcd83f1e87a80ac0",
       "priority": "P1",
       "source": {
-        "export": "art_working/nar_guild_to_epilogue_p1_2026_11_18/nar_13/normalized/kenta_root_bridge_story_v01.png",
-        "export_sha256": "d03bc21b980ab324721c7b6d4a4d981ecd93bb0c3aa9b9d9a809d054b2c5768d",
+        "export": "art_working/grove_runtime_export/kenta_root_bridge_story.png",
+        "export_sha256": "d2d5ba9984466a3e66147c726bc8d4709e992c722b34799efe800a807176e1c2",
         "manifest": "art_working/nar_guild_to_epilogue_p1_2026_11_18/manifest.json",
         "original": "art_working/nar_guild_to_epilogue_p1_2026_11_18/nar_13/source/kenta_root_bridge_story_v01.png",
         "original_sha256": "cb8d65ab9072ac9421acf108c5319ee79b7d3c8954180b8703d3a25087ca0a88",
         "prompt": "art_working/nar_guild_to_epilogue_p1_2026_11_18/nar_13/prompt_v01.txt",
-        "prompt_sha256": "8f7a17248e80765f5535fca2f45e71177789c202e26b539be8d647958e36a729"
+        "prompt_sha256": "8f7a17248e80765f5535fca2f45e71177789c202e26b539be8d647958e36a729",
+        "previous_export": "art_working/nar_guild_to_epilogue_p1_2026_11_18/nar_13/normalized/kenta_root_bridge_story_v01.png"
       }
     },
     {

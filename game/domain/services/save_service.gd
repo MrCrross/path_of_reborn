@@ -437,8 +437,14 @@ func validate(dto: Dictionary) -> bool:
 		return false
 	if typeof(dto["pending_battle_result"]) != TYPE_DICTIONARY:
 		return false
-	if not dto["pending_battle_result"].is_empty() and not GameSession.is_valid_pending_battle_result(dto["pending_battle_result"]):
-		return false
+	var battle: Dictionary = dto["pending_battle_result"]
+	if not battle.is_empty():
+		if not GameSession.is_valid_pending_battle_result(battle):
+			return false
+		if battle["encounter_mode"] == GameSession.ENCOUNTER_GROVE:
+			var profile: Dictionary = dto["profile"]
+			if dto["location_id"] != GameSession.LOCATION_GROVE or battle["route_node_id"] != GameSession.grove_stage_for(profile["quest_flags"], profile["npc_flags"]):
+				return false
 	if not _valid_story_reward(dto["pending_story_reward"]):
 		return false
 	if dto["awaiting_return"] and (not dto["pending_battle_result"].is_empty() or not dto["pending_story_reward"].is_empty()):

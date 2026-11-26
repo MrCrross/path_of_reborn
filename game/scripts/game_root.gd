@@ -12,6 +12,7 @@ var _restoring: bool = false
 var _claim_commit_active: bool = false
 var _checkpoint_commit_active: bool = false
 var _shop_commit_active: bool = false
+var _grove_commit_active: bool = false
 var _observed_inventory: InventoryService
 
 @onready var screen_host: Control = %ScreenHost
@@ -109,6 +110,8 @@ func _on_screen_added(screen: Control) -> void:
 		screen.connect("shop_deal_requested", _on_shop_deal_requested)
 	if screen.has_signal("guild_registration_requested"):
 		screen.connect("guild_registration_requested", _on_guild_registration_requested)
+	if screen.has_signal("grove_command_requested"):
+		screen.connect("grove_command_requested", _on_grove_command_requested)
 	if screen.has_signal("open_bag_requested"):
 		screen.connect("open_bag_requested", _on_open_bag_requested)
 
@@ -211,13 +214,39 @@ func _on_guild_registration_requested() -> void:
 	notice_bar.hide()
 	screen.call("registration_committed")
 
+func _on_grove_command_requested(command: String) -> void:
+	var screen: Control = router.current_screen
+	if commit_grove_command(command):
+		screen.call("grove_command_committed", command)
+	else:
+		screen.call("grove_command_rejected", command)
+
+func commit_grove_command(command: String) -> bool:
+	if _restoring or _grove_commit_active or _claim_commit_active or _checkpoint_commit_active or _shop_commit_active:
+		return false
+	if session.in_combat or session.checkpoints.channel_active or session.checkpoints.has_pending_completion():
+		return false
+	_grove_commit_active = true
+	var candidate := GameSession.new()
+	candidate.apply_state_dto(save_service.capture(session))
+	if not candidate.apply_grove_command(command) or not save_service.save(candidate, save_path):
+		_grove_commit_active = false
+		return false
+	_restoring = true
+	session.apply_state_dto(save_service.capture(candidate))
+	_restoring = false
+	_grove_commit_active = false
+	_connect_session_signals()
+	notice_bar.hide()
+	return true
+
 func _on_open_bag_requested(instance_id: String) -> void:
 	router.go_to("inventory")
 	if router.current_screen != null and router.current_screen.has_method("open_item"):
 		router.current_screen.call("open_item", instance_id)
 
 func claim_battle_result(result_id: String) -> bool:
-	if _claim_commit_active or _restoring:
+	if _claim_commit_active or _restoring or result_id.is_empty() or session.pending_battle_result.get("result_id", "") != result_id:
 		return false
 	_claim_commit_active = true
 	var candidate := GameSession.new()

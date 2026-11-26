@@ -46,7 +46,10 @@ func _run() -> void:
 			_check(absf(actual_pivot.y - expected.y) < 0.15, key + " logical floor preserved")
 			sprite.free()
 			clips += 1
-	_check(clips == 19 and total_frames == 62, "all 19 live/preloaded clips and 62 frames covered")
+	_check(clips == 19 and total_frames == 62, "all 19 source-resolution clips and 62 frames covered")
+	var grove: Vector2i = _grove_sheet_contracts()
+	clips += grove.x
+	total_frames += grove.y
 	var centered_actor := AnimatedSprite2D.new()
 	ArtMap.apply_animation_transform(centered_actor, ArtMap.YUI["wait"], true)
 	_check(absf(centered_actor.offset.y * centered_actor.scale.y) < 0.15, "prologue centered canvas preserved")
@@ -83,6 +86,25 @@ func _run() -> void:
 		_check(false, "intentional runner exit-code check")
 	print("ANIMATION RESULT: clips=%d frames=%d checks=%d failed=%d" % [clips, total_frames, checks, failures])
 	quit(1 if failures > 0 else 0)
+
+func _grove_sheet_contracts() -> Vector2i:
+	var totals := Vector2i.ZERO
+	for species: String in ["needle_hound", "dust_moth", "root_weaver"]:
+		for clip: String in ArtMap.ENEMY_SHEETS[species]:
+			var definition: Dictionary = ArtMap.ENEMY_SHEETS[species][clip]
+			var bounds: Rect2 = Rect2(Vector2.ZERO, ArtMap.texture(definition["path"]).get_size())
+			var frames: SpriteFrames = ArtMap.sprite_frames(definition, 10.0, clip != "idle")
+			var count: int = frames.get_frame_count(&"default")
+			_check(count == definition["count"], "%s %s frame count" % [species, clip])
+			_check(frames.get_animation_loop(&"default") == (clip == "idle"), "%s %s loop contract" % [species, clip])
+			_check(int(definition["contact_frame"]) < count, "%s %s contact frame fits" % [species, clip])
+			for index: int in range(count):
+				var frame: AtlasTexture = frames.get_frame_texture(&"default", index)
+				_check(bounds.encloses(frame.region), "%s %s frame %d fits its sheet" % [species, clip, index])
+			totals += Vector2i(1, count)
+	_check(totals == Vector2i(7, 28), "Seven Grove clips include all 28 frames")
+	return totals
+
 
 func _frame_contracts() -> void:
 	var fixture_host := Control.new()

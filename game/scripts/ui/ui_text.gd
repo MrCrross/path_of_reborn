@@ -22,6 +22,7 @@ const TYPE_LABELS: Dictionary = {
 	"charm": "Амулет",
 	"material": "Материал",
 	"echo": "Кристалл Эха",
+	"consumable": "Расходник",
 }
 const SLOT_LABELS: Dictionary = {
 	"helmet": "Шлем",
@@ -41,12 +42,16 @@ const STAT_LABELS: Dictionary = {
 }
 const LOCATION_LABELS: Dictionary = {
 	"lioren": "Лиорен",
+	"whispering_grass_grove": "Роща Шелестящих Трав",
 	"forest_edge": "Граница леса",
 }
 const ENEMY_LABELS: Dictionary = {
 	"moss_slime": "Слизь-тина",
 	"goblin_scout": "Гоблин-разведчик",
 	"goblin_trial": "Гоблин-испытание",
+	"needle_hound": "Иглопёс",
+	"dust_moth": "Пыльный мотылёк",
+	"root_weaver": "Корневой плетун",
 }
 const COIN_SUFFIXES: Dictionary = {GameSession.COPPER: "мед.", GameSession.SILVER: "сер.", GameSession.GOLD: "зол."}
 
