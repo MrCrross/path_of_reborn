@@ -1,5 +1,6 @@
 {
   "route_id": "whispering_grass_grove",
+  "order": {"rank": "E", "nodes": ["hound_pair", "pollen_pair"]},
   "nodes": [
     {
       "node_id": "approach",

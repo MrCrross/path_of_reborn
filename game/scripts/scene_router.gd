@@ -15,6 +15,7 @@ const SCENES: Dictionary = {
 	"merchant": "res://scenes/merchant.tscn",
 	"shop": "res://scenes/shop.tscn",
 	"guild": "res://scenes/guild.tscn",
+	"guild_orders": "res://scenes/guild_orders.tscn",
 	"characters": "res://scenes/characters.tscn",
 	"settings": "res://scenes/settings.tscn",
 }
@@ -30,7 +31,15 @@ func configure(host: Control, session: GameSession) -> void:
 func go_to(scene_id: String) -> bool:
 	var open_hero: bool = scene_id == "hero_profile"
 	var screen_id: String = "characters" if open_hero else scene_id
-	if scene_id == "world_from_map":
+	if scene_id == "world" and _session.location_id == GameSession.LOCATION_GUILD_ORDER:
+		screen_id = "guild_orders"
+	elif scene_id == "guild_from_orders":
+		screen_id = "guild"
+	elif scene_id == "guild_order_detail":
+		screen_id = "guild_orders"
+	elif scene_id == "shop_from_order":
+		screen_id = "shop"
+	elif scene_id == "world_from_map":
 		screen_id = "world"
 	elif scene_id in ["lioren_map", "map_from_shop", "map_from_guild", "map_from_lioren"]:
 		screen_id = "world_map"
@@ -43,6 +52,12 @@ func go_to(scene_id: String) -> bool:
 	elif screen.has_method("configure"):
 		screen.call("configure", _session)
 	match scene_id:
+		"guild_from_orders":
+			screen.set("focus_orders_on_entry", true)
+		"guild_order_detail":
+			screen.set("initial_order_id", _session.guild_order.get("id", ""))
+		"shop_from_order":
+			screen.set("return_to_order", true)
 		"world_from_map":
 			screen.set("focus_map_on_entry", true)
 		"lioren_map":

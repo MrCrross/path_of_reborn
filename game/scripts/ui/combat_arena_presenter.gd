@@ -351,7 +351,7 @@ func _setup_art() -> void:
 		enemy_sprite.animation_finished.connect(_on_enemy_clip_finished)
 
 func _uses_enemy_slot_presentation() -> bool:
-	return session.location_id in GameSession.EXPEDITION_LOCATIONS or ArtMap.GROVE_STILLS.has(session.current_enemy_id) or ArtMap.HOLLOW_STILLS.has(session.current_enemy_id)
+	return session.location_id in GameSession.EXPEDITION_LOCATIONS or session.location_id == GameSession.LOCATION_GUILD_ORDER or ArtMap.GROVE_STILLS.has(session.current_enemy_id) or ArtMap.HOLLOW_STILLS.has(session.current_enemy_id)
 
 func _build_outpost_ally() -> void:
 	_akari = AnimatedSprite2D.new()
@@ -450,22 +450,26 @@ func _build_grove_enemies() -> void:
 		var sheets: Dictionary = ArtMap.ENEMY_SHEETS[species]
 		view.head = sheets["idle"]["head"]
 		var still: Dictionary = ArtMap.WARDEN_STILL if species == "bone_warden" else ArtMap.HOLLOW_STILLS.get(species, ArtMap.GROVE_STILLS.get(species, {}))
-		view.body_width = float(still["size"].x)
+		var dimensions: Vector2 = still.get("size", Vector2(55, 55))
+		view.body_width = dimensions.x
 		view.body_bottom = 17.0 if slot.pollen_slow_ticks > 0 else 5.0
 		for clip_name: String in sheets:
 			view.clips[clip_name] = _build_clip(sheets[clip_name], clip_name not in ["idle", "stunned"])
 		_grove_enemies.append(view)
 
 func _grove_anchor(index: int) -> Vector2:
-	if session.location_id == GameSession.LOCATION_FOREST_EDGE:
+	var location: String = session.guild_order_location() if session.location_id == GameSession.LOCATION_GUILD_ORDER else session.location_id
+	if location == GameSession.LOCATION_FOREST_EDGE:
 		var slot: CombatResolver.EnemySlot = resolver.enemy_slots[index]
-		var anchor: Vector2 = SceneStaging.hollow_enemy_anchor(arena.size, index, 1)
+		var anchor: Vector2 = SceneStaging.hollow_enemy_anchor(arena.size, index, resolver.enemy_slots.size())
 		if slot.pollen_slow_ticks > 0 or slot.actor.definition.id == "ash_raven":
 			anchor.y -= 28.0
 		return anchor.round()
-	if session.location_id == GameSession.LOCATION_OUTPOST:
+	if location == GameSession.LOCATION_OUTPOST:
+		if resolver.enemy_slots.size() > 1 and resolver.enemy.definition.id != "bone_warden" and session.outpost_stage() != "ravens":
+			return SceneStaging.hollow_enemy_anchor(arena.size, index, resolver.enemy_slots.size()).round()
 		return SceneStaging.outpost_enemy_anchor(arena.size, index, resolver.enemy_slots[0].actor.definition.id == "bone_warden").round()
-	if session.location_id == GameSession.LOCATION_HOLLOW:
+	if location == GameSession.LOCATION_HOLLOW:
 		return SceneStaging.hollow_enemy_anchor(arena.size, index, resolver.enemy_slots.size()).round()
 	return SceneStaging.grove_enemy_anchor(arena.size, index, resolver.enemy_slots[index].pollen_slow_ticks > 0).round()
 
@@ -581,6 +585,7 @@ func _grove_warning(slot: CombatResolver.EnemySlot) -> String:
 		"root_weaver": return "Захват"
 		"river_shieldback": return "Уязвим" if slot.phase == CombatResolver.Phase.VULNERABILITY else "Удар клешнёй"
 		"stone_rodent": return "Бросок"
+		"goblin_scout": return "Замах"
 		"ash_raven": return "Пикирование"
 		"crystal_toad":
 			if slot.phase == CombatResolver.Phase.VULNERABILITY:

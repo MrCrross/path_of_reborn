@@ -20,6 +20,8 @@ const ENCOUNTER_TRIAL: String = "trial"
 const ENCOUNTER_GROVE: String = "grove"
 const ENCOUNTER_HOLLOW: String = "hollow"
 const ENCOUNTER_OUTPOST: String = "outpost"
+const ENCOUNTER_GUILD_ORDER := "guild_order"
+const LOCATION_GUILD_ORDER := "guild_order"
 const LOCATION_GROVE: String = "whispering_grass_grove"
 const LOCATION_HOLLOW: String = "blue_hollow"
 const LOCATION_OUTPOST: String = "winds_edge"
@@ -186,6 +188,7 @@ var claimed_echo_enemy_ids: Dictionary = {}
 ## как и начисленное Эхо. Первый trial суммарно даёт +2, повтор после возврата +0.
 var trial_echo_claimed: bool = false
 var quest_flags: Dictionary = {}
+var guild_order: Dictionary = {}
 var npc_flags: Dictionary = {}
 var world_flags: Dictionary = {}
 var characters: Dictionary = {}
@@ -255,6 +258,7 @@ func new_game() -> void:
 	claimed_echo_enemy_ids.clear()
 	trial_echo_claimed = false
 	quest_flags.clear()
+	guild_order.clear()
 	npc_flags.clear()
 	world_flags.clear()
 	characters.clear()
@@ -335,6 +339,10 @@ func start_combat(enemy_id: String, repeat: bool = false) -> CombatResolver:
 	var encounter: Dictionary = expedition_battle_node(context)
 	var slots: Array = encounter.get("enemies", [])
 	var first: Dictionary = slots[0].duplicate() if not slots.is_empty() else {}
+	if context["encounter_mode"] == ENCOUNTER_GUILD_ORDER:
+		enemy_definition = enemy_definition.duplicate()
+		enemy_definition.max_hp = int(encounter["hp"])
+		enemy_definition.strength = int(encounter["strength"])
 	if context["encounter_mode"] == ENCOUNTER_REPEAT:
 		var repeat_settings: Dictionary = route_definition()["repeat_enemies"][enemy_id]
 		enemy_definition = _scaled_repeat_enemy(enemy_definition, int(repeat_settings["level"]))
@@ -594,6 +602,15 @@ func _scaled_repeat_enemy(definition: ActorDefinition, reference_level: int) -> 
 func _encounter_context_for(enemy_id: String, repeat: bool) -> Dictionary:
 	if not _is_known_enemy(enemy_id):
 		return {}
+	if location_id == LOCATION_GUILD_ORDER:
+		var stage: Dictionary = guild_order_stage()
+		if repeat or stage.get("enemy_id", "") != enemy_id:
+			return {}
+		return {
+			"enemy_id": enemy_id, "encounter_mode": ENCOUNTER_GUILD_ORDER,
+			"route_id": guild_order["id"], "route_node_id": str(int(guild_order["cleared"])),
+			"order_total": int(guild_order["total"]),
+		}
 	if location_id == LOCATION_GROVE:
 		var grove: Dictionary = grove_node(grove_stage())
 		if repeat or String(grove.get("enemy_id", "")) != enemy_id:
@@ -658,7 +675,7 @@ func settle_combat(run_id: String, enemy_id: String) -> bool:
 		return false
 	_settled_run_ids[run_id] = true
 	var enemy_definition: ActorDefinition = load(ACTOR_PATHS[enemy_id])
-	var rewards: Array = expedition.get("rewards", [])
+	var rewards: Array = expedition.get("rewards", []).duplicate()
 	var echo_available: bool = false
 	if expedition.is_empty():
 		if LOOT_PATHS.has(enemy_id):
@@ -667,6 +684,14 @@ func settle_combat(run_id: String, enemy_id: String) -> bool:
 	else:
 		for slot: Dictionary in expedition["enemies"]:
 			echo_available = echo_available or not claimed_echo_enemy_ids.has(slot["actor_id"])
+	if context["encounter_mode"] == ENCOUNTER_GUILD_ORDER:
+		var order: Dictionary = GuildOrders.definition(context["route_id"])
+		rewards.append_array(GuildOrders.bonus_loot(order["rank"], int(context["route_node_id"]), int(context["order_total"]), loot_rng))
+	elif EXPEDITION_ROUTES.has(context["encounter_mode"]):
+		var stages: Dictionary = story_order(context["route_id"])
+		var index: int = stages["nodes"].find(context["route_node_id"])
+		if index >= 0:
+			rewards.append_array(GuildOrders.bonus_loot(stages["rank"], index, stages["nodes"].size(), loot_rng))
 	if String(context.get("encounter_mode", "")) == ENCOUNTER_ROUTE:
 		for node: Dictionary in route_nodes():
 			if String(node.get("node_id", "")) == String(context.get("route_node_id", "")):
@@ -703,6 +728,8 @@ func settle_combat(run_id: String, enemy_id: String) -> bool:
 		"loot_seed": loot_seed,
 		"loot_state": str(loot_rng.state),
 	}
+	if context["encounter_mode"] == ENCOUNTER_GUILD_ORDER:
+		pending_battle_result["order_total"] = context["order_total"]
 	profile_changed.emit()
 	return true
 
@@ -717,7 +744,7 @@ func claim_battle_result(result_id: String) -> bool:
 		return false
 	if String(pending_battle_result.get("result_id", "")) != result_id or not is_valid_pending_battle_result(pending_battle_result):
 		return false
-	if not expedition_battle_matches(pending_battle_result, location_id, quest_flags, npc_flags):
+	if not expedition_battle_matches(pending_battle_result, location_id, quest_flags, npc_flags, guild_order):
 		return false
 	_claim_in_progress = true
 	_transaction_depth += 1
@@ -1140,6 +1167,96 @@ func set_guild_visit_active(active: bool) -> void:
 func guild_rank() -> String:
 	return "E" if world_flags.get(WORLD_FLAG_GUILD_REGISTERED, false) == true else ""
 
+func guild_order_is_completed(order_id: String) -> bool:
+	return quest_flags.get("guild_order_completed_" + order_id, false)
+
+func guild_order_is_unlocked(order_id: String) -> bool:
+	var order: Dictionary = GuildOrders.definition(order_id)
+	if guild_rank().is_empty() or order.is_empty():
+		return false
+	var index: int = GuildOrders.RANKS.find(order["rank"])
+	if index == 0:
+		return true
+	var previous_rank: String = GuildOrders.RANKS[index - 1]
+	for previous_id: String in GuildOrders.data()["orders"]:
+		if GuildOrders.definition(previous_id)["rank"] == previous_rank and guild_order_is_completed(previous_id):
+			return true
+	return false
+
+func guild_order_stage() -> Dictionary:
+	if guild_order.is_empty():
+		return {}
+	return GuildOrders.stage(guild_order["id"], int(guild_order["cleared"]), int(guild_order["total"]))
+
+func guild_order_location() -> String:
+	return GuildOrders.order_type(GuildOrders.definition(guild_order.get("id", ""))).get("location", LOCATION_FOREST_EDGE)
+
+func apply_guild_order_command(command: String, order_id: String = "") -> bool:
+	if in_combat or has_pending_reward() or awaiting_return or checkpoints.channel_active or checkpoints.has_pending_completion():
+		return false
+	if command == "leave":
+		if location_id != LOCATION_GUILD_ORDER:
+			return false
+		location_id = LOCATION_LIOREN
+		world_flags[WORLD_FLAG_GUILD_VISIT] = true
+		return true
+	if not guild_visit_active():
+		return false
+	if command == "accept":
+		if not guild_order.is_empty() or not guild_order_is_unlocked(order_id) or guild_order_is_completed(order_id):
+			return false
+		var rules: Dictionary = GuildOrders.rank_rules(GuildOrders.definition(order_id)["rank"])
+		guild_order = {"id": order_id, "total": loot_rng.randi_range(int(rules["min"]), int(rules["max"])), "cleared": 0}
+		return true
+	if guild_order.is_empty() or guild_order["id"] != order_id:
+		return false
+	match command:
+		"depart":
+			if traces >= 3 or guild_order_stage().is_empty():
+				return false
+			location_id = LOCATION_GUILD_ORDER
+			world_flags.erase(WORLD_FLAG_GUILD_VISIT)
+		"report":
+			if not guild_order_stage().is_empty():
+				return false
+			var order: Dictionary = GuildOrders.definition(order_id)
+			var reward: Dictionary = GuildOrders.rank_rules(order["rank"])
+			var copper: int = int(reward["copper"])
+			if wallet[COPPER] > MAX_ASTRAS - copper:
+				return false
+			var gear: ItemDefinition = get_item_definition(GuildOrders.order_type(order)["reward"])
+			inventory.add(gear, 1, "", {"level": int(reward["level"])})
+			wallet[COPPER] += copper
+			hero.gain_xp(int(reward["xp"]))
+			quest_flags["guild_order_completed_" + order_id] = true
+			guild_order = {}
+		_:
+			return false
+	return true
+
+func story_order(location: String) -> Dictionary:
+	var route: Dictionary
+	var mode: String
+	match location:
+		LOCATION_GROVE:
+			route = grove_definition()
+			mode = ENCOUNTER_GROVE
+		LOCATION_HOLLOW:
+			route = hollow_definition()
+			mode = ENCOUNTER_HOLLOW
+		LOCATION_OUTPOST:
+			route = outpost_definition()
+			mode = ENCOUNTER_OUTPOST
+		_: return {}
+	var order: Dictionary = route["order"]
+	var nodes: Array = _outpost_order_nodes(quest_flags) if location == LOCATION_OUTPOST else order["nodes"]
+	var cleared: int = 0
+	for node_id: String in nodes:
+		var node: Dictionary = expedition_battle_node({"encounter_mode": mode, "route_node_id": node_id})
+		if quest_flags.get(node["cleared_flag"], false) or (node_id == "upper_guard" and quest_flags.get(HOLLOW_UPPER_MARKER, false)):
+			cleared += 1
+	return {"rank": order["rank"], "nodes": nodes, "cleared": cleared, "silver": int(route["report"]["silver"])}
+
 func can_register_with_guild() -> bool:
 	return guild_visit_active() and guild_rank().is_empty() and seen_cue_ids.has(GUILD_LAST_CUE_ID)
 
@@ -1293,6 +1410,8 @@ static func hollow_stage_for(quests: Dictionary) -> String:
 		return "water_marker"
 	if not quests.get(HOLLOW_SHELF_WON, false):
 		return "shelf"
+	if not quests.get(HOLLOW_UPPER_MARKER, false) and not quests.get("hollow_upper_guard_won", false):
+		return "upper_guard"
 	if not quests.get(HOLLOW_UPPER_MARKER, false):
 		return "upper_marker"
 	if quests.get(HOLLOW_ELITE_ENTERED, false) and not quests.get(HOLLOW_ELITE_WON, false):
@@ -1317,13 +1436,19 @@ static func outpost_stage_for(quests: Dictionary) -> String:
 		return "bowl"
 	if not quests.get(OUTPOST_SEAL, false):
 		return "seal"
-	if not quests.get(OUTPOST_RAVENS_WON, false):
-		return "ravens"
-	if not quests.get(OUTPOST_WARDEN_WON, false):
-		return "warden"
+	for node_id: String in _outpost_order_nodes(quests):
+		if not quests.get(outpost_node(node_id)["cleared_flag"], false):
+			return node_id
 	if not quests.get(OUTPOST_ALLIANCE, false):
 		return "alliance"
 	return "return"
+
+static func _outpost_order_nodes(quests: Dictionary) -> Array:
+	var nodes: Array = outpost_definition()["order"]["nodes"]
+	# Profiles that already touched the signal before the update keep their pending battles.
+	if quests.get(OUTPOST_SEAL, false) and not quests.get("outpost_patrol_route", false):
+		return [nodes.front(), nodes.back()]
+	return nodes
 
 func can_enter_outpost() -> bool:
 	return can_visit_guild() and guild_rank() == "E" and quest_flags.get(HOLLOW_REPORTED, false) and not quest_flags.get(OUTPOST_ALLIANCE, false) and traces < 3
@@ -1375,6 +1500,7 @@ func apply_outpost_command(command: String) -> bool:
 			quest_flags[OUTPOST_BOWL] = true
 		"seal":
 			quest_flags[OUTPOST_SEAL] = true
+			quest_flags["outpost_patrol_route"] = true
 		"alliance":
 			if not seen_cue_ids.has_all(outpost_node("alliance")["cues"]):
 				return false
@@ -1389,9 +1515,10 @@ static func expedition_battle_node(context: Dictionary) -> Dictionary:
 		ENCOUNTER_GROVE: return grove_node(node_id)
 		ENCOUNTER_HOLLOW: return hollow_node(node_id)
 		ENCOUNTER_OUTPOST: return outpost_node(node_id)
+		ENCOUNTER_GUILD_ORDER: return GuildOrders.stage(context["route_id"], int(node_id), int(context["order_total"]))
 		_: return {}
 
-static func expedition_battle_matches(result: Dictionary, location: String, quests: Dictionary, npcs: Dictionary) -> bool:
+static func expedition_battle_matches(result: Dictionary, location: String, quests: Dictionary, npcs: Dictionary, order: Dictionary = {}) -> bool:
 	match result["encounter_mode"]:
 		ENCOUNTER_GROVE:
 			return location == LOCATION_GROVE and result["route_node_id"] == grove_stage_for(quests, npcs)
@@ -1399,6 +1526,8 @@ static func expedition_battle_matches(result: Dictionary, location: String, ques
 			return location == LOCATION_HOLLOW and quests.get(GROVE_REPORTED, false) and result["route_node_id"] == hollow_stage_for(quests)
 		ENCOUNTER_OUTPOST:
 			return location == LOCATION_OUTPOST and quests.get(HOLLOW_REPORTED, false) and result["route_node_id"] == outpost_stage_for(quests)
+		ENCOUNTER_GUILD_ORDER:
+			return location == LOCATION_GUILD_ORDER and result["route_id"] == order.get("id") and result["route_node_id"] == str(int(order.get("cleared", -1))) and int(result["order_total"]) == int(order.get("total", 0))
 		_:
 			return true
 
@@ -1412,9 +1541,9 @@ func can_place_expedition_checkpoint() -> bool:
 	if location_id == LOCATION_GROVE:
 		return grove_stage() == "clearing"
 	if location_id == LOCATION_HOLLOW:
-		return hollow_stage() in ["shelf", "ledge"]
+		return hollow_stage() in ["shelf", "upper_guard", "ledge"]
 	if location_id == LOCATION_OUTPOST:
-		return outpost_stage() in ["bowl", "warden", "alliance", "return"]
+		return outpost_stage() in ["bowl", "gate_patrol", "stairs_patrol", "tower_patrol", "warden", "alliance", "return"]
 	return true
 
 ## Сюжетные команды Оврага проходят через ту же запись кандидата, что и Роща.
@@ -1577,6 +1706,28 @@ func shop_offers() -> Array[Dictionary]:
 
 ## Покупка по предложению каталога. Одна сделка — один проход: проверки,
 ## списание и выдача идут внутри транзакции, вехи пишутся вместе со сделкой.
+func equipment_upgrade_quote(instance_id: String) -> Dictionary:
+	if not can_trade() or guild_rank().is_empty():
+		return {}
+	var item: ItemInstance = inventory.get_item(instance_id)
+	if item == null or item.level >= GuildOrders.RANKS.size():
+		return {}
+	var definition: ItemDefinition = get_item_definition(item.definition_id)
+	if definition.slot_id.is_empty() or definition.modifiers.is_empty():
+		return {}
+	return {"id": instance_id, "level": item.level, "price": 12 * item.level * item.level}
+
+func upgrade_equipment(quote: Dictionary) -> bool:
+	if quote.is_empty() or quote != equipment_upgrade_quote(quote.get("id", "")):
+		return false
+	var price: int = quote["price"]
+	if checkpoints.channel_active or wallet[COPPER] < price:
+		return false
+	wallet[COPPER] -= price
+	inventory.upgrade_equipment(quote["id"], int(quote["level"]) + 1)
+	profile_changed.emit()
+	return true
+
 func buy_item(offer_id: String, quantity: int = 1, expected_price: int = -1) -> bool:
 	if in_combat or awaiting_return or has_pending_reward() or _claim_in_progress or quantity <= 0:
 		return false
@@ -1683,6 +1834,7 @@ func capture_profile_dto() -> Dictionary:
 		# JSON parses numbers as floats. Strings keep every coin at int64 precision.
 		"wallet": {COPPER: str(wallet[COPPER]), SILVER: str(wallet[SILVER]), GOLD: str(wallet[GOLD])},
 		"quest_flags": quest_flags.duplicate(true),
+		"guild_order": guild_order.duplicate(true),
 		"npc_flags": npc_flags.duplicate(true),
 		"world_flags": world_flags.duplicate(true),
 		"completed_encounter_ids": completed_encounter_ids().duplicate(true),
@@ -1714,6 +1866,7 @@ func apply_profile_dto(dto: Dictionary) -> void:
 	for coin: String in COIN_TYPES:
 		wallet[coin] = maxi(0, int(saved_wallet.get(coin, "0")))
 	quest_flags = dto.get("quest_flags", {}).duplicate(true)
+	guild_order = dto.get("guild_order", {}).duplicate(true)
 	npc_flags = dto.get("npc_flags", {}).duplicate(true)
 	world_flags = dto.get("world_flags", {}).duplicate(true)
 	for character_id: String in available_character_ids():
@@ -1776,6 +1929,9 @@ func _invalidate_active_resolver() -> void:
 	active_encounter_context = {}
 
 func _advance_route(result: Dictionary) -> bool:
+	if result["encounter_mode"] == ENCOUNTER_GUILD_ORDER:
+		guild_order["cleared"] = int(guild_order["cleared"]) + 1
+		return true
 	if EXPEDITION_ROUTES.has(result["encounter_mode"]):
 		var node: Dictionary = expedition_battle_node(result)
 		if not expedition_battle_matches(result, location_id, quest_flags, npc_flags):
@@ -1848,7 +2004,12 @@ static func is_valid_pending_battle_result(result: Dictionary) -> bool:
 	var enemy_id: String = String(result["enemy_id"])
 	var mode: String = String(result["encounter_mode"])
 	var is_expedition: bool = EXPEDITION_ROUTES.has(mode)
-	if is_expedition:
+	if mode == ENCOUNTER_GUILD_ORDER:
+		var index_text: String = result["route_node_id"]
+		var progress: Dictionary = {"id": result["route_id"], "total": result.get("order_total"), "cleared": int(index_text)}
+		if not index_text.is_valid_int() or not GuildOrders.valid_progress(progress) or expedition_battle_node(result).get("enemy_id", "") != enemy_id:
+			return false
+	elif is_expedition:
 		var expected_route: String = EXPEDITION_ROUTES[mode]
 		if result["route_id"] != expected_route or expedition_battle_node(result).get("enemy_id", "") != enemy_id:
 			return false
@@ -1876,7 +2037,7 @@ static func is_valid_pending_battle_result(result: Dictionary) -> bool:
 				break
 		if not matching_node:
 			return false
-	elif not is_expedition and not String(result["route_node_id"]).is_empty():
+	elif not is_expedition and mode != ENCOUNTER_GUILD_ORDER and not String(result["route_node_id"]).is_empty():
 		return false
 	if typeof(result.get("xp", null)) == TYPE_NIL or not _is_intlike_number(result["xp"]) or int(result["xp"]) < 0:
 		return false

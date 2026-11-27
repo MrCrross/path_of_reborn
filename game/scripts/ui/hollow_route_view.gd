@@ -75,6 +75,9 @@ func refresh(play_dialogue: bool = true) -> void:
 					var crop := Rect2(28, 16, 40, 24)
 					_prop("ShelfProp", ArtMap.crop(ArtMap.HOLLOW_PROPS["shelf"], crop), crop.size, Vector2(0.82, 0.38), collapse)
 				_fight_button(node, "Первый грызун оглушён" if session.quest_flags.get(GameSession.HOLLOW_COLLAPSED, false) else "")
+			"upper_guard":
+				_offer_checkpoint()
+				_fight_button(node, "Расчистите проход к верхнему маркеру.")
 			"ledge":
 				if not session.quest_flags.get(GameSession.HOLLOW_CLOTH, false):
 					var inspect := _button("InspectWall", "Осмотреть стену", _command.bind("cloth"))

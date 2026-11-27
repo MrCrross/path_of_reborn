@@ -3,14 +3,17 @@ extends Control
 signal navigate_requested(destination: String)
 signal shop_deal_requested(deal: Dictionary)
 signal open_bag_requested(instance_id: String)
+signal equipment_upgrade_requested(quote: Dictionary)
 
 const TAB_BUY: String = "buy"
 const TAB_SELL: String = "sell"
 const TAB_EXCHANGE: String = "exchange"
+const TAB_UPGRADE: String = "upgrade"
 const COUNTER_EDGE: float = 463.0 / 960.0
 const MERCHANT_PORTRAIT_SPACE: float = 58.0
 
 var session: GameSession
+var return_to_order: bool = false
 var _tab: String = TAB_BUY
 var _deal: Dictionary = {}
 var _committing: bool = false
@@ -25,6 +28,7 @@ var wallet_labels: Dictionary[String, Label] = {}
 var buy_tab: Button
 var sell_tab: Button
 var exchange_tab: Button
+var upgrade_tab: Button
 var _catalog_ui: SafeArea
 var _background: TextureRect
 var _catalog_scroll: ScrollContainer
@@ -48,6 +52,8 @@ func configure(game_session: GameSession) -> void:
 	session = game_session
 
 func handle_back() -> bool:
+	if ConfirmDialog.dismiss_from(self):
+		return true
 	if deal_layer != null and deal_layer.visible:
 		_close_deal()
 		return true
@@ -56,12 +62,14 @@ func handle_back() -> bool:
 			dialogue.stop()
 			_on_dialogue_finished("shop")
 		return true
-	navigate_requested.emit("map_from_shop")
+	navigate_requested.emit("guild_order_detail" if return_to_order else "map_from_shop")
 	return true
 
 func _ready() -> void:
 	if session == null:
 		session = GameSession.new()
+	if return_to_order:
+		_tab = TAB_UPGRADE
 	_build_scene()
 	_start_entry_scene()
 
@@ -196,6 +204,13 @@ func _build_scene() -> void:
 	tabs.add_child(sell_tab)
 	exchange_tab = _tab_button("Обмен", TAB_EXCHANGE)
 	tabs.add_child(exchange_tab)
+	upgrade_tab = _tab_button("Улучшить", TAB_UPGRADE)
+	upgrade_tab.visible = not session.guild_rank().is_empty()
+	if upgrade_tab.visible:
+		for tab: Button in [buy_tab, sell_tab, exchange_tab, upgrade_tab]:
+			tab.add_theme_font_size_override("font_size", 8)
+		upgrade_tab.size_flags_stretch_ratio = 1.15
+	tabs.add_child(upgrade_tab)
 	var portrait_space := Control.new()
 	portrait_space.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	column.add_child(portrait_space)
@@ -391,6 +406,8 @@ func _active_tab_button() -> Button:
 			return sell_tab
 		TAB_EXCHANGE:
 			return exchange_tab
+		TAB_UPGRADE:
+			return upgrade_tab
 	return buy_tab
 
 func _on_talk_pressed() -> void:
@@ -449,7 +466,7 @@ func _refresh_all() -> void:
 		amount.text = "%s\n%s" % [UiText.coin_count(session.wallet[coin]), UiText.COIN_SUFFIXES[coin]]
 		amount.accessibility_name = UiText.astra(session.wallet[coin], coin)
 		amount.get_parent_control().tooltip_text = amount.accessibility_name
-	for tab: Button in [buy_tab, sell_tab, exchange_tab]:
+	for tab: Button in [buy_tab, sell_tab, exchange_tab, upgrade_tab]:
 		tab.theme_type_variation = &"PrimaryButton" if tab == _active_tab_button() else &""
 	talk_button.visible = session.world_flags.get(GameSession.WORLD_FLAG_SHOP_INTRO_DONE, false) and not session.seen_cue_ids.has("DIA_SHOP_014")
 	var jacket: ItemInstance = _jacket_instance()
@@ -469,6 +486,8 @@ func _refresh_rows() -> void:
 	match _tab:
 		TAB_BUY:
 			_build_buy_rows()
+		TAB_UPGRADE:
+			_build_upgrade_rows()
 		TAB_SELL:
 			_build_sell_rows()
 		TAB_EXCHANGE:
@@ -482,7 +501,11 @@ func _refresh_rows() -> void:
 		empty.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		empty.add_theme_font_size_override("font_size", 8)
 		empty.add_theme_color_override("font_color", AppTheme.COLOR_TEXT_DIM)
-		empty.text = "Покупок пока нет." if _tab == TAB_BUY else "Нет предметов для продажи."
+		empty.text = {
+			TAB_BUY: "Покупок пока нет.",
+			TAB_SELL: "Нет предметов для продажи.",
+			TAB_UPGRADE: "Нет снаряжения для улучшения.",
+		}.get(_tab, "")
 		rows_box.add_child(empty)
 	_catalog_scroll.set_deferred("scroll_vertical", previous_scroll)
 
@@ -516,6 +539,45 @@ func _build_buy_rows() -> void:
 		if not sold_out:
 			button.pressed.connect(_open_deal.bind({"kind": "buy", "offer_id": offer_id, "row_key": row_key}))
 		rows_box.add_child(button)
+
+func _build_upgrade_rows() -> void:
+	for item: ItemInstance in session.inventory.items:
+		var quote: Dictionary = session.equipment_upgrade_quote(item.instance_id)
+		if quote.is_empty():
+			continue
+		var definition: ItemDefinition = session.get_item_definition(item.definition_id)
+		var button := Button.new()
+		button.name = "Upgrade_" + item.instance_id
+		button.set_meta(&"trade_row", "upgrade:" + item.instance_id)
+		button.text = "Улучшить · %s\nУр. %d → %d · %s" % [definition.display_name, item.level, item.level + 1, UiText.astra(quote["price"])]
+		button.add_theme_font_size_override("font_size", 8)
+		button.custom_minimum_size.y = 30
+		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		button.pressed.connect(_open_equipment_upgrade.bind(item.instance_id))
+		rows_box.add_child(button)
+
+func _open_equipment_upgrade(instance_id: String) -> void:
+	var quote: Dictionary = session.equipment_upgrade_quote(instance_id)
+	if quote.is_empty():
+		return
+	if session.wallet[GameSession.COPPER] < int(quote["price"]):
+		status_label.text = "Не хватает медных астр."
+		status_label.show()
+		return
+	var item: ItemInstance = session.inventory.get_item(instance_id)
+	var definition: ItemDefinition = session.get_item_definition(item.definition_id)
+	var bonuses: PackedStringArray = []
+	for modifier: StatModifierDefinition in InventoryService.equipment_modifiers(definition, item.level + 1):
+		bonuses.append("%s +%d" % [UiText.stat(modifier.stat_id), modifier.amount])
+	var message: String = "%s\nУр. %d → %d\n%s\nЦена · %s" % [definition.display_name, item.level, item.level + 1, ", ".join(bonuses), UiText.astra(quote["price"])]
+	var dialog: ConfirmDialog = ConfirmDialog.open(self, "Улучшение снаряжения", message, "Улучшить")
+	dialog.confirmed.connect(equipment_upgrade_requested.emit.bind(quote))
+
+func equipment_upgrade_finished(upgraded: bool, quote: Dictionary) -> void:
+	status_label.text = "Снаряжение улучшено до ур. %d." % (int(quote["level"]) + 1) if upgraded else "Улучшение не сохранено. Попробуйте ещё раз."
+	_pending_focus_key = "upgrade:" + String(quote["id"])
+	_refresh_all()
+	_restore_row_focus()
 
 func _build_sell_rows() -> void:
 	var equipped_rows: Array[Button] = []

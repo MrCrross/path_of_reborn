@@ -1,4 +1,5 @@
 {
+  "order": {"rank": "D", "nodes": ["river", "shelf", "upper_guard"]},
   "nodes": {
     "river": {
       "enemy_id": "river_shieldback",
@@ -21,6 +22,13 @@
       ],
       "xp": 7,
       "rewards": [{"item_id": "old_masonry_shard", "quantity": 2}]
+    },
+    "upper_guard": {
+      "enemy_id": "river_shieldback",
+      "cleared_flag": "hollow_upper_guard_won",
+      "enemies": [{"actor_id": "river_shieldback"}, {"actor_id": "stone_rodent", "telegraph_offset": 32}],
+      "xp": 0,
+      "rewards": [{"item_id": "river_shieldback_shell", "quantity": 1}]
     },
     "upper_marker": {},
     "ledge": {"cues": ["DIA_HOLLOW_007"]},

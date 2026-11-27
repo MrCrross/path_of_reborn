@@ -79,6 +79,8 @@ static func route_for_continue(target: GameSession) -> String:
 		return "merchant"
 	if not target.world_flags.get("prologue_completed", false):
 		return "prologue"
+	if target.location_id == GameSession.LOCATION_GUILD_ORDER:
+		return "world"
 	match target.next_route_approach():
 		"daijiro_lookout":
 			return "trail_dialogue"
@@ -111,6 +113,10 @@ func _on_screen_added(screen: Control) -> void:
 		screen.connect("shop_deal_requested", _on_shop_deal_requested)
 	if screen.has_signal("guild_registration_requested"):
 		screen.connect("guild_registration_requested", _on_guild_registration_requested)
+	if screen.has_signal("guild_order_requested"):
+		screen.connect("guild_order_requested", _on_guild_order_requested)
+	if screen.has_signal("equipment_upgrade_requested"):
+		screen.connect("equipment_upgrade_requested", _on_equipment_upgrade_requested)
 	if screen.has_signal("grove_command_requested"):
 		screen.connect("grove_command_requested", _on_grove_command_requested)
 	if screen.has_signal("hollow_command_requested"):
@@ -269,6 +275,29 @@ func _on_travel_requested(destination: String) -> void:
 				router.go_to("world")
 	else:
 		map.call("travel_rejected")
+
+func _on_guild_order_requested(command: String, order_id: String) -> void:
+	var screen: Control = router.current_screen
+	if not commit_guild_order(command, order_id):
+		screen.call("command_rejected")
+		return
+	match command:
+		"depart":
+			router.go_to("world")
+		"leave":
+			router.go_to("guild_order_detail")
+		"shop":
+			router.go_to("shop_from_order")
+		_:
+			screen.call("command_committed", command)
+
+func commit_guild_order(command: String, order_id: String) -> bool:
+	var action: String = "leave" if command == "shop" else command
+	return _commit_route_change(func(candidate: GameSession) -> bool: return candidate.apply_guild_order_command(action, order_id))
+
+func _on_equipment_upgrade_requested(quote: Dictionary) -> void:
+	var upgraded: bool = _commit_route_change(func(candidate: GameSession) -> bool: return candidate.upgrade_equipment(quote))
+	router.current_screen.call("equipment_upgrade_finished", upgraded, quote)
 
 func _commit_route_change(apply: Callable) -> bool:
 	if _restoring or _expedition_commit_active or _claim_commit_active or _checkpoint_commit_active or _shop_commit_active:

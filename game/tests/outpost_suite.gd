@@ -68,6 +68,8 @@ func _test_access(context: TestContext) -> void:
 	session.abandon_combat()
 	context.check(session.awaiting_return and session.checkpoints.restore(checkpoint_id), "Defeat uses the normal Seal flow")
 	context.check(session.location_id == GameSession.LOCATION_OUTPOST and session.outpost_stage() == "bowl" and session.traces == 1, "The Seal restores physical objectives and adds one trace")
+	var legacy: Dictionary = {GameSession.OUTPOST_BOWL: true, GameSession.OUTPOST_SEAL: true, GameSession.OUTPOST_RAVENS_WON: true}
+	context.check(GameSession.outpost_stage_for(legacy) == "warden", "Pre-update signal progress keeps the original route")
 
 func _test_battles(context: TestContext) -> void:
 	for format: String in [GameSession.COMBAT_FORMAT_AUTO, GameSession.COMBAT_FORMAT_ACTIVE]:
@@ -86,6 +88,7 @@ func _test_battles(context: TestContext) -> void:
 		context.check(ravens.won and DomainSuite.claim_pending(session), "The first battle completes in %s" % format)
 		context.check(actions == ["hold", "dive_warning"], "Akari gives both warnings in %s" % format)
 		context.check(session.hero.level == 4 and not session.select_encounter("bone_warden"), "Ravens preserve level 4 and the next dialogue gates the boss")
+		_clear_patrols(session, context)
 		see_cues(session, GameSession.outpost_node("warden")["cues"])
 		var boss: CombatResolver = session.start_combat("bone_warden")
 		if boss == null:
@@ -114,6 +117,7 @@ func _test_reward(context: TestContext) -> void:
 	_open_ravens(session)
 	session.start_combat("ash_raven").advance_ticks(1800)
 	DomainSuite.claim_pending(session)
+	_clear_patrols(session, context)
 	see_cues(session, GameSession.outpost_node("warden")["cues"])
 	session.start_combat("bone_warden").advance_ticks(1800)
 	var saves := SaveService.new()
@@ -142,6 +146,15 @@ func _test_reward(context: TestContext) -> void:
 	context.check(not restored.apply_outpost_command("finish"), "The letter and map are required to finish")
 	see_cues(restored, GameSession.outpost_definition()["epilogue_cues"])
 	context.check(restored.apply_outpost_command("finish") and not restored.apply_outpost_command("finish"), "The epilogue completes the chapter once")
+
+func _clear_patrols(session: GameSession, context: TestContext) -> void:
+	for expected: String in ["gate_patrol", "stairs_patrol", "tower_patrol"]:
+		context.check(session.outpost_stage() == expected, "Patrol stage %s is next" % expected)
+		var patrol: CombatResolver = session.start_combat(GameSession.outpost_node(expected)["enemy_id"])
+		if patrol == null:
+			return
+		_simulate(patrol)
+		context.check(patrol.won and DomainSuite.claim_pending(session), "Patrol loot advances the route")
 
 func _simulate(combat: CombatResolver) -> void:
 	while not combat.is_finished and combat.tick_count < 1800:

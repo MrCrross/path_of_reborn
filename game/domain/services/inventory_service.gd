@@ -93,7 +93,7 @@ func equip(instance_id: String, character_id: String = "haruto") -> bool:
 	slots[definition.slot_id] = instance_id
 	if character_id != "haruto":
 		character_equipment[character_id] = slots
-	state.set_modifiers(instance_id, definition.modifiers)
+	state.set_modifiers(instance_id, equipment_modifiers(definition, item.level))
 	changed.emit()
 	return true
 
@@ -124,6 +124,24 @@ func get_item(instance_id: String) -> ItemInstance:
 
 func get_definition(definition_id: String) -> ItemDefinition:
 	return _definitions.get(definition_id)
+
+static func equipment_modifiers(definition: ItemDefinition, level: int) -> Array[StatModifierDefinition]:
+	if definition.slot_id.is_empty() or level <= definition.level:
+		return definition.modifiers
+	var modifiers: Array[StatModifierDefinition] = []
+	for base: StatModifierDefinition in definition.modifiers:
+		var improved: StatModifierDefinition = base.duplicate()
+		improved.amount += clampi(level - definition.level, 0, 5)
+		modifiers.append(improved)
+	return modifiers
+
+func upgrade_equipment(instance_id: String, level: int) -> void:
+	var item: ItemInstance = get_item(instance_id)
+	item.level = level
+	var owner: String = _owner_for_instance(instance_id)
+	if not owner.is_empty():
+		character_state(owner).set_modifiers(instance_id, equipment_modifiers(get_definition(item.definition_id), level))
+	changed.emit()
 
 func is_equipped(instance_id: String, character_id: String = "") -> bool:
 	var item: ItemInstance = get_item(instance_id)
@@ -210,7 +228,7 @@ func _apply_modifiers(slots: Dictionary, character_id: String) -> void:
 	var state: CharacterState = character_state(character_id)
 	for slot_id: String in slots:
 		var item: ItemInstance = get_item(String(slots[slot_id]))
-		state.set_modifiers(item.instance_id, get_definition(item.definition_id).modifiers)
+		state.set_modifiers(item.instance_id, equipment_modifiers(get_definition(item.definition_id), item.level))
 
 func _owner_for_instance(instance_id: String) -> String:
 	var item: ItemInstance = get_item(instance_id)

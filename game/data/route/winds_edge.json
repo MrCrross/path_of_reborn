@@ -1,4 +1,5 @@
 {
+  "order": {"rank": "C", "nodes": ["ravens", "gate_patrol", "stairs_patrol", "tower_patrol", "warden"]},
   "nodes": {
     "ravens": {
       "enemy_id": "ash_raven",
@@ -9,7 +10,29 @@
         {"id": "raven_held", "actor_id": "ash_raven", "initial_stun_ticks": 115}
       ],
       "ally_warning_ticks": [1, 44],
-      "xp": 4
+      "xp": 4,
+      "rewards": [{"item_id": "old_masonry_shard", "quantity": 1}]
+    },
+    "gate_patrol": {
+      "enemy_id": "stone_rodent",
+      "cleared_flag": "outpost_gate_patrol_won",
+      "enemies": [{"actor_id": "stone_rodent"}, {"id": "rodent_rear", "actor_id": "stone_rodent", "telegraph_offset": 25}],
+      "xp": 0,
+      "rewards": [{"item_id": "old_masonry_shard", "quantity": 1}]
+    },
+    "stairs_patrol": {
+      "enemy_id": "ash_raven",
+      "cleared_flag": "outpost_stairs_patrol_won",
+      "enemies": [{"actor_id": "ash_raven"}, {"actor_id": "stone_rodent", "telegraph_offset": 32}],
+      "xp": 0,
+      "rewards": [{"item_id": "old_masonry_shard", "quantity": 2}]
+    },
+    "tower_patrol": {
+      "enemy_id": "ash_raven",
+      "cleared_flag": "outpost_tower_patrol_won",
+      "enemies": [{"actor_id": "ash_raven"}, {"id": "tower_raven", "actor_id": "ash_raven", "telegraph_offset": 20}],
+      "xp": 0,
+      "rewards": [{"item_id": "old_masonry_shard", "quantity": 2}]
     },
     "warden": {
       "enemy_id": "bone_warden",

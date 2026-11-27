@@ -71,6 +71,13 @@ func _run() -> void:
 		await _open_claim(combat)
 		await _click(combat.result_panel.claim_button)
 		_check(_game.session.quest_flags.has(GameSession.HOLLOW_TEMPO), "Result unlocks Tempo")
+		await _click(_node("HollowFight"))
+		combat = _game.router.current_screen
+		await _frames(39)
+		combat.set_physics_process(false)
+		await _win_active(combat)
+		await _open_claim(combat)
+		await _click(combat.result_panel.claim_button)
 		await _read(_game.router.current_screen.hollow_route.dialogue)
 		await _click(_node("RestoreMarker"))
 		await _read(_game.router.current_screen.hollow_route.dialogue)

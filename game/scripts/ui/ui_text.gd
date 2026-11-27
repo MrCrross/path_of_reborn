@@ -86,6 +86,8 @@ static func stat(stat_id: String) -> String:
 
 
 static func location(location_id: String) -> String:
+	if location_id == GameSession.LOCATION_GUILD_ORDER:
+		return "Вылазка Гильдии"
 	return String(LOCATION_LABELS.get(location_id, location_id))
 
 

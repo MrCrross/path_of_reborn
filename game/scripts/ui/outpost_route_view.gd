@@ -54,6 +54,9 @@ func refresh(auto_dialogue: bool = true) -> void:
 		"bowl": "Осмотреть сигнальную чашу",
 		"seal": "Коснуться знака дозора",
 		"ravens": "В бой с воронами",
+		"gate_patrol": "Очистить ворота",
+		"stairs_patrol": "Освободить лестницу",
+		"tower_patrol": "Очистить башню",
 		"warden": "В бой с дозорным",
 		"alliance": "Подтвердить союз",
 	}
@@ -67,7 +70,7 @@ func refresh(auto_dialogue: bool = true) -> void:
 	if stage == "seal":
 		_add_prop("FireSeal", "fire", Rect2(12, 58, 72, 28), Vector2(50, 19), Vector2(0.57, 0))
 		_add_prop("WatchSign", "sign", Rect2(4, 6, 40, 36), Vector2(22, 20), Vector2(0.57, -2), true)
-	if stage in ["ravens", "warden", "alliance", "return"]:
+	if stage in ["ravens", "gate_patrol", "stairs_patrol", "tower_patrol", "warden", "alliance", "return"]:
 		_add_prop("Akari", "akari", Rect2(34, 30, 78, 82), Vector2(78, 82), Vector2(0.50, -9))
 	_layout_props()
 	_show_shot(false)
@@ -91,11 +94,11 @@ func _on_action() -> void:
 		_play_dialogue()
 		return
 	var stage: String = session.outpost_stage()
-	match stage:
-		"ravens", "warden":
-			encounter_requested.emit(GameSession.outpost_node(stage)["enemy_id"])
-		_:
-			command_requested.emit(stage)
+	var node: Dictionary = GameSession.outpost_node(stage)
+	if node.has("enemy_id"):
+		encounter_requested.emit(node["enemy_id"])
+	else:
+		command_requested.emit(stage)
 
 func _play_dialogue() -> void:
 	var caption: String = "Согласиться" if session.outpost_stage() == "alliance" else "К бою"

@@ -81,6 +81,8 @@ func _ready() -> void:
 		$Arena/ArenaBackground.texture = ArtMap.world_background(session.location_id)
 		if session.location_id == GameSession.LOCATION_HOLLOW and session.hollow_stage() == "elite":
 			$Arena/ArenaBackground.texture = ArtMap.texture(ArtMap.BACKGROUNDS["hollow_basin"])
+	elif session.location_id == GameSession.LOCATION_GUILD_ORDER:
+		$Arena/ArenaBackground.texture = ArtMap.world_background(session.guild_order_location())
 	arena_presenter = CombatArenaPresenter.new()
 	arena_presenter.name = "ArenaPresenter"
 	add_child(arena_presenter)

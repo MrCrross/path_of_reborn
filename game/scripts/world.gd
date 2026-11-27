@@ -40,6 +40,7 @@ var _main_enemy_id: String = "moss_slime"
 var _navigating: bool = false
 var _inventory_badge: Label
 var _balance_exact: bool = false
+var _order_progress: Label
 var _focus_guard := ModalFocus.new()
 
 func configure(game_session: GameSession) -> void:
@@ -114,6 +115,14 @@ func _ready() -> void:
 	nav_bar.move_child(characters_button, 2)
 	nav_bar.move_child(map_button, 3)
 	var bottom: Control = nav_bar.get_parent()
+	if session.location_id in GameSession.EXPEDITION_LOCATIONS:
+		_order_progress = Label.new()
+		_order_progress.name = "StoryOrderProgress"
+		_order_progress.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_order_progress.add_theme_font_size_override("font_size", 8)
+		_order_progress.add_theme_color_override("font_outline_color", AppTheme.COLOR_PANEL)
+		_order_progress.add_theme_constant_override("outline_size", 4)
+		bottom.add_child(_order_progress)
 	equipment_strip = EquipmentStrip.new()
 	equipment_strip.name = "EquipmentStrip"
 	nav_bar.get_parent().add_child(equipment_strip)
@@ -479,6 +488,9 @@ func _refresh() -> void:
 
 	var in_city: bool = session.location_id == GameSession.LOCATION_LIOREN
 	var in_expedition: bool = session.location_id in GameSession.EXPEDITION_LOCATIONS
+	if _order_progress != null:
+		var order: Dictionary = session.story_order(session.location_id)
+		_order_progress.text = "%s · Бои %d/%d" % [order["rank"], int(order["cleared"]), order["nodes"].size()]
 	equipment_strip.set_suppressed(in_city or in_expedition)
 	checkpoint_button.visible = session.can_place_expedition_checkpoint()
 	repeats_button.visible = not session.route_repeat_enemy_ids().is_empty()

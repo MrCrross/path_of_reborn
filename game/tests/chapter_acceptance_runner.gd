@@ -219,6 +219,9 @@ func _hollow() -> bool:
 	await _click(_node("HollowFight"))
 	if not await _win_and_claim():
 		return false
+	await _click(_node("HollowFight"))
+	if not await _win_and_claim():
+		return false
 	await _read(_game.router.current_screen.hollow_route.dialogue)
 	await _click(_node("RestoreMarker"))
 	await _read(_game.router.current_screen.hollow_route.dialogue)
@@ -245,6 +248,11 @@ func _outpost() -> bool:
 	await _click(_node("OutpostAction"))
 	if not await _win_and_claim():
 		return false
+	for stage: String in ["gate_patrol", "stairs_patrol", "tower_patrol"]:
+		_check(_game.session.outpost_stage() == stage, "Outpost advances to " + stage)
+		await _click(_node("OutpostAction"))
+		if not await _win_and_claim():
+			return false
 	world = _game.router.current_screen
 	await _read(world.outpost_route.dialogue)
 	if DisplayServer.window_get_size() == CHECKPOINT_WINDOW and not await _return_at_outpost(world):

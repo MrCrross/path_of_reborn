@@ -48,6 +48,14 @@ func _run() -> void:
 		await _win_auto(combat)
 		await _open_claim(combat)
 		await _click(combat.result_panel.claim_button)
+		for stage: String in ["gate_patrol", "stairs_patrol", "tower_patrol"]:
+			_check(_game.session.outpost_stage() == stage, "Outpost advances to " + stage)
+			await _click(_node("OutpostAction"))
+			combat = _game.router.current_screen
+			await _frames(40)
+			await _win_auto(combat)
+			await _open_claim(combat)
+			await _click(combat.result_panel.claim_button)
 		world = _game.router.current_screen
 		await _read(world.outpost_route.dialogue)
 		_check(world.checkpoint_button.visible and _game.session.checkpoints.can_begin(), "Seal is available before the boss")
@@ -55,7 +63,7 @@ func _run() -> void:
 			_game.session.set_combat_format(GameSession.COMBAT_FORMAT_ACTIVE)
 		await _click(_node("OutpostAction"))
 		combat = _game.router.current_screen
-		if not _check(combat.name == "Combat" and combat.resolver.enemy.definition.id == "bone_warden", "Second battle starts through the existing combat screen"):
+		if not _check(combat.name == "Combat" and combat.resolver.enemy.definition.id == "bone_warden", "The fifth battle starts through the existing combat screen"):
 			break
 		await _frames(40)
 		combat.set_physics_process(false)

@@ -127,7 +127,11 @@ func _test_elite(context: TestContext) -> void:
 	session.start_combat("stone_rodent").advance_ticks(1800)
 	DomainSuite.claim_pending(session)
 	see(session, 21)
-	context.check(session.apply_hollow_command("upper_marker"), "Upper marker is restored after the second battle")
+	context.check(not session.apply_hollow_command("upper_marker"), "Upper marker is gated by the third battle")
+	context.check(session.apply_map_travel(GameSession.LOCATION_LIOREN) and session.apply_map_travel(GameSession.MAP_SHOP), "The shop is reachable between story battles")
+	context.check(session.apply_map_travel(GameSession.LOCATION_HOLLOW) and session.hollow_stage() == "upper_guard", "The story stage survives a shop visit")
+	session.start_combat("river_shieldback").advance_ticks(1800)
+	context.check(DomainSuite.claim_pending(session) and session.apply_hollow_command("upper_marker"), "Upper marker is restored after the guard")
 	see(session, 7)
 	context.check(session.apply_hollow_command("cloth") and session.checkpoints.begin(), "Cloth and safe ledge are available before elite")
 	session.checkpoints.advance_ticks(CheckpointService.CHANNEL_TICKS)
@@ -156,7 +160,8 @@ func _test_balance(context: TestContext) -> void:
 		see(session, 7)
 		see(session, 9)
 		see(session, 21)
-		for enemy_id: String in ["river_shieldback", "stone_rodent", "crystal_toad"]:
+		for enemy_id: String in ["river_shieldback", "stone_rodent", "river_shieldback", "crystal_toad"]:
+			var stage: String = session.hollow_stage()
 			var combat: CombatResolver = session.start_combat(enemy_id)
 			if combat == null:
 				context.check(false, "Missing encounter %s in %s" % [enemy_id, format])
@@ -168,15 +173,15 @@ func _test_balance(context: TestContext) -> void:
 				context.check(false, label)
 				break
 			context.check(true, label)
-			if enemy_id == "river_shieldback":
+			if stage == "river":
 				session.apply_hollow_command("water_marker")
-			elif enemy_id == "stone_rodent":
+			elif stage == "upper_guard":
 				session.apply_hollow_command("upper_marker")
 				session.apply_hollow_command("cloth")
 				session.choose_upgrade("strength")
 				session.choose_upgrade("max_hp")
 				session.apply_hollow_command("descend")
-			else:
+			elif stage == "elite":
 				var radiant: bool = false
 				for item: ItemInstance in session.inventory.filter("echo"):
 					radiant = radiant or item.aspect_id == "stone_radiant"

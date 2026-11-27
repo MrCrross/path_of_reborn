@@ -22,6 +22,8 @@ var _briefing_stage: bool = false
 var _report_view: CombatResultView
 var _dialogue_kind: String = ""
 var _route_map: TextureRect
+var _orders_button: Button
+var focus_orders_on_entry: bool = false
 
 @onready var backdrop: TextureRect = $Background
 @onready var back_button: Button = %Back
@@ -56,6 +58,9 @@ func _ready() -> void:
 	_outpost_report_button.pressed.connect(_start_outpost_report)
 	_outpost_epilogue_button = _order_button(desk, "OutpostEpilogue", "Прочитать письмо")
 	_outpost_epilogue_button.pressed.connect(_start_outpost_epilogue)
+	_orders_button = _order_button(desk, "GuildOrdersButton", "Дополнительные задания")
+	_orders_button.theme_type_variation = &""
+	_orders_button.pressed.connect(func() -> void: navigate_requested.emit("guild_orders"))
 	_report_view = CombatResultView.new()
 	_report_view.name = "GroveReportReward"
 	_report_view.claim_requested.connect(_claim_report)
@@ -321,8 +326,19 @@ func _show_desk() -> void:
 		%Objectives.text = "В следующей главе · архив Гильдии" if outpost_finished else "Дайдзиро принёс письмо"
 	if _outpost_report_button.visible or outpost_reported:
 		_route_map.texture = ArtMap.item_icon("old_watch_badge")
+	if registered and not outpost_reported:
+		var route: String = GameSession.LOCATION_GROVE
+		if hollow_reported:
+			route = GameSession.LOCATION_OUTPOST
+		elif reported:
+			route = GameSession.LOCATION_HOLLOW
+		var order: Dictionary = session.story_order(route)
+		%Objectives.text += "\n%s · бои %d/%d · %s" % [order["rank"], int(order["cleared"]), order["nodes"].size(), UiText.astra(order["silver"], GameSession.SILVER)]
 	register_button.visible = session.can_register_with_guild()
-	if outpost_finished:
+	_orders_button.visible = registered
+	if focus_orders_on_entry and registered:
+		_orders_button.grab_focus()
+	elif outpost_finished:
 		back_button.grab_focus()
 	elif register_button.visible:
 		register_button.grab_focus()

@@ -431,6 +431,8 @@ func validate(dto: Dictionary) -> bool:
 		return false
 	if not _valid_profile(dto["profile"]) or not _valid_meta(dto["meta"]) or not _valid_checkpoints(dto["checkpoints"]):
 		return false
+	if dto["location_id"] == GameSession.LOCATION_GUILD_ORDER and dto["profile"].get("guild_order", {}).is_empty():
+		return false
 	if typeof(dto["loot"]) != TYPE_DICTIONARY or not _has_keys(dto["loot"], ["seed", "state"]):
 		return false
 	if typeof(dto["loot"]["seed"]) != TYPE_STRING or typeof(dto["loot"]["state"]) != TYPE_STRING or not dto["loot"]["state"].is_valid_int():
@@ -442,7 +444,7 @@ func validate(dto: Dictionary) -> bool:
 		if not GameSession.is_valid_pending_battle_result(battle):
 			return false
 		var profile: Dictionary = dto["profile"]
-		if not GameSession.expedition_battle_matches(battle, dto["location_id"], profile["quest_flags"], profile["npc_flags"]):
+		if not GameSession.expedition_battle_matches(battle, dto["location_id"], profile["quest_flags"], profile["npc_flags"], profile.get("guild_order", {})):
 			return false
 	if not _valid_story_reward(dto["pending_story_reward"]):
 		return false
@@ -476,6 +478,9 @@ func _valid_profile(dto: Variant) -> bool:
 		return false
 	if not _valid_wallet(dto["wallet"]) or not _nonnegative(dto["play_tick"]):
 		return false
+	var order: Variant = dto.get("guild_order", {})
+	if not GuildOrders.valid_progress(order):
+		return false
 	if dto.has("run_sequence") and not _nonnegative(dto["run_sequence"]):
 		return false
 	if dto.has("pending_battle_result") or dto.has("trial_echo_claimed"):
@@ -492,6 +497,8 @@ func _valid_profile(dto: Variant) -> bool:
 	for key: String in ["quest_flags", "npc_flags", "world_flags", "completed_encounter_ids", "story_rewards"]:
 		if not _valid_flag_map(dto[key]):
 			return false
+	if not order.is_empty() and (not dto["world_flags"].get(GameSession.WORLD_FLAG_GUILD_REGISTERED, false) or dto["quest_flags"].get("guild_order_completed_" + order["id"], false)):
+		return false
 	if typeof(dto["characters"]) != TYPE_DICTIONARY:
 		return false
 	for character_id: Variant in dto["characters"]:
@@ -626,6 +633,7 @@ func _valid_snapshot(dto: Variant) -> bool:
 		and typeof(dto["location_id"]) == TYPE_STRING
 		and not dto["location_id"].is_empty()
 		and _valid_profile(dto["profile"])
+		and (dto["location_id"] != GameSession.LOCATION_GUILD_ORDER or not dto["profile"].get("guild_order", {}).is_empty())
 	)
 
 func _valid_story_reward(reward: Variant) -> bool:
