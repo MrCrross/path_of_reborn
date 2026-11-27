@@ -4,6 +4,7 @@ signal navigate_requested(destination: String)
 signal grove_command_requested(command: String)
 signal hollow_command_requested(command: String)
 signal outpost_command_requested(command: String)
+signal guild_order_requested(command: String, order_id: String)
 
 var session: GameSession
 
@@ -27,8 +28,8 @@ var session: GameSession
 
 var hero_health: ActorHealthDisplay
 var equipment_strip: EquipmentStrip
-var details_layer: Control
-var details_view: ItemDetailsView
+@onready var details_layer: ItemDetailsOverlay = %ItemDetailsLayer
+@onready var details_view: ItemDetailsView = details_layer.view
 var gates_dialogue: DialogueOverlay
 var grove_route: GroveRouteView
 var hollow_route: HollowRouteView
@@ -38,10 +39,9 @@ var _shown_background: String = ""
 var _hero_still_id: String = ""
 var _main_enemy_id: String = "moss_slime"
 var _navigating: bool = false
-var _inventory_badge: Label
 var _balance_exact: bool = false
 var _order_progress: Label
-var _focus_guard := ModalFocus.new()
+var _story_frame: bool = false
 
 func configure(game_session: GameSession) -> void:
 	session = game_session
@@ -56,7 +56,10 @@ func handle_back() -> bool:
 	if gates_dialogue != null and gates_dialogue.is_active():
 		return true
 	if details_layer != null and details_layer.visible:
-		_close_item_details()
+		details_layer.dismiss()
+		return true
+	if session.location_id == GameSession.LOCATION_GUILD_ORDER:
+		_on_order_destination("leave")
 		return true
 	if session.location_id in GameSession.EXPEDITION_LOCATIONS:
 		_on_map_pressed()
@@ -99,23 +102,12 @@ func _ready() -> void:
 	)
 	UiIcons.apply(rest_button, "rest", "Отдохнуть · снять Следы")
 	UiIcons.apply(map_button, "path", "Карта мира")
-	map_button.text = "Карта мира"
-	map_button.expand_icon = false
-	map_button.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	map_button.add_theme_constant_override("icon_max_width", 12)
-	map_button.add_theme_constant_override("h_separation", 2)
-	map_button.add_theme_font_size_override("font_size", 8)
 	var nav_bar: Control = inventory_button.get_parent()
 	UiIcons.apply(repeats_button, "repeat", "Случайный бой")
-	repeats_button.reparent(nav_bar)
-	upgrade_button.custom_minimum_size = Vector2(0, 22)
+	upgrade_button.custom_minimum_size.y = UiIcons.TOUCH_SIZE
 	upgrade_button.add_theme_font_size_override("font_size", 8)
-	nav_bar.move_child(checkpoint_button, 0)
-	nav_bar.move_child(inventory_button, 1)
-	nav_bar.move_child(characters_button, 2)
-	nav_bar.move_child(map_button, 3)
 	var bottom: Control = nav_bar.get_parent()
-	if session.location_id in GameSession.EXPEDITION_LOCATIONS:
+	if session.location_id in GameSession.EXPEDITION_LOCATIONS or session.location_id == GameSession.LOCATION_GUILD_ORDER:
 		_order_progress = Label.new()
 		_order_progress.name = "StoryOrderProgress"
 		_order_progress.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -129,11 +121,10 @@ func _ready() -> void:
 	nav_bar.get_parent().move_child(equipment_strip, main_action_button.get_index())
 	equipment_strip.configure(session, "world")
 	nav_bar.get_parent().move_child(upgrade_button, maxi(0, nav_bar.get_index() - 1))
-	equipment_strip.item_requested.connect(_open_equipment_details)
+	equipment_strip.item_requested.connect(details_layer.open_instance)
 	equipment_strip.empty_slot_requested.connect(func(_slot_id: String) -> void: navigate_requested.emit("inventory"))
 	equipment_strip.familiar_requested.connect(func(_character_id: String) -> void: _on_hero_profile_pressed())
-	_build_item_details()
-	_build_inventory_badge()
+	details_view.configure(session)
 	hero_health = ActorHealthDisplay.new()
 	hero_health.name = "HeroHealth"
 	hero_health.setup("hero")
@@ -145,10 +136,6 @@ func _ready() -> void:
 	gates_dialogue.command_requested.connect(_on_dialogue_command)
 	gates_dialogue.finished.connect(_on_gates_finished)
 	add_child(gates_dialogue)
-	if session.location_id in GameSession.EXPEDITION_LOCATIONS:
-		settings_button.reparent(nav_bar, false)
-		settings_button.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
-		settings_button.custom_minimum_size = Vector2(24, 24)
 	if session.location_id == GameSession.LOCATION_GROVE:
 		grove_route = GroveRouteView.new()
 		add_child(grove_route)
@@ -175,6 +162,15 @@ func _ready() -> void:
 		outpost_route.encounter_requested.connect(_on_grove_encounter)
 		outpost_route.shot_changed.connect(_show_grove_dialogue_shot)
 		outpost_route.refresh.call_deferred()
+	elif session.location_id == GameSession.LOCATION_GUILD_ORDER:
+		%OrderActions.show()
+		%OrderFight.pressed.connect(_on_order_fight)
+		%OrderToReport.pressed.connect(_on_order_destination.bind("leave"))
+		%OrderGuild.pressed.connect(_on_order_destination.bind("leave"))
+		%OrderShop.pressed.connect(_on_order_destination.bind("shop"))
+	if _order_progress != null:
+		bottom.move_child(_order_progress, -1)
+	bottom.move_child(nav_bar, -1)
 	_refresh()
 	session.profile_changed.connect(_refresh_hero_art)
 	_refresh_hero_art()
@@ -182,6 +178,9 @@ func _ready() -> void:
 		resized.connect(_layout_scene)
 	if focus_map_on_entry:
 		_focus_map.call_deferred()
+	elif %OrderActions.visible:
+		var action: Button = %OrderFight if %OrderFight.visible else %OrderToReport
+		action.grab_focus()
 	else:
 		inventory_button.grab_focus()
 	_try_start_gates_dialogue()
@@ -191,66 +190,6 @@ func _focus_map() -> void:
 	if not _has_modal():
 		map_button.grab_focus()
 
-func _build_item_details() -> void:
-	details_layer = Control.new()
-	details_layer.name = "ItemDetailsLayer"
-	details_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	details_layer.visible = false
-	add_child(details_layer)
-	var dim := ColorRect.new()
-	dim.color = Color(0.02, 0.03, 0.05, 0.78)
-	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	dim.gui_input.connect(_on_item_details_dismiss)
-	details_layer.add_child(dim)
-	details_view = ItemDetailsView.new()
-	details_view.name = "ItemDetails"
-	details_view.anchor_left = 0.5
-	details_view.anchor_top = 0.5
-	details_view.anchor_right = 0.5
-	details_view.anchor_bottom = 0.5
-	details_view.offset_left = -76.0
-	details_view.offset_top = -100.0
-	details_view.offset_right = 76.0
-	details_view.offset_bottom = 100.0
-	details_layer.add_child(details_view)
-	details_view.configure(session)
-	details_view.close_requested.connect(_close_item_details)
-
-func _open_equipment_details(instance_id: String) -> void:
-	if not details_view.present_instance(instance_id):
-		return
-	details_layer.show()
-	_focus_guard.capture(details_layer)
-	details_view.close_button.grab_focus()
-
-func _close_item_details() -> void:
-	details_layer.hide()
-	_focus_guard.restore()
-	inventory_button.grab_focus()
-
-func _on_item_details_dismiss(event: InputEvent) -> void:
-	if (event is InputEventScreenTouch and event.pressed) or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
-		get_viewport().set_input_as_handled()
-		_close_item_details()
-
-## Badge сумки: доступное улучшение или новые вещи после claim. Ведёт в
-## существующий экран сумки, где живёт и выбор улучшения.
-func _build_inventory_badge() -> void:
-	_inventory_badge = Label.new()
-	_inventory_badge.name = "InventoryBadge"
-	_inventory_badge.text = "!"
-	_inventory_badge.add_theme_font_size_override("font_size", 8)
-	_inventory_badge.add_theme_color_override("font_color", Color("1a1208"))
-	_inventory_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_inventory_badge.visible = false
-	var bg := StyleBoxFlat.new()
-	bg.bg_color = Color(0.949, 0.761, 0.306, 1)
-	bg.corner_radius_top_left = 5
-	bg.corner_radius_top_right = 5
-	bg.corner_radius_bottom_right = 5
-	bg.corner_radius_bottom_left = 5
-	_inventory_badge.add_theme_stylebox_override("normal", bg)
-	inventory_button.add_child(_inventory_badge)
 
 func _refresh_hero_art() -> void:
 	var still_id: String = ArtMap.hero_still_id(session.inventory)
@@ -274,8 +213,6 @@ func _layout_scene() -> void:
 	).round()
 	# Полоса HP над головой: верх solid силуэта — HERO_SOLID_HEIGHT над опорой.
 	hero_health.follow(anchor + Vector2(0, -SceneStaging.HERO_SOLID_HEIGHT), view)
-	if _inventory_badge != null:
-		_inventory_badge.position = Vector2(inventory_button.size.x - 9, -2)
 
 func _on_main_action_pressed() -> void:
 	if _navigating or details_layer.visible or gates_dialogue.is_active() or ConfirmDialog.has_open(self):
@@ -305,6 +242,8 @@ func _enter_combat() -> void:
 
 func _show_grove_dialogue_shot(active: bool, bridge_shot: bool) -> void:
 	$Margin.visible = not active
+	_story_frame = bridge_shot
+	_refresh_upgrade_button()
 	hero_label.get_parent_control().visible = not bridge_shot
 	balance_button.get_parent_control().visible = not bridge_shot
 	traces_label.visible = not bridge_shot and (_balance_exact or session.traces > 0 or session.echoes > 0)
@@ -346,6 +285,18 @@ func _on_repeats_pressed() -> void:
 	if _navigating or details_layer.visible or gates_dialogue.is_active() or ConfirmDialog.has_open(self):
 		return
 	if session.select_random_repeat_encounter():
+		_enter_combat()
+
+func _on_order_destination(command: String) -> void:
+	guild_order_requested.emit(command, session.guild_order["id"])
+
+func command_rejected() -> void:
+	locked_label.text = "Действие не сохранено. Попробуйте ещё раз."
+	locked_label.show()
+	locked_label.get_parent().show()
+
+func _on_order_fight() -> void:
+	if session.select_encounter(session.guild_order_stage().get("enemy_id", "")):
 		_enter_combat()
 
 func _on_map_pressed() -> void:
@@ -439,9 +390,11 @@ func _has_modal() -> bool:
 	)
 
 func _refresh() -> void:
-	if session.location_id != _shown_background:
-		_shown_background = session.location_id
-		art_background.texture = ArtMap.world_background(session.location_id)
+	var on_order: bool = session.location_id == GameSession.LOCATION_GUILD_ORDER
+	var place: String = session.guild_order_location() if on_order else session.location_id
+	if place != _shown_background:
+		_shown_background = place
+		art_background.texture = ArtMap.world_background(place)
 	hero_label.text = "Ур. %d" % session.hero.level
 	balance_button.text = UiText.astra_compact(session.wallet[GameSession.COPPER])
 	var balance_width: float = ceilf(balance_button.get_combined_minimum_size().x)
@@ -453,8 +406,8 @@ func _refresh() -> void:
 	balance_button.accessibility_name = "Баланс: " + balance_button.tooltip_text
 	traces_label.text = balance_button.tooltip_text if _balance_exact else "Следы %d/3 · Эхо %d" % [session.traces, session.echoes]
 	traces_label.visible = _balance_exact or session.traces > 0 or session.echoes > 0
-	location_label.text = "Роща" if grove_route != null else UiText.location(session.location_id)
-	location_label.tooltip_text = UiText.location(session.location_id)
+	location_label.text = "Роща" if place == GameSession.LOCATION_GROVE else UiText.location(place)
+	location_label.tooltip_text = UiText.location(place)
 	var combat_blocked: bool = session.awaiting_return or session.traces == 3
 
 	# HP героя на пути: полоса появляется после урона, при полном здоровье скрыта.
@@ -488,14 +441,27 @@ func _refresh() -> void:
 
 	var in_city: bool = session.location_id == GameSession.LOCATION_LIOREN
 	var in_expedition: bool = session.location_id in GameSession.EXPEDITION_LOCATIONS
-	if _order_progress != null:
+	if on_order:
+		var stage: Dictionary = session.guild_order_stage()
+		var contract: Dictionary = GuildOrders.definition(session.guild_order["id"])
+		%OrderFight.visible = not stage.is_empty()
+		%OrderFight.disabled = combat_blocked or _navigating
+		%OrderToReport.visible = stage.is_empty()
+		%OrderGuild.visible = not stage.is_empty()
+		%OrderObjective.visible = not stage.is_empty()
+		%OrderObjective.text = stage.get("objective", "")
+		_order_progress.text = "%s · %s · %d/%d" % [contract["rank"], contract["title"], session.guild_order["cleared"], session.guild_order["total"]]
+		_order_progress.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	elif _order_progress != null:
 		var order: Dictionary = session.story_order(session.location_id)
 		_order_progress.text = "%s · Бои %d/%d" % [order["rank"], int(order["cleared"]), order["nodes"].size()]
-	equipment_strip.set_suppressed(in_city or in_expedition)
+	equipment_strip.set_suppressed(in_city or in_expedition or on_order)
 	checkpoint_button.visible = session.can_place_expedition_checkpoint()
 	repeats_button.visible = not session.route_repeat_enemy_ids().is_empty()
 	repeats_button.disabled = _navigating
 	rest_button.visible = session.location_id == "lioren" and session.traces > 0
-	_inventory_badge.visible = session.hero.pending_upgrade_choices > 0 or session.pending_receive_fx
-	upgrade_button.visible = not in_expedition and session.hero.pending_upgrade_choices > 0 and not combat_blocked
+	_refresh_upgrade_button()
+
+func _refresh_upgrade_button() -> void:
+	upgrade_button.visible = not _story_frame and session.hero.pending_upgrade_choices > 0 and not session.awaiting_return and session.traces < 3
 	upgrade_button.text = "Выбрать улучшение · %d" % session.hero.pending_upgrade_choices

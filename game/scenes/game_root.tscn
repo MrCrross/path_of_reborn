@@ -29,6 +29,7 @@ layout_mode = 2
 mouse_filter = 2
 
 [node name="NoticeBar" type="PanelContainer" parent="."]
+mouse_filter = 2
 unique_name_in_owner = true
 visible = false
 layout_mode = 1

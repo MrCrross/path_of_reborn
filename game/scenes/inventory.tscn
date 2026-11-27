@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/inventory_screen.gd" id="1_inventory"]
 [ext_resource type="Texture2D" path="res://art/effects/inventory_receive_01.png" id="2_fx"]
-[ext_resource type="Script" path="res://scripts/ui/item_details_view.gd" id="3_details"]
+[ext_resource type="PackedScene" path="res://scenes/ui/item_details_overlay.tscn" id="3_details"]
+[ext_resource type="Script" path="res://scripts/ui/safe_area.gd" id="5_safe"]
 [ext_resource type="Script" path="res://scripts/ui/equipment_strip.gd" id="4_equipment"]
 
 [node name="Inventory" type="Control"]
@@ -31,10 +32,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-offset_left = 12.0
-offset_top = 12.0
-offset_right = -12.0
-offset_bottom = -12.0
+script = ExtResource("5_safe")
+padding = 12
 
 [node name="Column" type="VBoxContainer" parent="Margin"]
 layout_mode = 2
@@ -63,43 +62,6 @@ unique_name_in_owner = true
 layout_mode = 2
 script = ExtResource("4_equipment")
 
-[node name="StatsText" type="Label" parent="Margin/Column"]
-unique_name_in_owner = true
-layout_mode = 2
-visible = false
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 9
-
-[node name="UpgradeRow" type="HBoxContainer" parent="Margin/Column"]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="StrengthUpgrade" type="Button" parent="Margin/Column/UpgradeRow"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 26)
-theme_override_font_sizes/font_size = 9
-
-[node name="HpUpgrade" type="Button" parent="Margin/Column/UpgradeRow"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 26)
-theme_override_font_sizes/font_size = 9
-
-[node name="FormatOption" type="OptionButton" parent="Margin/Column"]
-unique_name_in_owner = true
-layout_mode = 2
-custom_minimum_size = Vector2(0, 24)
-theme_override_font_sizes/font_size = 9
-item_count = 2
-selected = 0
-popup/item_0/text = "Полный автобой"
-popup/item_0/id = 0
-popup/item_1/text = "Активный"
-popup/item_1/id = 1
-tooltip_text = "Управление боем перенесено в Настройки. Ручной режим: атака и уклонение по вводу игрока."
 
 [node name="TypeFilter" type="OptionButton" parent="Margin/Column"]
 unique_name_in_owner = true
@@ -111,6 +73,7 @@ theme_override_font_sizes/font_size = 9
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
+follow_focus = true
 
 [node name="ItemsList" type="GridContainer" parent="Margin/Column/Scroll"]
 unique_name_in_owner = true
@@ -146,37 +109,9 @@ texture = ExtResource("2_fx")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="DetailsLayer" type="Control" parent="."]
+[node name="DetailsLayer" parent="." instance=ExtResource("3_details")]
 unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-visible = false
 
-[node name="Dim" type="ColorRect" parent="DetailsLayer"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.02, 0.03, 0.05, 0.78)
-
-[node name="Details" type="PanelContainer" parent="DetailsLayer"]
-unique_name_in_owner = true
-layout_mode = 1
-anchor_left = 0.04
-anchor_top = 0.10
-anchor_right = 0.96
-anchor_bottom = 0.90
-script = ExtResource("3_details")
-
-[connection signal="pressed" from="Margin/Column/TopRow/BackButton" to="." method="_on_back_pressed"]
+[connection signal="pressed" from="Margin/Column/TopRow/BackButton" to="." method="handle_back"]
 [connection signal="pressed" from="Margin/Column/TopRow/StatsButton" to="." method="_on_stats_pressed"]
-[connection signal="pressed" from="Margin/Column/UpgradeRow/StrengthUpgrade" to="." method="_on_strength_upgrade_pressed"]
-[connection signal="pressed" from="Margin/Column/UpgradeRow/HpUpgrade" to="." method="_on_hp_upgrade_pressed"]
 [connection signal="item_selected" from="Margin/Column/TypeFilter" to="." method="_on_filter_selected"]
-[connection signal="gui_input" from="DetailsLayer/Dim" to="." method="_on_details_dismiss"]

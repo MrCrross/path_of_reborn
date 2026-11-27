@@ -79,6 +79,7 @@ func _play_prologue() -> int:
 	var visited: Dictionary = {}
 	var threshold_captured: bool = false
 	var hold_captured: bool = false
+	var warning_street: Image
 	for step: int in range(300):
 		var screen: Control = _game.router.current_screen
 		if screen.name != "Prologue":
@@ -91,6 +92,9 @@ func _play_prologue() -> int:
 		if runner.transition_ticks > 0:
 			await _frames(1)
 			continue
+		if runner.current_shot() == "alarm" and warning_street == null:
+			await _capture("03_crosswalk_warning")
+			warning_street = _street_above_truck()
 		match runner.current_kind():
 			"look":
 				await _drag(Vector2(90, 100), Vector2(30, 0))
@@ -98,6 +102,7 @@ func _play_prologue() -> int:
 				if not hold_captured:
 					hold_captured = true
 					await _capture("03_crosswalk_hold")
+					_check(warning_street != null and warning_street.get_data() == _street_above_truck().get_data(), "Street and signal above the truck stay fixed from the warning to the rescue prompt")
 				await _hold(screen.hold_area, runner)
 			_:
 				await _click(screen.dialogue_panel)
@@ -105,6 +110,12 @@ func _play_prologue() -> int:
 	_check(visited.size() == 15, "First pass visits the authored 15 cues")
 	_report["prologue"] = {"actions": _actions - 1, "cues": visited.size(), "seconds_to_world": snappedf((_game.session.play_tick - started_tick) / 60.0, 0.01)}
 	return started_tick
+
+func _street_above_truck() -> Image:
+	RenderingServer.force_draw()
+	var frame: Image = root.get_texture().get_image()
+	var size: Vector2i = frame.get_size()
+	return frame.get_region(Rect2i(size.x / 2, size.y / 8, size.x / 2, size.y / 4))
 
 func _flow() -> void:
 	var started_tick: int = await _play_prologue()

@@ -117,15 +117,28 @@ func _test_stable_round_trip(context: TestContext) -> void:
 	var service := SaveService.new()
 	var session := GameSession.new()
 	session.wallet[GameSession.COPPER] = 19
+	session.grant_familiar("moss_sprite")
+	session.assign_familiar("haruto", "moss_sprite")
+	session.hero.restore_full_health()
+	session.world_flags["road_companion_joined"] = true
+	var companion: CharacterState = session.character_state("road_companion")
+	var charm: ItemInstance = session.inventory.add(session.get_item_definition("moss_charm"), 1)[0]
+	session.equip_item(charm.instance_id, "road_companion")
+	companion.restore_full_health()
 	session.checkpoints.begin()
 	session.checkpoints.advance_ticks(CheckpointService.CHANNEL_TICKS)
 	session.checkpoints.apply_completion()
-	service.save(session, path)
+	context.check(service.save(session, path), "A party and its familiars can be saved with a manual Checkpoint")
 	var restored := GameSession.new()
-	service.load_into(restored, path)
+	context.check(service.load_into(restored, path), "Read the party through the persisted JSON boundary")
+	context.check(restored.hero.current_hp == session.hero.max_hp and restored.character_state("road_companion").current_hp == companion.max_hp, "HP contributed by a familiar or companion equipment survives load")
 	var first_save: String = FileAccess.get_file_as_string(path)
 	context.check(service.save(restored, path), "Second save succeeds")
 	context.check(FileAccess.get_file_as_string(path) == first_save, "Save-load-save produces identical readable JSON")
+	var legacy: Dictionary = service.capture(restored)
+	legacy["profile"]["familiars"]["owned"]["moss_sprite"] = {"level": 1}
+	_write_text(path, JSON.stringify(legacy))
+	context.check(service.load_into(restored, path) and restored.familiar_level("moss_sprite") == 1, "Previously accepted object-shaped familiar levels become the runtime integer")
 	_cleanup(path)
 
 func _test_backup(context: TestContext) -> void:
@@ -140,6 +153,9 @@ func _test_backup(context: TestContext) -> void:
 	var restored := GameSession.new()
 	context.check(service.load_into(restored, path), "Backup is used when primary is malformed")
 	context.check(service.loaded_from_backup and restored.wallet[GameSession.COPPER] == 10, "Previous valid state, not the latest corrupt write, is restored")
+	var previous_backup: String = FileAccess.get_file_as_string(path + ".bak")
+	_write_text(path, JSON.stringify(PreferencesService.new().capture_dto()))
+	context.check(service.save(session, path) and FileAccess.get_file_as_string(path + ".bak") == previous_backup, "Replacing a JSON document of the wrong format preserves the valid profile backup")
 	_cleanup(path)
 
 func _test_rejection(context: TestContext) -> void:
@@ -155,6 +171,10 @@ func _test_rejection(context: TestContext) -> void:
 	var incomplete: String = _path("incomplete")
 	_write_text(incomplete, JSON.stringify({"schema_version": 1, "profile": {}}))
 	context.check(not service.load_into(session, incomplete) and session.wallet[GameSession.COPPER] == 55, "Incomplete DTO is rejected without partial apply")
+	var broken: Dictionary = service.capture(session)
+	broken["profile"]["inventory"] = 0
+	_write_text(incomplete, JSON.stringify(broken))
+	context.check(not service.load_into(session, incomplete) and session.wallet[GameSession.COPPER] == 55, "A non-object inventory is rejected before accessing equipment")
 	_cleanup(malformed)
 	_cleanup(incomplete)
 
@@ -228,6 +248,13 @@ func _test_write_failure(context: TestContext) -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path + ".tmp"))
 	var restored := GameSession.new()
 	context.check(service.load_into(restored, path) and restored.wallet[GameSession.COPPER] == 77, "Failed write leaves previous primary intact")
+	var primary: String = FileAccess.get_file_as_string(path)
+	var backup_path: String = ProjectSettings.globalize_path(path + ".bak")
+	DirAccess.make_dir_recursive_absolute(backup_path)
+	context.check(not service.save(session, path) and not service.last_error.is_empty(), "A failure replacing the backup aborts publication")
+	context.check(FileAccess.get_file_as_string(path) == primary and not FileAccess.file_exists(path + ".tmp") and not FileAccess.file_exists(path + ".bak.tmp"), "Failed backup replacement keeps the primary and clears staged writes")
+	DirAccess.remove_absolute(backup_path)
+	context.check(service.save(session, path) and FileAccess.get_file_as_string(path + ".bak") == primary, "Retry publishes the new primary and preserves its predecessor")
 	_cleanup(path)
 
 func _test_safe_boundaries(context: TestContext) -> void:
@@ -309,6 +336,12 @@ func _test_v3_pending_source_policy(context: TestContext) -> void:
 	dto["meta"].erase("trial_echo_claimed")
 	var profile_pending: Dictionary = dto["profile"]["pending_battle_result"].duplicate(true)
 	var root_pending: Dictionary = dto["pending_battle_result"].duplicate(true)
+	for pending: Dictionary in [profile_pending, root_pending]:
+		pending.erase("choices")
+		pending.erase("route_id")
+		for entry: Dictionary in pending["items"]:
+			for key: String in ["entry_id", "level", "sale_price_copper", "sellable"]:
+				entry.erase(key)
 	profile_pending["result_id"] = "profile_result"
 	profile_pending["run_id"] = "profile_run"
 	root_pending["result_id"] = "root_result"
@@ -319,11 +352,20 @@ func _test_v3_pending_source_policy(context: TestContext) -> void:
 	context.check(service.validate(migrated), "Conflicting valid v3 copies have a controlled migration result")
 	context.check(migrated["pending_battle_result"].get("result_id", "") == "profile_result", "The copy applied by the old runtime wins")
 	context.check(not migrated["profile"].has("pending_battle_result"), "Current profile no longer duplicates pending")
+	var legacy_path: String = _path("v3_pending_cards")
+	_write_text(legacy_path, JSON.stringify(dto))
+	var loaded := GameSession.new()
+	context.check(service.load_into(loaded, legacy_path) and not loaded.reward_choices_complete() and DomainSuite.claim_pending(loaded), "A real v3 pending card acquires its metadata before validation and can be claimed once")
+	context.check(not loaded.claim_battle_result("profile_result"), "Repeating the migrated claim grants nothing")
+	_cleanup(legacy_path)
 	dto["profile"]["pending_battle_result"] = {}
 	migrated = service.migrate(dto)
 	context.check(migrated["pending_battle_result"].get("result_id", "") == "root_result", "A valid root is retained when the old profile copy is empty")
 	dto["profile"]["pending_battle_result"] = {"broken": true}
 	context.check(not service.validate(service.migrate(dto)), "An invalid old-runtime copy rejects the DTO instead of silently substituting root")
+	dto["profile"]["pending_battle_result"] = {}
+	dto["checkpoints"]["pending_completion"] = 1
+	context.check(service.migrate(dto).is_empty(), "Malformed staged Checkpoint data fails migration before accessing the profile")
 
 func _test_pending_contradictions(context: TestContext) -> void:
 	var service := SaveService.new()
@@ -334,6 +376,9 @@ func _test_pending_contradictions(context: TestContext) -> void:
 	dto["awaiting_return"] = true
 	context.check(not service.validate(dto), "awaiting_return and pending cannot coexist")
 	dto["awaiting_return"] = false
+	dto["profile"]["last_claimed_result_id"] = dto["pending_battle_result"]["result_id"]
+	context.check(not service.validate(dto), "An already claimed result cannot reopen from disk")
+	dto["profile"]["last_claimed_result_id"] = ""
 	dto["pending_battle_result"]["enemy_id"] = "unknown_enemy"
 	context.check(not service.validate(dto), "Unknown pending encounter is rejected")
 	dto = service.capture(session)
@@ -342,6 +387,19 @@ func _test_pending_contradictions(context: TestContext) -> void:
 	dto = service.capture(session)
 	dto["pending_battle_result"].erase("loot_state")
 	context.check(not service.validate(dto), "Incomplete pending DTO is rejected")
+	dto = service.capture(session)
+	var result: Dictionary = dto["pending_battle_result"]
+	var entry: Dictionary = result["items"][0]
+	result["items"].append(entry.duplicate())
+	context.check(not service.validate(dto), "Duplicate card IDs cannot grant two items from one choice")
+	result["items"].pop_back()
+	var choice := {"entry_id": entry["entry_id"], "result_id": result["result_id"], "action": "store"}
+	result["choices"]["missing_card"] = choice
+	context.check(not service.validate(dto), "Orphan choices cannot fill a different card")
+	result["choices"].clear()
+	result["choices"][entry["entry_id"]] = choice
+	choice["entry_id"] = "other_card"
+	context.check(not service.validate(dto), "Every saved choice names the card that owns it")
 	dto = service.capture(session)
 	dto["checkpoints"]["first_trace_snapshot"]["profile"]["pending_battle_result"] = session.pending_battle_result.duplicate(true)
 	context.check(not service.validate(dto), "A rollback snapshot cannot own a non-empty pending result")
@@ -434,6 +492,15 @@ func _test_preferences(context: TestContext) -> void:
 	_write_text(path, "{broken")
 	var backup := PreferencesService.new()
 	context.check(backup.load_preferences(path) and not backup.sound_enabled and backup.combat_format == GameSession.COMBAT_FORMAT_ACTIVE and backup.auto_speed == 2, "Corrupt primary preferences fall back to the previous .bak")
+	var previous_backup: String = FileAccess.get_file_as_string(path + ".bak")
+	var malformed := preferences.capture_dto()
+	malformed["schema_version"] = 1.5
+	_write_text(path, JSON.stringify(malformed))
+	context.check(preferences.save_preferences(path) and FileAccess.get_file_as_string(path + ".bak") == previous_backup, "A fractional preferences version never replaces the last valid backup")
+	malformed["schema_version"] = PreferencesService.CURRENT_VERSION
+	malformed["auto_speed"] = 1.5
+	_write_text(path, JSON.stringify(malformed))
+	context.check(backup.load_preferences(path) and backup.auto_speed == 2, "A fractional combat speed falls back to valid preferences")
 	var old_dto := preferences.capture_dto()
 	old_dto.erase("auto_ability")
 	_write_text(path, JSON.stringify(old_dto))

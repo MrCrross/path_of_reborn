@@ -180,14 +180,14 @@ func _observe_presentation() -> void:
 	var navigations: Array = []
 	screen.navigate_requested.connect(func(destination: String) -> void: navigations.append(destination))
 	# «Старый» палец: нажатие началось до terminal event.
-	screen._on_press_began()
+	_touch(screen.size * 0.5, true)
 	screen.resolver.advance_ticks(6000)
 	# Новая семантика: результат висит без таймера, награда только по новому
 	# намеренному press→release.
 	presentation["result_visible_at_victory"] = screen.result_panel.visible
 	presentation["pending_exists_at_victory"] = not session.pending_battle_result.is_empty()
 	presentation["inventory_empty_at_victory"] = session.inventory.items.is_empty()
-	screen._on_press_ended()
+	_touch(screen.size * 0.5, false)
 	# Ввод, начавшийся до terminal event, не собирает награду.
 	presentation["navigations_from_stale_press"] = navigations.duplicate()
 	presentation["pending_after_stale_press"] = not session.pending_battle_result.is_empty()
@@ -195,11 +195,17 @@ func _observe_presentation() -> void:
 	presentation["navigations_after_1_2s"] = navigations.duplicate()
 	presentation["result_still_visible_without_claim"] = screen.result_panel.visible and screen.result_panel.modulate.a > 0.9
 	presentation["pending_after_1_2s"] = not session.pending_battle_result.is_empty()
-	# Один новый press→release собирает ровно один раз.
-	screen._on_press_began()
-	screen._on_press_ended()
-	presentation["navigations_after_claim_press"] = navigations.duplicate()
-	presentation["pending_after_claim"] = not session.pending_battle_result.is_empty()
-	presentation["inventory_after_claim"] = session.inventory.items.size()
+	# Касание арены под результатом не подтверждает получение добычи.
+	_touch(screen.size * 0.5, true)
+	_touch(screen.size * 0.5, false)
+	presentation["navigations_after_arena_tap"] = navigations.duplicate()
+	presentation["pending_after_arena_tap"] = not session.pending_battle_result.is_empty()
+	presentation["inventory_after_arena_tap"] = session.inventory.items.size()
 	screen.free()
 	host.free()
+
+func _touch(point: Vector2, pressed: bool) -> void:
+	var event := InputEventScreenTouch.new()
+	event.position = point
+	event.pressed = pressed
+	root.push_input(event, true)

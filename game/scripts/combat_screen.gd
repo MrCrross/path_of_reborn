@@ -3,7 +3,6 @@ extends Control
 signal navigate_requested(destination: String)
 signal claim_requested(result_id: String)
 
-const VICTORY_FONT_SIZE := 24
 const VICTORY_REACTION_SECONDS := 0.65
 const DEFEAT_TO_CHECKPOINT_SECONDS := 0.8
 const FOCUSED_STRIKE_TUTORIAL := "tutorial_focused_strike"
@@ -33,8 +32,8 @@ var resolver: CombatResolver
 @onready var speed_switch: Button = %SpeedSwitch
 @onready var format_label: Label = %FormatLabel
 @onready var result_panel: CombatResultView = %ResultPanel
-@onready var details_layer: Control = %DetailsLayer
-@onready var details_view: ItemDetailsView = %DetailsView
+@onready var details_layer: ItemDetailsOverlay = %DetailsLayer
+@onready var details_view: ItemDetailsView = details_layer.view
 @onready var detail_close: Button = details_view.close_button
 @onready var equipment_strip: EquipmentStrip = %EquipmentStrip
 
@@ -50,19 +49,14 @@ var _navigating: bool = false
 ## Результат ждёт игрока: ни auto-dismiss, ни auto-world. Каждая находка
 ## получает выбор «В рюкзак»/«Надеть», затем выполняется один атомарный claim.
 var _result_visible: bool = false
-var _pointer_candidate: Dictionary = {}
-var _pointer_down: bool = false
-var _pointer_down_began_at_result: bool = false
-var _details_open: bool = false
 var _loot_tutorial: ConfirmDialog
-var _focus_guard := ModalFocus.new()
 
 func configure(game_session: GameSession) -> void:
 	session = game_session
 
 func handle_back() -> bool:
-	if _details_open:
-		_close_details()
+	if details_layer.visible:
+		details_layer.dismiss()
 		return true
 	if _result_visible:
 		# Из несобранного результата Back не уводит: состояние не теряется.
@@ -91,7 +85,6 @@ func _ready() -> void:
 	hero_health = arena_presenter.hero_health
 	enemy_health = arena_presenter.enemy_health
 	details_view.configure(session)
-	details_view.close_requested.connect(_close_details)
 	result_panel.claim_requested.connect(_claim_result)
 	result_panel.summary_acknowledged.connect(_show_next_reward)
 	result_panel.choice_requested.connect(_on_reward_choice)
@@ -130,128 +123,52 @@ func _ready() -> void:
 	_start_intro()
 
 func _physics_process(_delta: float) -> void:
-	_update_marker_positions()
-	if resolver != null and not resolver.is_finished and not _intro_active and not _pause_open and not _ability_lesson:
-		resolver.advance_ticks(_combat_speed())
-		_refresh_cooldowns()
-		if _feedback_ticks > 0:
-			_feedback_ticks -= 1
-			if _feedback_ticks == 0:
-				hint_label.hide()
+	if _pause_open:
+		return
+	if _intro_active:
+		arena_presenter.update_positions()
+		return
+	if resolver == null or resolver.is_finished or _ability_lesson:
+		return
+	resolver.advance_ticks(_combat_speed())
+	if resolver.is_finished:
+		return
+	arena_presenter.advance_pose()
+	_refresh_cooldowns()
+	if _feedback_ticks > 0:
+		_feedback_ticks -= 1
+		if _feedback_ticks == 0:
+			hint_label.hide()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not is_inside_tree() or event.is_action_pressed("ui_cancel"):
+	if resolver == null or resolver.is_finished or _intro_active or _pause_open or _navigating:
 		return
-	if event is InputEventMouseButton and event.device == InputEvent.DEVICE_ID_EMULATION:
-		return
-	if event is InputEventScreenTouch and event.canceled:
-		if _matches_pointer(event, "touch"):
-			get_viewport().set_input_as_handled()
-		_cancel_pointer()
-		return
-	if event is InputEventScreenDrag:
-		if _matches_pointer(event, "touch"):
-			_cancel_pointer()
-			get_viewport().set_input_as_handled()
-		return
-	if not _result_visible and _current_combat_format() == GameSession.COMBAT_FORMAT_ACTIVE:
-		if event.is_action_pressed("primary"):
-			get_viewport().set_input_as_handled()
-			_on_attack_pressed()
-			return
-		if event.is_action_pressed("secondary"):
-			get_viewport().set_input_as_handled()
-			_on_dodge_pressed()
-			return
-	if ability_button.is_visible_in_tree() and event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_Q:
+	if ability_button.is_visible_in_tree() and event.is_action_pressed("combat_ability"):
 		get_viewport().set_input_as_handled()
 		_on_ability_pressed()
 		return
-	if _is_press(event):
-		if resolver != null and not _intro_active and not _pause_open and not _result_visible and not _details_open and _current_combat_format() == GameSession.COMBAT_FORMAT_ACTIVE:
-			if event is InputEventScreenTouch or event is InputEventMouseButton:
-				var relative: Vector2 = arena.get_global_transform_with_canvas().affine_inverse() * event.position
-				if resolver.select_target(arena_presenter.target_at(relative)):
-					get_viewport().set_input_as_handled()
-					return
+	if _ability_lesson or resolver.combat_format != GameSession.COMBAT_FORMAT_ACTIVE:
+		return
+	if event.is_action_pressed("primary"):
 		get_viewport().set_input_as_handled()
-		_on_press_began(event)
-	elif _is_release(event):
-		var canceled: bool = event is InputEventScreenTouch and event.canceled
-		var matches: bool = _matches_event_pointer(event)
-		if matches or canceled:
+		_on_attack_pressed()
+	elif event.is_action_pressed("secondary"):
+		get_viewport().set_input_as_handled()
+		_on_dodge_pressed()
+	elif _is_pointer_press(event):
+		var relative: Vector2 = arena.get_global_transform_with_canvas().affine_inverse() * event.position
+		if resolver.select_target(arena_presenter.target_at(relative)):
 			get_viewport().set_input_as_handled()
-		_on_press_ended(event, canceled)
 
-func _is_press(event: InputEvent) -> bool:
+func _is_pointer_press(event: InputEvent) -> bool:
 	if event is InputEventScreenTouch:
-		return event.pressed
+		return event.pressed and not event.canceled
 	if event is InputEventMouseButton:
-		return event.pressed and event.button_index == MOUSE_BUTTON_LEFT
-	return event.is_action_pressed("primary") or event.is_action_pressed("secondary")
-
-func _is_release(event: InputEvent) -> bool:
-	if event is InputEventScreenTouch:
-		return not event.pressed
-	if event is InputEventMouseButton:
-		return not event.pressed and event.button_index == MOUSE_BUTTON_LEFT
-	return event.is_action_released("primary") or event.is_action_released("secondary")
-
-func _on_press_began(event: InputEvent = null) -> void:
-	if _intro_active or _pause_open or _navigating or _details_open:
-		return
-	if event is InputEventScreenTouch and not _pointer_candidate.is_empty():
-		_cancel_pointer()
-		return
-	if not _pointer_candidate.is_empty():
-		return
-	_pointer_candidate = _pointer_identity(event)
-	_pointer_down = true
-	_pointer_down_began_at_result = _result_visible
-	if _result_visible:
-		return
-
-func _on_press_ended(_event: InputEvent = null, _canceled: bool = false) -> void:
-	_cancel_pointer()
-
-func _pointer_identity(event: InputEvent) -> Dictionary:
-	var kind: String = "key"
-	var index: int = 0
-	var device: int = 0
-	var pointer_position: Vector2 = Vector2.ZERO
-	if event is InputEventScreenTouch:
-		kind = "touch"
-		index = event.index
-		device = event.device
-		pointer_position = event.position
-	elif event is InputEventMouseButton:
-		kind = "mouse"
-		index = event.button_index
-		device = event.device
-		pointer_position = event.position
-	return {"kind": kind, "index": index, "device": device, "position": pointer_position}
-
-func _matches_event_pointer(event: InputEvent) -> bool:
-	if event is InputEventScreenTouch:
-		return _matches_pointer(event, "touch")
-	if event is InputEventMouseButton:
-		return _matches_pointer(event, "mouse")
-	return not _pointer_candidate.is_empty() and _pointer_candidate.get("kind", "") == "key" and (event == null or not (event is InputEventScreenTouch or event is InputEventMouseButton))
-
-func _matches_pointer(event: InputEvent, kind: String) -> bool:
-	if _pointer_candidate.is_empty() or _pointer_candidate.get("kind", "") != kind:
-		return false
-	var event_index: Variant = event.get("index") if kind == "touch" else event.get("button_index")
-	return _pointer_candidate.get("index", -1) == event_index and _pointer_candidate.get("device", -1) == event.get("device")
-
-func _cancel_pointer() -> void:
-	_pointer_candidate = {}
-	_pointer_down = false
-	_pointer_down_began_at_result = false
+		return event.device != InputEvent.DEVICE_ID_EMULATION and event.pressed and event.button_index == MOUSE_BUTTON_LEFT
+	return false
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
-		_cancel_pointer()
 		if resolver != null and not resolver.is_finished and not _result_visible:
 			_set_pause(true)
 
@@ -506,7 +423,6 @@ func _show_restored_result() -> void:
 	_show_result_panel(session.pending_battle_result)
 
 func _show_result_panel(result: Dictionary) -> void:
-	_cancel_pointer()
 	format_label.hide()
 	pause_button.hide()
 	actions.hide()
@@ -519,27 +435,7 @@ func _show_next_reward() -> void:
 		_loot_tutorial = ConfirmDialog.tutorial(self, session, "tutorial_loot_gestures", "Добыча", "Коснитесь карточки или смахните влево, чтобы забрать. Экипировку можно надеть свайпом вправо. Значок i открывает описание.")
 
 func _open_details(reward: Dictionary) -> void:
-	_cancel_pointer()
-	if not details_view.present_reward(String(reward["item_id"]), String(reward["aspect_id"]), int(reward["quantity"]), reward):
-		return
-	details_layer.show()
-	_details_open = true
-	_focus_guard.capture(details_layer)
-	detail_close.grab_focus()
-
-func _close_details() -> void:
-	_cancel_pointer()
-	details_layer.hide()
-	_details_open = false
-	_focus_guard.restore()
-
-func _on_detail_close_pressed() -> void:
-	_close_details()
-
-func _on_details_dismiss(event: InputEvent) -> void:
-	if _is_press(event):
-		get_viewport().set_input_as_handled()
-		_close_details()
+	details_layer.open_reward(reward)
 
 func _on_reward_choice(entry_id: String, action: String) -> void:
 	if _navigating:

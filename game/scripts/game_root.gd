@@ -1,6 +1,8 @@
 class_name GameRoot
 extends Control
 
+enum CommitResult { SUCCESS, UNAVAILABLE, REJECTED, WRITE_FAILED }
+
 var session: GameSession
 var router: SceneRouter
 var save_service: SaveService
@@ -8,12 +10,27 @@ var preferences: PreferencesService
 var preferences_path: String = ""
 var save_path: String = SaveService.DEFAULT_PATH
 
-var _restoring: bool = false
-var _claim_commit_active: bool = false
-var _checkpoint_commit_active: bool = false
-var _shop_commit_active: bool = false
-var _expedition_commit_active: bool = false
+var _applying_profile: bool = false
 var _observed_inventory: InventoryService
+var _observed_checkpoints: CheckpointService
+var _screen_commands: Dictionary[StringName, Callable] = {
+	&"new_game_requested": _on_new_game_requested,
+	&"continue_requested": _on_continue_requested,
+	&"claim_requested": _on_claim_requested,
+	&"checkpoint_commit_requested": _on_checkpoint_commit_requested,
+	&"story_claim_requested": _on_story_claim_requested,
+	&"sound_change_requested": set_sound_enabled,
+	&"voice_change_requested": set_voice_id,
+	&"shop_deal_requested": _on_shop_deal_requested,
+	&"guild_registration_requested": _on_guild_registration_requested,
+	&"guild_order_requested": _on_guild_order_requested,
+	&"equipment_upgrade_requested": _on_equipment_upgrade_requested,
+	&"grove_command_requested": _on_grove_command_requested,
+	&"hollow_command_requested": _on_hollow_command_requested,
+	&"outpost_command_requested": _on_outpost_command_requested,
+	&"travel_requested": _on_travel_requested,
+	&"open_bag_requested": _on_open_bag_requested,
+}
 
 @onready var screen_host: Control = %ScreenHost
 @onready var notice_bar: PanelContainer = %NoticeBar
@@ -32,10 +49,7 @@ func _ready() -> void:
 	preferences = PreferencesService.new()
 	preferences_path = PreferencesService.path_for_profile(save_path)
 	preferences.load_preferences(preferences_path, save_service.peek_combat_format(save_path))
-	session.combat_format = preferences.combat_format
-	session.auto_speed = preferences.auto_speed
-	session.auto_ability = preferences.auto_ability
-	AudioServer.set_bus_mute(0, not preferences.sound_enabled)
+	_apply_preferences()
 	router = SceneRouter.new()
 	router.configure(screen_host, session)
 	router.screen_added.connect(_on_screen_added)
@@ -69,7 +83,7 @@ func _handle_back() -> bool:
 ## Ожидающий результат боя важнее World: экран боя восстановит pending без
 ## нового resolver'а и даст его спокойно прочесть и получить.
 static func route_for_continue(target: GameSession) -> String:
-	if target.awaiting_return:
+	if target.awaiting_return or target.checkpoints.has_pending_completion():
 		return "checkpoint"
 	if target.has_pending_battle_result():
 		return "combat"
@@ -96,37 +110,12 @@ static func route_for_continue(target: GameSession) -> String:
 	return "world"
 
 func _on_screen_added(screen: Control) -> void:
-	if screen.has_signal("new_game_requested"):
-		screen.connect("new_game_requested", _on_new_game_requested)
-		screen.connect("continue_requested", _on_continue_requested)
-		screen.call("set_profile_status", save_service.has_profile(save_path), save_service.last_error)
-	if screen.has_signal("claim_requested"):
-		screen.connect("claim_requested", _on_claim_requested)
-	if screen.has_signal("checkpoint_commit_requested"):
-		screen.connect("checkpoint_commit_requested", _on_checkpoint_commit_requested)
-	if screen.has_signal("story_claim_requested"):
-		screen.connect("story_claim_requested", _on_story_claim_requested)
-	if screen.has_signal("sound_change_requested"):
-		screen.connect("sound_change_requested", set_sound_enabled)
-		screen.connect("voice_change_requested", set_voice_id)
-	if screen.has_signal("shop_deal_requested"):
-		screen.connect("shop_deal_requested", _on_shop_deal_requested)
-	if screen.has_signal("guild_registration_requested"):
-		screen.connect("guild_registration_requested", _on_guild_registration_requested)
-	if screen.has_signal("guild_order_requested"):
-		screen.connect("guild_order_requested", _on_guild_order_requested)
-	if screen.has_signal("equipment_upgrade_requested"):
-		screen.connect("equipment_upgrade_requested", _on_equipment_upgrade_requested)
-	if screen.has_signal("grove_command_requested"):
-		screen.connect("grove_command_requested", _on_grove_command_requested)
-	if screen.has_signal("hollow_command_requested"):
-		screen.connect("hollow_command_requested", _on_hollow_command_requested)
-	if screen.has_signal("outpost_command_requested"):
-		screen.connect("outpost_command_requested", _on_outpost_command_requested)
-	if screen.has_signal("travel_requested"):
-		screen.connect("travel_requested", _on_travel_requested)
-	if screen.has_signal("open_bag_requested"):
-		screen.connect("open_bag_requested", _on_open_bag_requested)
+	for command: StringName in _screen_commands:
+		if screen.has_signal(command):
+			screen.connect(command, _screen_commands[command])
+	if screen.has_method("set_profile_status"):
+		var available := save_service.has_profile(save_path)
+		screen.call("set_profile_status", available, save_service.last_error)
 
 func _on_claim_requested(result_id: String) -> void:
 	if not claim_battle_result(result_id):
@@ -146,22 +135,12 @@ func _on_story_claim_requested(reward_id: String) -> void:
 		router.current_screen.call("retry_gift")
 
 func claim_story_reward(reward_id: String) -> bool:
-	if _claim_commit_active or _restoring:
+	var result := _commit_profile_change(func(candidate: GameSession) -> bool: return candidate.claim_story_reward(reward_id))
+	if result != CommitResult.SUCCESS:
+		if result == CommitResult.WRITE_FAILED:
+			_show_notice("Не удалось сохранить подарок. Повторите получение.")
 		return false
-	_claim_commit_active = true
-	var candidate := GameSession.new()
-	candidate.apply_state_dto(save_service.capture(session))
-	var claimed: bool = candidate.claim_story_reward(reward_id)
-	if not claimed or not save_service.save(candidate, save_path):
-		_claim_commit_active = false
-		_show_claim_failure()
-		return false
-	_restoring = true
-	session.apply_state_dto(save_service.capture(candidate))
-	_restoring = false
-	_claim_commit_active = false
-	_connect_session_signals()
-	notice_bar.hide()
+	session.story_reward_claimed.emit(session.last_settlement)
 	return true
 
 ## --- Граница commit сделок лавки ---
@@ -175,57 +154,35 @@ func _on_shop_deal_requested(deal: Dictionary) -> void:
 	commit_shop_deal(deal)
 
 func commit_shop_deal(deal: Dictionary) -> bool:
-	if _shop_commit_active or _claim_commit_active or _restoring or not session.can_trade():
+	if not session.can_trade():
 		return false
-	var kind: String = String(deal.get("kind", ""))
-	if kind not in ["buy", "sell", "exchange"]:
-		return false
-	_shop_commit_active = true
-	var candidate := GameSession.new()
-	candidate.apply_state_dto(save_service.capture(session))
-	var applied: bool = false
+	var result := _commit_profile_change(_apply_shop_deal.bind(deal))
+	var screen := router.current_screen
+	if result == CommitResult.SUCCESS:
+		if screen != null and screen.has_method("deal_committed"):
+			screen.call("deal_committed", session.last_deal)
+		return true
+	if screen != null and screen.has_method("deal_rejected"):
+		var reason := "Не удалось сохранить сделку. Попробуйте ещё раз." if result == CommitResult.WRITE_FAILED else "Условия изменились. Проверьте сумму и количество."
+		screen.call("deal_rejected", reason)
+	return false
+
+func _apply_shop_deal(candidate: GameSession, deal: Dictionary) -> bool:
 	var price: int = int(deal.get("unit_price_copper", -1))
 	var quantity: int = int(deal.get("quantity", 1))
-	match kind:
+	match deal.get("kind", ""):
 		"buy":
-			applied = candidate.buy_item(String(deal.get("offer_id", "")), quantity, price)
+			return candidate.buy_item(String(deal.get("offer_id", "")), quantity, price)
 		"sell":
-			applied = candidate.sell_item(String(deal.get("instance_id", "")), quantity, price, int(deal.get("stock", -1)))
+			return candidate.sell_item(String(deal.get("instance_id", "")), quantity, price, int(deal.get("stock", -1)))
 		"exchange":
-			applied = candidate.exchange_coins(String(deal.get("from_coin", "")), String(deal.get("to_coin", "")), quantity, deal.get("quote", {}))
-	if not applied or not save_service.save(candidate, save_path):
-		_shop_commit_active = false
-		if router.current_screen != null and router.current_screen.has_method("deal_rejected"):
-			var reason := "Не удалось сохранить сделку. Попробуйте ещё раз." if applied else "Условия изменились. Проверьте сумму и количество."
-			router.current_screen.call("deal_rejected", reason)
-		return false
-	var committed_deal: Dictionary = candidate.last_deal.duplicate(true)
-	_restoring = true
-	session.apply_state_dto(save_service.capture(candidate))
-	session.last_deal = committed_deal
-	_restoring = false
-	_shop_commit_active = false
-	_connect_session_signals()
-	notice_bar.hide()
-	if router.current_screen != null and router.current_screen.has_method("deal_committed"):
-		router.current_screen.call("deal_committed", committed_deal)
-	return true
+			return candidate.exchange_coins(String(deal.get("from_coin", "")), String(deal.get("to_coin", "")), quantity, deal.get("quote", {}))
+	return false
 
 func _on_guild_registration_requested() -> void:
 	var screen: Control = router.current_screen
-	if _restoring or not session.can_register_with_guild():
-		return
-	var candidate := GameSession.new()
-	candidate.apply_state_dto(save_service.capture(session))
-	if not candidate.register_with_guild() or not save_service.save(candidate, save_path):
-		screen.call("registration_rejected")
-		return
-	_restoring = true
-	session.apply_state_dto(save_service.capture(candidate))
-	_restoring = false
-	_connect_session_signals()
-	notice_bar.hide()
-	screen.call("registration_committed")
+	var result := _commit_profile_change(func(candidate: GameSession) -> bool: return candidate.register_with_guild())
+	screen.call("registration_committed" if result == CommitResult.SUCCESS else "registration_rejected")
 
 func _on_grove_command_requested(command: String) -> void:
 	var screen: Control = router.current_screen
@@ -300,25 +257,31 @@ func _on_equipment_upgrade_requested(quote: Dictionary) -> void:
 	router.current_screen.call("equipment_upgrade_finished", upgraded, quote)
 
 func _commit_route_change(apply: Callable) -> bool:
-	if _restoring or _expedition_commit_active or _claim_commit_active or _checkpoint_commit_active or _shop_commit_active:
-		return false
-	if session.in_combat or session.checkpoints.channel_active or session.checkpoints.has_pending_completion():
-		return false
-	_expedition_commit_active = true
+	return _commit_profile_change(apply) == CommitResult.SUCCESS
+
+## Check live-only guards before taking the snapshot. Callbacks during publication
+## cannot write an intermediate state or start a nested command.
+func _commit_profile_change(apply: Callable, completing_checkpoint: bool = false) -> CommitResult:
+	if _applying_profile or session.is_transaction_active() or session.in_combat or session.checkpoints.channel_active:
+		return CommitResult.UNAVAILABLE
+	if session.checkpoints.has_pending_completion() != completing_checkpoint:
+		return CommitResult.UNAVAILABLE
+	_applying_profile = true
 	var candidate := GameSession.new()
 	candidate.apply_state_dto(save_service.capture(session))
-	if not apply.call(candidate) or not save_service.save(candidate, save_path):
-		_expedition_commit_active = false
-		return false
-	_restoring = true
-	var receive_fx: bool = session.pending_receive_fx
-	session.apply_state_dto(save_service.capture(candidate))
-	session.pending_receive_fx = receive_fx
-	_restoring = false
-	_expedition_commit_active = false
-	_connect_session_signals()
+	candidate.pending_receive_fx = session.pending_receive_fx
+	var result := CommitResult.REJECTED
+	if apply.call(candidate):
+		result = _save_candidate(candidate)
+	_applying_profile = false
+	return result
+
+func _save_candidate(candidate: GameSession) -> CommitResult:
+	if not save_service.save(candidate, save_path):
+		return CommitResult.WRITE_FAILED
+	session.apply_state_dto(save_service.capture(candidate), candidate)
 	notice_bar.hide()
-	return true
+	return CommitResult.SUCCESS
 
 func _on_open_bag_requested(instance_id: String) -> void:
 	router.go_to("inventory")
@@ -326,27 +289,14 @@ func _on_open_bag_requested(instance_id: String) -> void:
 		router.current_screen.call("open_item", instance_id)
 
 func claim_battle_result(result_id: String) -> bool:
-	if _claim_commit_active or _restoring or result_id.is_empty() or session.pending_battle_result.get("result_id", "") != result_id:
+	if result_id.is_empty() or session.pending_battle_result.get("result_id", "") != result_id:
 		return false
-	_claim_commit_active = true
-	var candidate := GameSession.new()
-	candidate.apply_state_dto(save_service.capture(session))
-	var claimed: bool = candidate.claim_battle_result(result_id)
-	if not claimed or not save_service.save(candidate, save_path):
-		_claim_commit_active = false
-		_show_claim_failure()
+	var result := _commit_profile_change(func(candidate: GameSession) -> bool: return candidate.claim_battle_result(result_id))
+	if result != CommitResult.SUCCESS:
+		if result == CommitResult.WRITE_FAILED:
+			_show_claim_failure()
 		return false
-	var settlement: Dictionary = candidate.last_settlement.duplicate(true)
-	var receive_fx: bool = candidate.pending_receive_fx
-	_restoring = true
-	session.apply_state_dto(save_service.capture(candidate))
-	session.last_settlement = settlement
-	session.pending_receive_fx = receive_fx
-	_restoring = false
-	_claim_commit_active = false
-	_connect_session_signals()
 	session.publish_battle_result_claimed()
-	notice_bar.hide()
 	return true
 
 func _show_claim_failure() -> void:
@@ -371,79 +321,26 @@ func _on_checkpoint_commit_requested(kind: String, payload: Dictionary) -> void:
 			_commit_checkpoint_delete(String(payload.get("checkpoint_id", "")))
 
 func _commit_checkpoint_completion() -> bool:
-	if _checkpoint_commit_active or _restoring:
-		return false
-	if not session.checkpoints.has_pending_completion():
-		return false
-	_checkpoint_commit_active = true
-	var candidate := GameSession.new()
-	candidate.apply_state_dto(save_service.capture(session))
-	candidate.checkpoints.apply_completion()
-	var committed: bool = save_service.save(candidate, save_path)
-	if committed:
-		_restoring = true
-		session.apply_state_dto(save_service.capture(candidate))
-		_restoring = false
-		_connect_session_signals()
-		notice_bar.hide()
-	_checkpoint_commit_active = false
-	if committed:
-		_notify_checkpoint_screen("checkpoint_committed", "completion")
-	else:
-		_notify_checkpoint_screen("show_checkpoint_error", "completion")
-	return committed
+	var result := _commit_profile_change(func(candidate: GameSession) -> bool: return candidate.checkpoints.apply_completion(), true)
+	if result == CommitResult.SUCCESS and session.has_pending_reward() and not session.awaiting_return:
+		router.go_to(route_for_continue(session))
+		return true
+	return _finish_checkpoint_commit(result, "completion")
 
 func _commit_checkpoint_restore(checkpoint_id: String) -> bool:
-	if _checkpoint_commit_active or _restoring or not session.awaiting_return:
-		return false
-	_checkpoint_commit_active = true
-	var candidate := GameSession.new()
-	candidate.apply_state_dto(save_service.capture(session))
-	var plan: Dictionary = candidate.checkpoints.restore_plan(checkpoint_id)
-	if plan.is_empty():
-		_checkpoint_commit_active = false
-		_notify_checkpoint_screen("show_checkpoint_error", "restore")
-		return false
-	candidate.checkpoints.apply_restore_plan(plan)
-	var committed: bool = save_service.save(candidate, save_path)
-	if committed:
-		_restoring = true
-		session.apply_state_dto(save_service.capture(candidate))
-		_restoring = false
-		_connect_session_signals()
-		notice_bar.hide()
-	_checkpoint_commit_active = false
-	if committed:
-		# Возврат применён и записан: FX профиля уже сыграл по profile_changed.
+	var result := _commit_profile_change(func(candidate: GameSession) -> bool: return candidate.checkpoints.restore(checkpoint_id))
+	if result == CommitResult.SUCCESS:
 		router.go_to("world")
-	else:
-		_notify_checkpoint_screen("show_checkpoint_error", "restore")
-	return committed
+		return true
+	return _finish_checkpoint_commit(result, "restore")
 
 func _commit_checkpoint_delete(checkpoint_id: String) -> bool:
-	if _checkpoint_commit_active or _restoring:
-		return false
-	_checkpoint_commit_active = true
-	var candidate := GameSession.new()
-	candidate.apply_state_dto(save_service.capture(session))
-	var plan: Dictionary = candidate.checkpoints.delete_plan(checkpoint_id)
-	if plan.is_empty():
-		_checkpoint_commit_active = false
-		_notify_checkpoint_screen("show_checkpoint_error", "delete")
-		return false
-	candidate.checkpoints.apply_delete_plan(plan)
-	var committed: bool = save_service.save(candidate, save_path)
-	if committed:
-		_restoring = true
-		session.apply_state_dto(save_service.capture(candidate))
-		_restoring = false
-		_connect_session_signals()
-		notice_bar.hide()
-	_checkpoint_commit_active = false
-	if committed:
-		_notify_checkpoint_screen("checkpoint_committed", "delete")
-	else:
-		_notify_checkpoint_screen("show_checkpoint_error", "delete")
+	var result := _commit_profile_change(func(candidate: GameSession) -> bool: return candidate.checkpoints.delete_checkpoint(checkpoint_id))
+	return _finish_checkpoint_commit(result, "delete")
+
+func _finish_checkpoint_commit(result: CommitResult, kind: String) -> bool:
+	var committed := result == CommitResult.SUCCESS
+	_notify_checkpoint_screen("checkpoint_committed" if committed else "show_checkpoint_error", kind)
 	return committed
 
 func _notify_checkpoint_screen(method: String, kind: String) -> void:
@@ -451,28 +348,28 @@ func _notify_checkpoint_screen(method: String, kind: String) -> void:
 		router.current_screen.call(method, kind)
 
 func _on_new_game_requested() -> void:
-	_restoring = true
-	session.new_game()
-	_connect_session_signals()
-	_restoring = false
-	if not save_service.save(session, save_path):
+	if _applying_profile:
+		return
+	_applying_profile = true
+	var candidate := GameSession.new()
+	candidate.combat_format = preferences.combat_format
+	var result := _save_candidate(candidate)
+	_applying_profile = false
+	if result != CommitResult.SUCCESS:
 		_show_notice(save_service.last_error)
 		return
-	notice_bar.hide()
 	router.go_to("prologue")
 
 func _on_continue_requested() -> void:
-	_restoring = true
+	if _applying_profile:
+		return
+	_applying_profile = true
 	var loaded: bool = save_service.load_into(session, save_path)
-	_restoring = false
+	_applying_profile = false
 	if not loaded:
 		_show_notice("Не удалось загрузить профиль. " + save_service.last_error)
 		return
-	session.combat_format = preferences.combat_format
-	session.auto_speed = preferences.auto_speed
-	session.auto_ability = preferences.auto_ability
-	AudioServer.set_bus_mute(0, not preferences.sound_enabled)
-	_connect_session_signals()
+	_apply_preferences()
 	_was_awaiting_return = session.awaiting_return
 	if save_service.loaded_from_backup:
 		_show_notice("Основной файл повреждён. Загружена резервная копия.")
@@ -480,40 +377,40 @@ func _on_continue_requested() -> void:
 		notice_bar.hide()
 	router.go_to(route_for_continue(session))
 
+func _apply_preferences() -> void:
+	session.combat_format = preferences.combat_format
+	session.auto_speed = preferences.auto_speed
+	session.auto_ability = preferences.auto_ability
+	AudioServer.set_bus_mute(0, not preferences.sound_enabled)
+
 func _connect_session_signals() -> void:
-	if not session.profile_changed.is_connected(_on_profile_changed):
-		session.profile_changed.connect(_on_profile_changed)
-	if not session.combat_format_changed.is_connected(_on_combat_format_changed):
-		session.combat_format_changed.connect(_on_combat_format_changed)
-	if not session.auto_speed_changed.is_connected(_on_auto_speed_changed):
-		session.auto_speed_changed.connect(_on_auto_speed_changed)
-	if not session.auto_ability_changed.is_connected(_on_auto_ability_changed):
-		session.auto_ability_changed.connect(_on_auto_ability_changed)
-	if not session.checkpoints.changed.is_connected(_autosave):
-		session.checkpoints.changed.connect(_autosave)
-	_observe_inventory()
+	session.profile_changed.connect(_on_profile_changed)
+	session.combat_format_changed.connect(_on_combat_format_changed)
+	session.auto_speed_changed.connect(_on_auto_speed_changed)
+	session.auto_ability_changed.connect(_on_auto_ability_changed)
+	_observe_profile_services()
 
 func _on_profile_changed() -> void:
 	if _was_awaiting_return and not session.awaiting_return:
 		_show_return_fx()
 	_was_awaiting_return = session.awaiting_return
-	_observe_inventory()
+	_observe_profile_services()
 	_autosave()
 
 func _on_combat_format_changed(format: String) -> void:
-	if _restoring:
+	if _applying_profile:
 		return
 	preferences.combat_format = format
 	_save_preferences()
 
 func _on_auto_speed_changed(speed: int) -> void:
-	if _restoring:
+	if _applying_profile:
 		return
 	preferences.auto_speed = speed
 	_save_preferences()
 
 func _on_auto_ability_changed(enabled: bool) -> void:
-	if _restoring:
+	if _applying_profile:
 		return
 	preferences.auto_ability = enabled
 	_save_preferences()
@@ -534,16 +431,20 @@ func _save_preferences() -> bool:
 	_show_notice("Не удалось сохранить настройки. Повторите выбор.")
 	return false
 
-func _observe_inventory() -> void:
-	if _observed_inventory == session.inventory:
-		return
-	if _observed_inventory != null:
-		_observed_inventory.changed.disconnect(_autosave)
-	_observed_inventory = session.inventory
-	_observed_inventory.changed.connect(_autosave)
+func _observe_profile_services() -> void:
+	if _observed_inventory != session.inventory:
+		if _observed_inventory != null:
+			_observed_inventory.changed.disconnect(_autosave)
+		_observed_inventory = session.inventory
+		_observed_inventory.changed.connect(_autosave)
+	if _observed_checkpoints != session.checkpoints:
+		if _observed_checkpoints != null:
+			_observed_checkpoints.changed.disconnect(_autosave)
+		_observed_checkpoints = session.checkpoints
+		_observed_checkpoints.changed.connect(_autosave)
 
 func _autosave() -> bool:
-	if _restoring or session.in_combat or session.checkpoints.channel_active or session.is_transaction_active():
+	if _applying_profile or session.in_combat or session.checkpoints.channel_active or session.is_transaction_active():
 		return true
 	if save_service.save(session, save_path):
 		notice_bar.hide()

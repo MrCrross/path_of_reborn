@@ -31,8 +31,8 @@ func configure(host: Control, session: GameSession) -> void:
 func go_to(scene_id: String) -> bool:
 	var open_hero: bool = scene_id == "hero_profile"
 	var screen_id: String = "characters" if open_hero else scene_id
-	if scene_id == "world" and _session.location_id == GameSession.LOCATION_GUILD_ORDER:
-		screen_id = "guild_orders"
+	if scene_id == "combat" and _session.checkpoints.has_pending_completion():
+		screen_id = "checkpoint"
 	elif scene_id == "guild_from_orders":
 		screen_id = "guild"
 	elif scene_id == "guild_order_detail":

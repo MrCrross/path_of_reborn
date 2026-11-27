@@ -975,24 +975,27 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        288,
-        384
+        166,
+        460
       ],
-      "sha256": "76c54c2cca435359ee4e947325d15845e812d956b616c902ecdf96e3a3d4e049",
-      "rgba_sha256": "c8146562938c6214bc6f5bfffca058e8c3028c834a847cebb4019036139d8c67",
+      "sha256": "f2aaea3d77a082c01f21ba13b97f985e1e85da42a24578b1ba8c9741aaab899b",
+      "rgba_sha256": "f0dad3e7403e81f25beba70d844e1c134741f506980df208dc72c0994fec4689",
       "priority": "P0",
       "source": {
-        "export": "art_working/guild_stage_2026_11_22/exports/midori_registrar_idle.png",
-        "export_sha256": "76c54c2cca435359ee4e947325d15845e812d956b616c902ecdf96e3a3d4e049",
+        "export": "art_working/guild_portrait_polish_2026_11_27/midori_registrar_idle.png",
+        "export_sha256": "f2aaea3d77a082c01f21ba13b97f985e1e85da42a24578b1ba8c9741aaab899b",
         "manifest": "art_working/identity_p0_2026_11_18/manifest.json",
         "original": "art_working/identity_p0_2026_11_18/chr_08/source/midori_registrar_idle_v01.png",
         "original_sha256": "817bb0b212e346556b1f382b1fdf3e0e93ec4fc8d4bce8bc073b510fccaf955a",
         "prompt": "art_working/identity_p0_2026_11_18/chr_08/prompt_v01.txt",
-        "prompt_sha256": "0b47153665a2707d25f231d43206a67e9313d290395ac277384437d5d9d3645e"
+        "prompt_sha256": "0b47153665a2707d25f231d43206a67e9313d290395ac277384437d5d9d3645e",
+        "previous_export": "art_working/guild_stage_2026_11_22/exports/midori_registrar_idle.png",
+        "revision": "2026-11-27 guild cast",
+        "hd_processing": "Trim original to alpha >=16 bounds, fit to twice the previous silhouette, add 2 px transparent padding"
       },
       "pivot": [
-        144,
-        336
+        84,
+        458
       ]
     },
     {
@@ -1029,24 +1032,27 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        288,
-        384
+        220,
+        508
       ],
-      "sha256": "fbb86014a6eedcc044c256fc997c6b8dfd6894386b59f2e49f36138116fd69c7",
-      "rgba_sha256": "2e1cf7c56cb63885f4a0679bbd1782058e8c4cda329ee8ce2f5509d99643efcb",
+      "sha256": "f0e052b4f2cd38025fff841968dc827e447aad519ba092f51b55b9fbe3e95921",
+      "rgba_sha256": "04a743a590ddb6f9a7523aa47d4a61a5cf829068bc3ac71023b05ea945d62936",
       "priority": "P1",
       "source": {
-        "export": "art_working/guild_stage_2026_11_22/exports/goro_guildmaster_idle.png",
-        "export_sha256": "fbb86014a6eedcc044c256fc997c6b8dfd6894386b59f2e49f36138116fd69c7",
+        "export": "art_working/guild_portrait_polish_2026_11_27/goro_guildmaster_idle.png",
+        "export_sha256": "f0e052b4f2cd38025fff841968dc827e447aad519ba092f51b55b9fbe3e95921",
         "manifest": "art_working/lioren_gate_and_guild_p1_2026_11_18/manifest.json",
         "original": "art_working/lioren_gate_and_guild_p1_2026_11_18/chr_10/source/goro_guildmaster_idle_v01.png",
         "original_sha256": "d0a0e2ce582feccd9e7cdc549350a714059f190fd898d85a24e49dd6085d1da3",
         "prompt": "art_working/lioren_gate_and_guild_p1_2026_11_18/chr_10/prompt_v01.txt",
-        "prompt_sha256": "80ce491a9891f10940d9a2bf382a7ce02930d269755d3587a7ec50ab8e92451e"
+        "prompt_sha256": "80ce491a9891f10940d9a2bf382a7ce02930d269755d3587a7ec50ab8e92451e",
+        "previous_export": "art_working/guild_stage_2026_11_22/exports/goro_guildmaster_idle.png",
+        "revision": "2026-11-27 guild cast",
+        "hd_processing": "Trim original to alpha >=16 bounds, fit to twice the previous silhouette, add 2 px transparent padding"
       },
       "pivot": [
-        144,
-        336
+        110,
+        506
       ]
     },
     {
@@ -1083,24 +1089,27 @@
       "kind": "texture",
       "status": "approved",
       "size": [
-        288,
-        384
+        208,
+        462
       ],
-      "sha256": "9f71fb0fd11236eaa0173fd5488281d25f777dbdca239f2b8ac42990895d5e30",
-      "rgba_sha256": "ab783732e60aab9ab2c37d5994f2da9606c5725798efc8fea4d76d74aebff5a5",
+      "sha256": "5d153dbb2e4fd43fb362c79e895e65478476d783cfeed80b43028dc44cfd6e96",
+      "rgba_sha256": "04c6bb09140de98919971bbc2cfbc1dd553f68c98423b89d155acfde0558a365",
       "priority": "P1",
       "source": {
-        "export": "art_working/guild_stage_2026_11_22/exports/kenta_novice_idle.png",
-        "export_sha256": "9f71fb0fd11236eaa0173fd5488281d25f777dbdca239f2b8ac42990895d5e30",
+        "export": "art_working/guild_portrait_polish_2026_11_27/kenta_novice_idle.png",
+        "export_sha256": "5d153dbb2e4fd43fb362c79e895e65478476d783cfeed80b43028dc44cfd6e96",
         "manifest": "art_working/whispering_grove_p1_2026_11_18/manifest.json",
         "original": "art_working/whispering_grove_p1_2026_11_18/chr_12/source/kenta_novice_idle_v01.png",
         "original_sha256": "cabb655ca0d50d483d036b7712fe97e64e8c58c8564a580375673221d36d6261",
         "prompt": "art_working/whispering_grove_p1_2026_11_18/chr_12/prompt_v01.txt",
-        "prompt_sha256": "7ce59ce020e09b13648891440d38aca8b2681089b12628217677d333ce752480"
+        "prompt_sha256": "7ce59ce020e09b13648891440d38aca8b2681089b12628217677d333ce752480",
+        "previous_export": "art_working/guild_stage_2026_11_22/exports/kenta_novice_idle.png",
+        "revision": "2026-11-27 guild cast",
+        "hd_processing": "Trim original to alpha >=16 bounds, fit to twice the previous silhouette, add 2 px transparent padding"
       },
       "pivot": [
-        144,
-        336
+        104,
+        460
       ]
     },
     {

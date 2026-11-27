@@ -219,6 +219,10 @@ func _test_shop_and_travel(context: TestContext) -> void:
 	context.check(returning.can_trade() and returning.buy_item("wanderer_jacket", 1, 12) and not returning.world_flags.has(GameSession.WORLD_FLAG_SHOP_FIRST_SALE_DONE), "A funded player can buy before the first sale")
 	var stack: ItemInstance = returning.inventory.add(returning.get_item_definition("echo_crystal"), 3, "moss")[0]
 	context.check(not returning.sell_item(stack.instance_id, 1, 19, 3) and stack.quantity == 3, "A stale sale price leaves the stack intact")
+	returning.inventory.changed.connect(func() -> void:
+		context.check(returning.is_transaction_active(), "Inventory observers see the pending sale")
+		context.check(not returning.sell_item(stack.instance_id), "An inventory observer cannot start a second sale during settlement")
+	, CONNECT_ONE_SHOT)
 	context.check(returning.sell_item(stack.instance_id, 1, 20, 3) and stack.quantity == 2, "A partial sale leaves the correct remainder")
 	context.check(not returning.sell_item(stack.instance_id, 1, 20, 3) and returning.wallet[GameSession.COPPER] == 20, "A repeated confirmation with the old stock credits no additional money")
 	context.check(GameSession.trade_total(GameSession.MAX_ASTRAS, 2) == 0, "An overflowing trade total is rejected before multiplication")

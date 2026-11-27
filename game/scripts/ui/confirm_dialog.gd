@@ -85,7 +85,10 @@ func _setup(
 		_confirm.focus_neighbor_bottom = _confirm.get_path_to(_cancel)
 		_cancel.focus_neighbor_top = _cancel.get_path_to(_confirm)
 		_cancel.focus_neighbor_bottom = _cancel.get_path_to(_confirm)
-	_confirm.grab_focus()
+	if danger and _cancel.visible:
+		_cancel.grab_focus()
+	else:
+		_confirm.grab_focus()
 
 
 func _on_confirm_pressed() -> void:
@@ -100,8 +103,8 @@ func _on_cancel_pressed() -> void:
 	if _closed:
 		return
 	_closed = true
-	cancelled.emit()
 	close()
+	cancelled.emit()
 
 
 func _on_outside_pressed(event: InputEvent = null) -> void:
@@ -111,6 +114,7 @@ func _on_outside_pressed(event: InputEvent = null) -> void:
 		pressed = pressed or (event is InputEventScreenTouch and (event as InputEventScreenTouch).pressed)
 		if not pressed:
 			return
+		get_viewport().set_input_as_handled()
 	_on_cancel_pressed()
 
 

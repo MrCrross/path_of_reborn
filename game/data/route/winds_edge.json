@@ -9,7 +9,7 @@
         {"id": "raven_free", "actor_id": "ash_raven"},
         {"id": "raven_held", "actor_id": "ash_raven", "initial_stun_ticks": 115}
       ],
-      "ally_warning_ticks": [1, 44],
+      "ally_warning_ticks": [1, 22],
       "xp": 4,
       "rewards": [{"item_id": "old_masonry_shard", "quantity": 1}]
     },

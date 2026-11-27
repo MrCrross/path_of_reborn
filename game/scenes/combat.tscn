@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" path="res://art/environments/first_breath_trail_background.png" id="2_bg"]
 [ext_resource type="Texture2D" path="res://art/effects/attack_zone_telegraph_01.png" id="3_telegraph"]
 [ext_resource type="Script" path="res://scripts/ui/combat_result_view.gd" id="4_result"]
-[ext_resource type="Script" path="res://scripts/ui/item_details_view.gd" id="5_details"]
+[ext_resource type="PackedScene" path="res://scenes/ui/item_details_overlay.tscn" id="5_details"]
 [ext_resource type="Script" path="res://scripts/ui/safe_area.gd" id="6_safe"]
 [ext_resource type="Script" path="res://scripts/ui/equipment_strip.gd" id="7_equipment"]
 
@@ -59,7 +59,9 @@ offset_right = 24.0
 offset_bottom = 20.0
 mouse_filter = 2
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_outline_color = Color(0.09, 0.10, 0.07, 1)
+theme_override_constants/outline_size = 3
 
 [node name="HudSafeArea" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -228,35 +230,8 @@ theme_override_font_sizes/font_size = 12
 text = "II"
 accessibility_name = "Пауза"
 
-[node name="DetailsLayer" type="Control" parent="."]
+[node name="DetailsLayer" parent="." instance=ExtResource("5_details")]
 unique_name_in_owner = true
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Dim" type="ColorRect" parent="DetailsLayer"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.03, 0.04, 0.05, 0.55)
-
-[node name="DetailsView" type="PanelContainer" parent="DetailsLayer"]
-unique_name_in_owner = true
-layout_mode = 1
-anchor_left = 0.04
-anchor_top = 0.10
-anchor_right = 0.96
-anchor_bottom = 0.90
-grow_horizontal = 2
-grow_vertical = 2
-script = ExtResource("5_details")
 
 [node name="PauseLayer" type="Control" parent="."]
 unique_name_in_owner = true
@@ -351,7 +326,6 @@ horizontal_alignment = 1
 [connection signal="pressed" from="HudSafeArea/Hud/Actions/AbilityButton" to="." method="_on_ability_pressed"]
 [connection signal="pressed" from="HudSafeArea/Hud/Actions/DodgeButton" to="." method="_on_dodge_pressed"]
 [connection signal="pressed" from="HudSafeArea/Hud/PauseButton" to="." method="_on_pause_pressed"]
-[connection signal="gui_input" from="DetailsLayer/Dim" to="." method="_on_details_dismiss"]
 [connection signal="pressed" from="PauseLayer/SafeArea/Center/Panel/Inset/Column/ResumeButton" to="." method="_on_resume_pressed"]
 [connection signal="pressed" from="PauseLayer/SafeArea/Center/Panel/Inset/Column/FormatSwitch" to="." method="_on_format_switch_pressed"]
 [connection signal="pressed" from="PauseLayer/SafeArea/Center/Panel/Inset/Column/SpeedSwitch" to="." method="_on_speed_switch_pressed"]

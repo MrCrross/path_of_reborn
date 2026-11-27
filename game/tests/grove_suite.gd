@@ -51,7 +51,7 @@ func _at_hounds(noise: bool = false, xp: int = 16) -> GameSession:
 	return session
 
 func _at_clearing(xp: int = 16) -> GameSession:
-	var session: GameSession = _at_hounds(false, xp)
+	var session: GameSession = _at_hounds(true, xp)
 	_win(session.start_combat("needle_hound"))
 	DomainSuite.claim_pending(session)
 	see(session, 7)
@@ -118,7 +118,7 @@ func _test_targets(context: TestContext) -> void:
 func _test_kenta(context: TestContext) -> void:
 	var save := SaveService.new()
 	for choice: String in GameSession.GROVE_KENTA_CHOICES:
-		var session: GameSession = _at_hounds()
+		var session: GameSession = _at_hounds(true)
 		_win(session.start_combat("needle_hound"))
 		DomainSuite.claim_pending(session)
 		context.check(not session.apply_grove_command(choice), "Choice is gated by the opening dialogue")
@@ -138,7 +138,7 @@ func _test_kenta(context: TestContext) -> void:
 
 func _test_pollen(context: TestContext) -> void:
 	for dodge: bool in [false, true]:
-		var session: GameSession = _at_hounds()
+		var session: GameSession = _at_hounds(true)
 		_win(session.start_combat("needle_hound"))
 		DomainSuite.claim_pending(session)
 		see(session, 7)
@@ -169,7 +169,7 @@ func _test_pollen(context: TestContext) -> void:
 
 func _test_progress(context: TestContext) -> void:
 	var save := SaveService.new()
-	var session: GameSession = _at_hounds()
+	var session: GameSession = _at_hounds(true)
 	_win(session.start_combat("needle_hound"))
 	context.check(save.save(session, SAVE_PATH), "Pending Grove result saves as v7")
 	var restored := GameSession.new()
@@ -225,6 +225,13 @@ func _test_technique(context: TestContext) -> void:
 	context.check(damages[1] > damages[0], "The mastered technique increases vulnerability contact damage")
 
 func _test_balance(context: TestContext) -> void:
+	var direct: GameSession = _at_hounds()
+	direct.choose_upgrade("strength")
+	var jacket: ItemInstance = direct.inventory.add(direct.get_item_definition("wanderer_jacket"), 1)[0]
+	direct.equip_item(jacket.instance_id)
+	var hounds: CombatResolver = direct.start_combat("needle_hound")
+	hounds.advance_ticks(1200)
+	context.check(hounds.won and direct.hero.current_hp < direct.hero.max_hp, "The equipped level-two hero survives the direct approach and takes damage")
 	for xp: int in [16, 48]:
 		for format: String in [GameSession.COMBAT_FORMAT_AUTO, GameSession.COMBAT_FORMAT_ACTIVE]:
 			for combat_seed: int in [11, 22, 33]:

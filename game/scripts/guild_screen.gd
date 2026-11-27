@@ -387,8 +387,8 @@ func _layout_actors() -> void:
 	$Shizuka.position = Vector2(size.x * 0.50, origin.y + 231.0 * art_scale).round()
 	$Akari.position = Vector2(size.x * 0.34, origin.y + 231.0 * art_scale).round()
 	$Merchant.scale = Vector2.ONE * 0.39 * pair_scale
-	$Kenta.scale = Vector2.ONE * 0.52 * pair_scale
-	$Midori.scale = Vector2.ONE * 0.44 * art_scale
-	$Goro.scale = Vector2.ONE * 0.56 * art_scale
+	$Kenta.scale = Vector2.ONE * 0.26 * pair_scale
+	$Midori.scale = Vector2.ONE * 0.22 * art_scale
+	$Goro.scale = Vector2.ONE * 0.28 * art_scale
 	$Shizuka.scale = Vector2.ONE * 0.38 * pair_scale
-	$Akari.scale = Vector2.ONE * pair_scale
+	$Akari.scale = Vector2.ONE * 0.36 * pair_scale

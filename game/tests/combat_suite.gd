@@ -72,17 +72,21 @@ func _test_slime_boundaries(context: TestContext) -> void:
 	context.check(combat.hero.current_hp == 12, "Startup cannot deal early damage")
 	combat.advance_ticks(1)
 	context.check(combat.enemy_phase == CombatResolver.Phase.ACTIVE, "Startup enters active on its exact boundary")
-	context.check(combat.hero.current_hp == 11, "Slime active entry applies its damage")
+	context.check(combat.hero.current_hp == combat.hero.max_hp - _enemy_hit(combat), "Slime active entry applies its damage")
+
+func _enemy_hit(combat: CombatResolver) -> int:
+	return CharacterState.calculate_damage(combat.enemy.strength, combat.hero.defense, combat.enemy.definition.attack_multiplier)
 
 func _test_goblin_cycle(context: TestContext) -> void:
 	var combat := _combat(GOBLIN_PATH)
 	combat.advance_ticks(combat.enemy.definition.telegraph_ticks + combat.enemy.definition.startup_ticks)
 	context.check(combat.enemy_phase == CombatResolver.Phase.ACTIVE and combat.strike_index == 0, "Goblin starts the first slash")
-	context.check(combat.hero.current_hp == 11, "First slash deals its configured damage")
+	var hit: int = _enemy_hit(combat)
+	context.check(combat.hero.current_hp == combat.hero.max_hp - hit, "First slash deals its configured damage")
 	combat.advance_ticks(combat.enemy.definition.active_ticks)
 	context.check(combat.enemy_phase == CombatResolver.Phase.STARTUP and combat.strike_index == 1, "First slash leads into the second startup")
 	combat.advance_ticks(combat.enemy.definition.startup_ticks)
-	context.check(combat.enemy_phase == CombatResolver.Phase.ACTIVE and combat.hero.current_hp == 10, "Second slash deals damage once on entry")
+	context.check(combat.enemy_phase == CombatResolver.Phase.ACTIVE and combat.hero.current_hp == combat.hero.max_hp - 2 * hit, "Second slash deals damage once on entry")
 	combat.advance_ticks(combat.enemy.definition.active_ticks + combat.enemy.definition.recovery_ticks)
 	context.check(combat.enemy_phase == CombatResolver.Phase.VULNERABILITY, "Retreat ends in a vulnerability window")
 
@@ -94,11 +98,11 @@ func _test_dodge(context: TestContext) -> void:
 	context.check(success.hero.current_hp == 12, "Timed dodge prevents active damage")
 	var failure := _combat()
 	failure.advance_ticks(failure.enemy.definition.telegraph_ticks + failure.enemy.definition.startup_ticks)
-	context.check(failure.hero.current_hp == 11, "No dodge means the hit lands")
+	context.check(failure.hero.current_hp == failure.hero.max_hp - _enemy_hit(failure), "No dodge means the hit lands")
 	var early := _combat()
 	early.request_dodge()
 	early.advance_ticks(early.enemy.definition.telegraph_ticks + early.enemy.definition.startup_ticks)
-	context.check(early.hero.current_hp == 11, "An early dodge expires before the hit")
+	context.check(early.hero.current_hp == early.hero.max_hp - _enemy_hit(early), "An early dodge expires before the hit")
 
 func _test_attack_windows(context: TestContext) -> void:
 	var cooldown := _combat(GOBLIN_PATH)
@@ -125,12 +129,13 @@ func _test_attack_windows(context: TestContext) -> void:
 
 func _test_damage_once(context: TestContext) -> void:
 	var combat := _combat()
+	var hp_after_hit: int = combat.hero.max_hp - _enemy_hit(combat)
 	combat.advance_ticks(combat.enemy.definition.telegraph_ticks + combat.enemy.definition.startup_ticks)
-	context.check(combat.hero.current_hp == 11, "Active entry deals one hit")
+	context.check(combat.hero.current_hp == hp_after_hit, "Active entry deals one hit")
 	combat.advance_ticks(combat.enemy.definition.active_ticks - 1)
-	context.check(combat.hero.current_hp == 11 and combat.enemy_phase == CombatResolver.Phase.ACTIVE, "Remaining active ticks do not repeat damage")
+	context.check(combat.hero.current_hp == hp_after_hit and combat.enemy_phase == CombatResolver.Phase.ACTIVE, "Remaining active ticks do not repeat damage")
 	combat.advance_ticks(1)
-	context.check(combat.enemy_phase == CombatResolver.Phase.RECOVERY and combat.hero.current_hp == 11, "Recovery starts without another hit")
+	context.check(combat.enemy_phase == CombatResolver.Phase.RECOVERY and combat.hero.current_hp == hp_after_hit, "Recovery starts without another hit")
 
 func _test_reachable_victory(context: TestContext) -> void:
 	for path: String in [SLIME_PATH, GOBLIN_PATH]:
@@ -146,6 +151,7 @@ func _test_reachable_victory(context: TestContext) -> void:
 func _test_auto_attack(context: TestContext) -> void:
 	for path: String in [SLIME_PATH, GOBLIN_PATH]:
 		var combat := _combat(path, true)
+		combat.auto_dodge_enabled = true
 		var signals := SignalCounter.new()
 		combat.hero_attack_begun.connect(func(_run_id: String) -> void: signals.begun += 1)
 		combat.hero_attack_landed.connect(func(_run_id: String, _target: String, _amount: int) -> void: signals.landed += 1)
@@ -280,12 +286,18 @@ func _test_auto_dodge_policy(context: TestContext) -> void:
 	var slime := _combat(SLIME_PATH, true)
 	slime.auto_dodge_enabled = true
 	var attempts: Array[String] = []
+	var contacts: Array[int] = []
 	slime.dodge_begun.connect(func(source: String) -> void: attempts.append(source))
+	var record_contact: Callable = func(_success: bool) -> void: contacts.append(slime.tick_count)
+	slime.dodge_resolved.connect(record_contact)
 	while not slime.is_finished and slime.tick_count < 3000:
 		slime.advance_ticks(1)
+	slime.dodge_resolved.disconnect(record_contact)
 	context.check(slime.won, "Auto defense still wins the ordinary fight")
 	context.check(attempts.size() >= 2, "Auto defense attempts at least twice over the fight")
-	context.check(attempts.size() < slime.enemy.definition.attacks_per_cycle * 3 + 3, "Auto defense does not cover every cycle")
+	context.check(attempts.size() < contacts.size(), "Auto defense does not cover every cycle")
+	context.check(contacts.size() >= 3 and contacts[0] >= 30 and contacts[0] <= 45 and contacts[1] - contacts[0] <= 80, "First slime gives a readable warning and keeps up pressure")
+	context.check(slime.hero.max_hp - slime.hero.current_hp >= 3, "The starter loses at least a quarter of his health on full auto")
 	var goblin := _combat(GOBLIN_PATH, true)
 	goblin.auto_dodge_enabled = true
 	# Лямбды над локальными int в раннере ненадёжны — считаем через массивы.
@@ -494,6 +506,10 @@ func _test_trial_echo_rollback(context: TestContext) -> void:
 		ordinary.advance_ticks(6000)
 		DomainSuite.claim_pending(session)
 		session.choose_upgrade("strength")
+	# Дайдзиро вручает меч после победы над разведчиком, до испытания.
+	session.world_flags["daijiro_intervened"] = true
+	session.world_flags["daijiro_introduction_completed"] = true
+	context.check(session.prepare_daijiro_sword_reward() and session.choose_story_reward("daijiro_sword_01", "equip") and session.claim_story_reward(GameSession.DAIJIRO_SWORD_REWARD_ID), "Equip the earned story sword for the post-trail trial")
 	session.checkpoints.begin()
 	session.checkpoints.advance_ticks(CheckpointService.CHANNEL_TICKS)
 	session.checkpoints.apply_completion()
@@ -587,8 +603,9 @@ func _test_auto_speed_determinism(context: TestContext) -> void:
 			frames += 1
 		context.check(resolver.won and observed_speed == speed, "Auto ×%d finishes with its fixed encounter timing" % speed)
 		var pending: Dictionary = session.pending_battle_result.duplicate(true)
-		context.check(session._settled_run_ids.size() == 1 and not pending.is_empty(), "Auto ×%d performs exactly one terminal loot roll" % speed)
 		context.check(DomainSuite.claim_pending(session), "Auto ×%d claims its fixed result" % speed)
+		var settled_rng: int = session.loot_rng.state
+		context.check(not session.settle_combat(resolver.run_id, "moss_slime") and session.loot_rng.state == settled_rng and not session.has_pending_battle_result(), "Auto ×%d consumes the terminal loot roll exactly once" % speed)
 		for signal_name: String in ["phase_changed", "damage_dealt", "dodge_resolved", "hero_attack_begun", "finished"]:
 			for connection: Dictionary in resolver.get_signal_connection_list(signal_name):
 				resolver.disconnect(signal_name, connection["callable"])

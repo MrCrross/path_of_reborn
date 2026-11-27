@@ -46,6 +46,8 @@ func _run() -> void:
 		await _read(world.grove_route.dialogue)
 		if window_size.y != 800:
 			await _click(_node("GroveNoise"))
+		else:
+			_check(_game.session.choose_upgrade("strength"), "The direct approach uses the level earned on the trail")
 		await _click(_node("GroveFight"))
 		var combat: Control = _game.router.current_screen
 		if not _check(combat.name == "Combat", "First encounter starts through World"):
@@ -76,7 +78,7 @@ func _run() -> void:
 		await _read(world.grove_route.dialogue)
 		_check(world.art_background.texture == ArtMap.texture(ArtMap.BACKGROUNDS["grove_bridge"]) and not world.hero_sprite.visible, "Kenta remains in the bridge shot during the decision")
 		_check(not world.traces_label.is_visible_in_tree() and not world.hero_label.is_visible_in_tree() and world.map_button.is_visible_in_tree(), "Bridge choices keep the map while clearing the HUD from Kenta's face")
-		_check(not world.upgrade_button.visible and world.inventory_button.is_visible_in_tree(), "The route choices have room and upgrades remain reachable from the bag")
+		_check(world.inventory_button.is_visible_in_tree() and world.map_button.text.is_empty(), "The bridge uses the same bag and map icons as the trail")
 		await _capture("06_kenta_choices")
 		if window_size.y == 800:
 			await _click(_node("KentaSafe"))

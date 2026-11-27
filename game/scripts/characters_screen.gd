@@ -11,7 +11,6 @@ var catalog_buttons: Dictionary[String, Button] = {}
 
 var _open_hero_on_ready: bool = false
 var _hero_art: AtlasTexture
-var _focus_guard := ModalFocus.new()
 
 @onready var back_button: Button = %BackButton
 @onready var catalog: ScrollContainer = %Catalog
@@ -23,8 +22,8 @@ var _focus_guard := ModalFocus.new()
 @onready var familiar_option: OptionButton = %FamiliarOption
 @onready var familiar_button: Button = %FamiliarButton
 @onready var equipment_strip: EquipmentStrip = %EquipmentStrip
-@onready var details_layer: Control = %ItemDetailsLayer
-@onready var details_view: ItemDetailsView = %ItemDetails
+@onready var details_layer: ItemDetailsOverlay = %ItemDetailsLayer
+@onready var details_view: ItemDetailsView = details_layer.view
 
 func configure(game_session: GameSession, open_hero: bool = false) -> void:
 	session = game_session
@@ -48,9 +47,7 @@ func _ready() -> void:
 	equipment_strip.empty_slot_requested.connect(_on_empty_slot)
 	equipment_strip.familiar_requested.connect(_show_familiar)
 	details_view.configure(session, true)
-	details_view.close_requested.connect(_close_details)
 	details_view.action_requested.connect(_on_item_action)
-	$ItemDetailsLayer/Dim.gui_input.connect(_on_details_dismiss)
 	strength_upgrade.pressed.connect(_choose_upgrade.bind("strength"))
 	hp_upgrade.pressed.connect(_choose_upgrade.bind("max_hp"))
 	familiar_option.accessibility_name = "Фамильяр Харуто"
@@ -61,13 +58,16 @@ func _ready() -> void:
 	if _open_hero_on_ready:
 		_open_character(HERO_ID)
 		if upgrade_row.visible:
-			strength_upgrade.grab_focus()
+			# Opening from the upgrade action puts the choices below the level summary.
+			%Progression.get_parent().move_child(%Progression, 1)
+			strength_upgrade.grab_focus.call_deferred()
+			profile.set_deferred("scroll_vertical", 0)
 	else:
 		_show_catalog()
 
 func handle_back() -> bool:
 	if details_layer.visible:
-		_close_details()
+		details_layer.dismiss()
 	elif profile.visible and not _open_hero_on_ready:
 		_show_catalog(selected_character_id)
 	else:
@@ -184,12 +184,12 @@ func _on_profile_changed() -> void:
 		_refresh()
 	else:
 		if details_layer.visible:
-			_close_details()
+			details_layer.dismiss()
 		_show_catalog()
 
 func _refresh_background() -> void:
-	var key: String = "world_lioren" if session.location_id == "lioren" else "world_forest_edge"
-	var texture: Texture2D = ArtMap.texture(ArtMap.BACKGROUNDS[key])
+	var location: String = session.guild_order_location() if session.location_id == GameSession.LOCATION_GUILD_ORDER else session.location_id
+	var texture: Texture2D = ArtMap.world_background(location)
 	%CatalogArt.texture = texture
 	%StageArt.texture = texture
 
@@ -210,7 +210,7 @@ func _refresh_progression(state: CharacterState) -> void:
 	var required_xp: int = state.xp_to_next_level()
 	var has_next: bool = required_xp > 0
 	var gains: Dictionary[String, int] = state.upgrade_gains()
-	%NextLevel.text = "Следующий уровень · %d" % (state.level + 1) if has_next else "Максимальный уровень"
+	%NextLevel.text = "До уровня %d" % (state.level + 1) if has_next else "Максимальный уровень"
 	%Experience.text = "%d / %d XP" % [state.experience, required_xp]
 	%Experience.visible = has_next
 	%ExperienceBar.visible = has_next
@@ -288,12 +288,8 @@ func _choose_upgrade(upgrade_id: String) -> void:
 		back_button.grab_focus()
 
 func _open_details(instance_id: String) -> void:
-	if not details_view.present_instance(instance_id):
-		return
-	%SlotHint.hide()
-	details_layer.show()
-	_focus_guard.capture(details_layer)
-	details_view.close_button.grab_focus()
+	if details_layer.open_instance(instance_id):
+		%SlotHint.hide()
 
 func _on_empty_slot(slot_id: String) -> void:
 	%SlotHint.text = "Слот «%s» пуст. Вещи можно надеть в рюкзаке." % UiText.slot(slot_id)
@@ -304,12 +300,3 @@ func _on_item_action(instance_id: String, slot_id: String, equipped: bool) -> vo
 	if changed:
 		%SlotHint.hide()
 		details_view.present_instance(instance_id)
-
-func _close_details() -> void:
-	details_layer.hide()
-	_focus_guard.restore()
-
-func _on_details_dismiss(event: InputEvent) -> void:
-	if (event is InputEventScreenTouch and event.pressed) or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
-		get_viewport().set_input_as_handled()
-		_close_details()

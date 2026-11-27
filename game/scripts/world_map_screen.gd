@@ -110,6 +110,8 @@ func handle_back() -> bool:
 func _get_current_point() -> String:
 	if city_map:
 		return CITY_GATE
+	if session.location_id == GameSession.LOCATION_GUILD_ORDER:
+		return session.guild_order_location()
 	if session.location_id == GameSession.LOCATION_HOLLOW:
 		match session.hollow_stage():
 			"elite": return GameSession.MAP_HOLLOW_BASIN
@@ -117,11 +119,13 @@ func _get_current_point() -> String:
 	return session.location_id
 
 func _add_point(destination: String) -> void:
-	if destination != CITY_GATE and not session.has_visited_map_location(destination):
+	if destination != CITY_GATE and destination != _current_point and not session.has_visited_map_location(destination):
 		return
 	var details: Array = POINTS[destination]
 	var city_entrance: bool = destination == GameSession.LOCATION_LIOREN and session.location_id == destination
 	var blocker: String = "" if destination == CITY_GATE or city_entrance else session.map_travel_blocker(destination)
+	if destination == _current_point and session.location_id == GameSession.LOCATION_GUILD_ORDER:
+		blocker = "current"
 	var button := Button.new()
 	button.name = details[0]
 	button.text = details[1]
@@ -254,8 +258,8 @@ func _prepare_lioren_return() -> void:
 					grove_command_committed("decline_point")
 				else:
 					var confirm: ConfirmDialog = ConfirmDialog.open(
-						self, "Вернуться в Лиорен?", "Печать Пути сохранит эту поляну как точку возврата после поражения.",
-						"Уйти без точки", "Остаться"
+						self, "Вернуться в Лиорен?", "Поляна пока не закреплена. Поставьте здесь Печать, чтобы вернуться сюда после поражения.",
+						"Уйти без точки", "Остаться", true
 					)
 					confirm.confirmed.connect(func() -> void: grove_command_requested.emit("decline_point"))
 				return

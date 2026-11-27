@@ -8,12 +8,10 @@ var equipment: Dictionary = {}
 var character_equipment: Dictionary = {}
 var next_serial: int = 1
 
-var _hero: CharacterState
 var _definitions: Dictionary
 var _characters: Dictionary = {}
 
 func _init(hero: CharacterState, definitions: Dictionary) -> void:
-	_hero = hero
 	_definitions = definitions
 	_characters["haruto"] = hero
 
@@ -86,14 +84,13 @@ func equip(instance_id: String, character_id: String = "haruto") -> bool:
 	if slots.get(definition.slot_id, "") == instance_id:
 		return true
 	var previous_owner: String = _owner_for_instance(instance_id)
+	var replaced: String = slots.get(definition.slot_id, "")
 	if not previous_owner.is_empty():
-		unequip(definition.slot_id, previous_owner)
-	if slots.has(definition.slot_id):
-		unequip(definition.slot_id, character_id)
+		equipment_for(previous_owner).erase(definition.slot_id)
 	slots[definition.slot_id] = instance_id
-	if character_id != "haruto":
-		character_equipment[character_id] = slots
-	state.set_modifiers(instance_id, equipment_modifiers(definition, item.level))
+	if not previous_owner.is_empty():
+		character_state(previous_owner).remove_modifiers(instance_id)
+	state.set_modifiers(instance_id, equipment_modifiers(definition, item.level), replaced)
 	changed.emit()
 	return true
 

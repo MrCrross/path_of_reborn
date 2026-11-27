@@ -1,8 +1,10 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/world.gd" id="1_world"]
 [ext_resource type="Texture2D" path="res://art/characters/haruto_exiled_idle.png" id="2_hero"]
 [ext_resource type="Script" path="res://scripts/ui/safe_area.gd" id="3_safe"]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/item_details_overlay.tscn" id="4_details"]
 
 [node name="World" type="Control"]
 layout_mode = 3
@@ -157,6 +159,53 @@ mouse_filter = 2
 layout_mode = 2
 theme_override_constants/separation = 4
 
+[node name="OrderActions" type="VBoxContainer" parent="Margin/Column/BottomColumn"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="OrderObjective" type="Label" parent="Margin/Column/BottomColumn/OrderActions"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_outline_color = Color(0.06, 0.11, 0.08, 1)
+theme_override_constants/outline_size = 3
+
+[node name="Destinations" type="HBoxContainer" parent="Margin/Column/BottomColumn/OrderActions"]
+layout_mode = 2
+
+[node name="OrderFight" type="Button" parent="Margin/Column/BottomColumn/OrderActions/Destinations"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 24)
+theme_type_variation = &"PrimaryButton"
+text = "В бой"
+
+[node name="OrderToReport" type="Button" parent="Margin/Column/BottomColumn/OrderActions/Destinations"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 24)
+theme_type_variation = &"PrimaryButton"
+text = "К отчёту"
+
+[node name="OrderShop" type="Button" parent="Margin/Column/BottomColumn/OrderActions/Destinations"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 24)
+text = "В Лавку"
+
+[node name="OrderGuild" type="Button" parent="Margin/Column/BottomColumn/OrderActions/Destinations"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 24)
+text = "В Гильдию"
+
 [node name="UpgradeButton" type="Button" parent="Margin/Column/BottomColumn"]
 unique_name_in_owner = true
 visible = false
@@ -165,12 +214,6 @@ custom_minimum_size = Vector2(0, 26)
 theme_type_variation = &"PrimaryButton"
 theme_override_font_sizes/font_size = 9
 text = "Выбрать улучшение"
-
-[node name="RepeatsButton" type="Button" parent="Margin/Column/BottomColumn"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-custom_minimum_size = Vector2(24, 24)
 
 [node name="MainActionButton" type="Button" parent="Margin/Column/BottomColumn"]
 unique_name_in_owner = true
@@ -186,12 +229,12 @@ layout_mode = 2
 alignment = 1
 theme_override_constants/separation = 3
 
-[node name="InventoryButton" type="Button" parent="Margin/Column/BottomColumn/NavBar"]
+[node name="CheckpointButton" type="Button" parent="Margin/Column/BottomColumn/NavBar"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 
-[node name="CheckpointButton" type="Button" parent="Margin/Column/BottomColumn/NavBar"]
+[node name="InventoryButton" type="Button" parent="Margin/Column/BottomColumn/NavBar"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
@@ -201,21 +244,30 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 
+[node name="MapButton" type="Button" parent="Margin/Column/BottomColumn/NavBar"]
+unique_name_in_owner = true
+layout_mode = 2
+
 [node name="RestButton" type="Button" parent="Margin/Column/BottomColumn/NavBar"]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 
-[node name="MapButton" type="Button" parent="Margin/Column/BottomColumn/NavBar"]
+[node name="RepeatsButton" type="Button" parent="Margin/Column/BottomColumn/NavBar"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
+custom_minimum_size = Vector2(24, 24)
+
+[node name="ItemDetailsLayer" parent="." instance=ExtResource("4_details")]
+unique_name_in_owner = true
 
 [connection signal="pressed" from="Margin/Column/TopBar/Row/LeftZone/SettingsButton" to="." method="_on_settings_pressed"]
 [connection signal="pressed" from="Margin/Column/TopBar/Row/RightZone/BalanceButton" to="." method="_on_balance_pressed"]
 [connection signal="pressed" from="Margin/Column/BottomColumn/UpgradeButton" to="." method="_on_hero_profile_pressed"]
 [connection signal="pressed" from="Margin/Column/BottomColumn/MainActionButton" to="." method="_on_main_action_pressed"]
-[connection signal="pressed" from="Margin/Column/BottomColumn/RepeatsButton" to="." method="_on_repeats_pressed"]
+[connection signal="pressed" from="Margin/Column/BottomColumn/NavBar/RepeatsButton" to="." method="_on_repeats_pressed"]
 [connection signal="pressed" from="Margin/Column/BottomColumn/NavBar/InventoryButton" to="." method="_on_inventory_pressed"]
 [connection signal="pressed" from="Margin/Column/BottomColumn/NavBar/CheckpointButton" to="." method="_on_checkpoint_pressed"]
 [connection signal="pressed" from="Margin/Column/BottomColumn/NavBar/CharactersButton" to="." method="_on_characters_pressed"]

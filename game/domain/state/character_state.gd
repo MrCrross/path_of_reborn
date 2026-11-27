@@ -132,9 +132,11 @@ func choose_upgrade(upgrade_id: String) -> bool:
 	recompute_stats()
 	return true
 
-func set_modifiers(source_id: String, modifiers: Array[StatModifierDefinition]) -> bool:
+func set_modifiers(source_id: String, modifiers: Array[StatModifierDefinition], replaced_source: String = "") -> bool:
 	if source_id.is_empty():
 		return false
+	# Clamp current HP against the final equipment set when replacing a slot.
+	_modifiers.erase(replaced_source)
 	_modifiers[source_id] = modifiers.duplicate()
 	recompute_stats()
 	return true

@@ -49,6 +49,7 @@ func _test_channel_completion(context: TestContext) -> void:
 	session.checkpoints.advance_ticks(1)
 	context.check(not session.checkpoints.channel_active and session.checkpoints.manual_snapshots.is_empty(), "300 ticks stage the point without publishing it")
 	context.check(session.checkpoints.has_pending_completion(), "Completion is staged for the application commit")
+	context.check(session.start_combat("moss_slime") == null and not session.in_combat, "A staged point must be saved before the next fight starts")
 	context.check(not session.checkpoints.begin(), "A new channel cannot start while a completion is staged")
 	context.check(session.checkpoints.apply_completion() and session.checkpoints.manual_snapshots.size() == 1, "Applying the staged completion creates one point")
 	context.check(not session.checkpoints.apply_completion(), "Applying the staged completion is a single-shot no-op")

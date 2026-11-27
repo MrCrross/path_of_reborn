@@ -6,11 +6,11 @@
 script = ExtResource("1_actor")
 id = "ash_raven"
 display_name = "Пепельный ворон"
-max_hp = 8
-strength = 3
-telegraph_ticks = 53
+max_hp = 13
+strength = 5
+telegraph_ticks = 31
 startup_ticks = 14
-active_ticks = 10
-recovery_ticks = 17
-vulnerability_ticks = 39
+active_ticks = 8
+recovery_ticks = 11
+vulnerability_ticks = 22
 vulnerability_multiplier = 1.45

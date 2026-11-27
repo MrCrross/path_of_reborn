@@ -3,7 +3,7 @@
   {"id":"DIA_INTRO_002","speaker":"Харуто / мысли","text":"Мама написала. Отвечу дома. Дома будет тише. Дома будет… позже.","shot":"routine","enter":"","once":true},
   {"id":"TUT_STORY_002","kind":"look","shot":"crosswalk","text":"Проведите взглядом к дороге: коснитесь отмеченной области или проведите по ней.","enter":"approach","once":true,"first_pass":true},
   {"id":"DIA_INTRO_003","speaker":"Харуто / мысли","text":"Слишком быстро. Он вообще видит переход?","shot":"crosswalk","enter":"","once":true},
-  {"id":"DIA_INTRO_004","speaker":"Харуто","text":"Эй! Стой! Там машина!","shot":"alarm","enter":"signal","once":true,"first_pass":true},
+  {"id":"DIA_INTRO_004","speaker":"Харуто","text":"Эй! Стой! Там машина!","shot":"alarm","enter":"","once":true,"first_pass":true},
   {"id":"DIA_INTRO_005","speaker":"Харуто / мысли","text":"Ноги? Сейчас было бы очень удобно вспомнить, зачем вы нужны.","shot":"alarm","enter":"","once":true},
   {"id":"DIA_INTRO_006","speaker":"Харуто / мысли","text":"Ремешок. Могу дотянуться. Хотя бы до ремешка.","shot":"alarm","enter":"","once":true},
   {"id":"TUT_STORY_003","kind":"hold","shot":"alarm","text":"Удерживайте, чтобы сделать шаг вперёд.","enter":"","once":true,"first_pass":true},

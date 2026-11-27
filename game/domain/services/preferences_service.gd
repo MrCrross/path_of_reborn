@@ -1,6 +1,7 @@
 class_name PreferencesService
 extends RefCounted
 
+const AtomicJsonFile = preload("res://domain/services/atomic_json_file.gd")
 const CURRENT_VERSION: int = 1
 const AUTO_SPEEDS: Array[int] = [1, 2]
 
@@ -41,36 +42,8 @@ func save_preferences(path: String) -> bool:
 	if not _valid(dto):
 		last_error = "Настройки не прошли проверку"
 		return false
-	var make_error: Error = DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(path.get_base_dir()))
-	if make_error != OK:
-		last_error = "Не удалось создать каталог настроек: %s" % error_string(make_error)
-		return false
-	var temp_path: String = path + ".tmp"
-	var backup_path: String = path + ".bak"
-	var file: FileAccess = FileAccess.open(temp_path, FileAccess.WRITE)
-	if file == null:
-		last_error = "Не удалось открыть временный файл настроек: %s" % error_string(FileAccess.get_open_error())
-		return false
-	file.store_string(JSON.stringify(dto, "\t"))
-	file.flush()
-	var write_error: Error = file.get_error()
-	file.close()
-	if write_error != OK:
-		_remove(temp_path)
-		last_error = "Не удалось записать настройки: %s" % error_string(write_error)
-		return false
-	if FileAccess.file_exists(path) and not _read(path).is_empty():
-		var copy_error: Error = DirAccess.copy_absolute(ProjectSettings.globalize_path(path), ProjectSettings.globalize_path(backup_path))
-		if copy_error != OK:
-			_remove(temp_path)
-			last_error = "Не удалось обновить резервную копию настроек: %s" % error_string(copy_error)
-			return false
-	var rename_error: Error = DirAccess.rename_absolute(ProjectSettings.globalize_path(temp_path), ProjectSettings.globalize_path(path))
-	if rename_error != OK:
-		_remove(temp_path)
-		last_error = "Не удалось заменить файл настроек: %s" % error_string(rename_error)
-		return false
-	return true
+	last_error = AtomicJsonFile.write(path, dto, func(current: String) -> bool: return not _read(current).is_empty())
+	return last_error.is_empty()
 
 func capture_dto() -> Dictionary:
 	return {
@@ -93,14 +66,19 @@ func _read(path: String) -> Dictionary:
 	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
 	if file == null:
 		return {}
+	var text: String = file.get_as_text()
+	var read_error: Error = file.get_error()
+	file.close()
+	if read_error != OK:
+		return {}
 	var parser := JSON.new()
-	if parser.parse(file.get_as_text()) != OK or typeof(parser.data) != TYPE_DICTIONARY:
+	if parser.parse(text) != OK or typeof(parser.data) != TYPE_DICTIONARY:
 		return {}
 	var dto: Dictionary = parser.data
 	return dto if _valid(dto) else {}
 
 func _valid(dto: Dictionary) -> bool:
-	if typeof(dto.get("schema_version")) not in [TYPE_INT, TYPE_FLOAT] or int(dto.get("schema_version", -1)) != CURRENT_VERSION:
+	if typeof(dto.get("schema_version")) not in [TYPE_INT, TYPE_FLOAT] or dto["schema_version"] != CURRENT_VERSION:
 		return false
 	if typeof(dto.get("sound_enabled")) != TYPE_BOOL or typeof(dto.get("voice_id")) != TYPE_STRING:
 		return false
@@ -108,8 +86,5 @@ func _valid(dto: Dictionary) -> bool:
 		return false
 	if typeof(dto.get("auto_ability", true)) != TYPE_BOOL:
 		return false
-	return typeof(dto.get("auto_speed")) in [TYPE_INT, TYPE_FLOAT] and int(dto.get("auto_speed", 0)) in AUTO_SPEEDS
-
-func _remove(path: String) -> void:
-	if FileAccess.file_exists(path):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	var speed: Variant = dto.get("auto_speed")
+	return typeof(speed) in [TYPE_INT, TYPE_FLOAT] and speed == int(speed) and int(speed) in AUTO_SPEEDS

@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/characters_screen.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/ui/safe_area.gd" id="2"]
 [ext_resource type="Script" path="res://scripts/ui/equipment_strip.gd" id="3"]
-[ext_resource type="Script" path="res://scripts/ui/item_details_view.gd" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/ui/item_details_overlay.tscn" id="4"]
 
 [node name="Characters" type="Control"]
 layout_mode = 3
@@ -114,11 +114,15 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 10
+autowrap_mode = 3
 
 [node name="Power" type="Label" parent="Margin/Column/Profile/Contents/Summary"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 11
+autowrap_mode = 3
+horizontal_alignment = 2
 
 [node name="Stage" type="PanelContainer" parent="Margin/Column/Profile/Contents"]
 layout_mode = 2
@@ -162,6 +166,7 @@ autowrap_mode = 3
 horizontal_alignment = 1
 
 [node name="Progression" type="PanelContainer" parent="Margin/Column/Profile/Contents"]
+unique_name_in_owner = true
 layout_mode = 2
 
 [node name="Inset" type="MarginContainer" parent="Margin/Column/Profile/Contents/Progression"]
@@ -183,6 +188,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 10
+autowrap_mode = 3
 
 [node name="Experience" type="Label" parent="Margin/Column/Profile/Contents/Progression/Inset/ProgressionStack/ProgressHeader"]
 unique_name_in_owner = true
@@ -206,6 +212,7 @@ autowrap_mode = 3
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 9
+autowrap_mode = 3
 
 [node name="UpgradeRow" type="HBoxContainer" parent="Margin/Column/Profile/Contents/Progression/Inset/ProgressionStack"]
 unique_name_in_owner = true
@@ -258,32 +265,5 @@ custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 theme_override_font_sizes/font_size = 9
 
-[node name="ItemDetailsLayer" type="Control" parent="."]
+[node name="ItemDetailsLayer" parent="." instance=ExtResource("4")]
 unique_name_in_owner = true
-visible = false
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-mouse_filter = 0
-
-[node name="Dim" type="ColorRect" parent="ItemDetailsLayer"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-color = Color(0.02, 0.03, 0.05, 0.8)
-
-[node name="SafeArea" type="MarginContainer" parent="ItemDetailsLayer"]
-mouse_filter = 2
-script = ExtResource("2")
-padding = 7
-
-[node name="Center" type="VBoxContainer" parent="ItemDetailsLayer/SafeArea"]
-layout_mode = 2
-mouse_filter = 2
-alignment = 1
-
-[node name="ItemDetails" type="PanelContainer" parent="ItemDetailsLayer/SafeArea/Center"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 240)
-layout_mode = 2
-script = ExtResource("4")

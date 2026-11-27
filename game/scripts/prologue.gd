@@ -13,7 +13,6 @@ var runner: DialogueRunner
 
 @onready var background: ColorRect = %Background
 @onready var shot_frame: TextureRect = %ShotFrame
-@onready var signal_prop: TextureRect = %SignalProp
 @onready var action_sprite: AnimatedSprite2D = %ActionSprite
 @onready var full_clip: AnimatedSprite2D = %FullClip
 @onready var hotspot_marker: Panel = %HotspotMarker
@@ -87,7 +86,6 @@ func _ready() -> void:
 	_hero_push = ArtMap.sprite_frames(ArtMap.HERO_MODERN["push"], 8.0)
 	for clip_name: String in ArtMap.MITSUKI_FULL:
 		_mitsuki_clips[clip_name] = ArtMap.sprite_frames(ArtMap.MITSUKI_FULL[clip_name], 2.5)
-	signal_prop.texture = ArtMap.texture(ArtMap.PROPS["pedestrian_signal"])
 	debug_panel.visible = DebugFlags.ui_enabled
 	plan_caption.visible = DebugFlags.ui_enabled
 	dialogue_panel.gui_input.connect(_gui_input)
@@ -434,8 +432,6 @@ func _refresh_art(kind: String, cue: Dictionary, shot: String) -> void:
 		ArtMap.apply_animation_transform(full_clip, ArtMap.MITSUKI_FULL[full_name])
 		full_clip.show()
 		full_clip.play(&"default")
-	# Светофор появляется в тревожном плане (cue signal).
-	signal_prop.visible = shot == "alarm" and enter == "signal"
 	# Актёрский оверлей: Юи на переходе; толчок — только если план не содержит
 	# героя в кадре (иначе дубль).
 	if kind == "hold" and not PrologueStaging.is_actor_overlay_suppressed(shot):

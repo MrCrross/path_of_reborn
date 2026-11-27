@@ -22,10 +22,13 @@ var _session: GameSession
 var _entry: Dictionary = {}
 var _can_equip: bool = false
 var _processing: bool = false
-var _pointer: Dictionary = {}
+enum DragAxis { UNDECIDED, HORIZONTAL, VERTICAL }
+
+var _pointer: InputEvent
+var _touches_down: Dictionary[Vector2i, bool] = {}
 var _origin: Vector2 = Vector2.ZERO
 var _drag: Vector2 = Vector2.ZERO
-var _axis: String = ""
+var _axis := DragAxis.UNDECIDED
 
 func _ready() -> void:
 	theme_type_variation = &"ArenaPanel"
@@ -118,9 +121,7 @@ func can_claim() -> bool:
 
 func _reset_input() -> void:
 	_processing = false
-	_pointer = {}
-	_axis = ""
-	_reset_card()
+	_cancel_gesture()
 
 func _show_summary(button: Button) -> void:
 	card.hide()
@@ -225,6 +226,7 @@ func _choose(action: String) -> void:
 func _open_details() -> void:
 	if _processing or _entry.is_empty():
 		return
+	_cancel_gesture()
 	item_requested.emit(_entry)
 
 func _on_card_input(event: InputEvent) -> void:
@@ -238,84 +240,86 @@ func _on_card_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 			_choose("equip")
 		return
-	if event is InputEventMouseButton and (event.device == InputEvent.DEVICE_ID_EMULATION or event.button_index != MOUSE_BUTTON_LEFT):
+	# GUI hit testing owns the start. A press on the info button or on a
+	# modal over the card must never become a reward choice.
+	if _pointer != null or _touches_down.size() > 1:
 		return
-	if event is InputEventScreenTouch or event is InputEventMouseButton:
-		var kind: String = "touch" if event is InputEventScreenTouch else "mouse"
-		var index: int = event.index if event is InputEventScreenTouch else event.button_index
-		if event.pressed:
-			if not _pointer.is_empty():
-				return
-			_pointer = {"kind": kind, "index": index, "device": event.device}
-			# Координаты жеста храним во вьюпорте: gui_input даёт локальные
-			# точки, а добор жеста в _input — вьюпортные.
-			_origin = card.get_global_transform() * event.position
-			_drag = Vector2.ZERO
-			_axis = ""
+	if event is InputEventScreenTouch:
+		if not event.pressed or event.canceled:
 			return
-		if _pointer.is_empty() or _pointer["kind"] != kind or _pointer["index"] != index or _pointer["device"] != event.device:
-			# Второй pointer/чужое отпускание отменяет кандидат: жест одного
-			# пальца нельзя подтвердить отпусканием другого.
-			if not _pointer.is_empty():
-				_pointer = {}
-				_axis = ""
-				_reset_card()
+	elif event is InputEventMouseButton:
+		if not event.pressed or event.device == InputEvent.DEVICE_ID_EMULATION or event.button_index != MOUSE_BUTTON_LEFT:
 			return
-		_finish_gesture(card.get_global_transform() * event.position, event is InputEventScreenTouch and event.canceled)
-	elif (event is InputEventScreenDrag or event is InputEventMouseMotion) and not _pointer.is_empty():
-		var matches: bool = (event is InputEventScreenDrag and _pointer["kind"] == "touch" and event.index == _pointer["index"]) or (event is InputEventMouseMotion and _pointer["kind"] == "mouse")
-		if matches:
-			_track_drag(card.get_global_transform() * event.position)
+	else:
+		return
+	_pointer = event
+	_origin = card.get_global_transform_with_canvas() * event.position
+	card.accept_event()
 
 func _input(event: InputEvent) -> void:
-	# Motion и release могут попасть мимо сдвинувшейся карточки (у мыши нет
-	# implicit capture, как у touch), поэтому активный жест добираем здесь.
-	# _input вызывается раньше gui_input, повторное отпускание в карточке
-	# увидит пустой _pointer и проигнорируется.
-	if _pointer.is_empty():
+	if card == null or not card.is_visible_in_tree():
 		return
-	if event is InputEventScreenDrag or event is InputEventMouseMotion:
-		var motion_matches: bool = (event is InputEventScreenDrag and _pointer["kind"] == "touch" and event.index == _pointer["index"] and event.device == _pointer["device"]) or (event is InputEventMouseMotion and _pointer["kind"] == "mouse")
-		if motion_matches:
-			_track_drag(event.position)
-	elif event is InputEventScreenTouch or event is InputEventMouseButton:
-		var release_matches: bool = (event is InputEventScreenTouch and _pointer["kind"] == "touch" and event.index == _pointer["index"] and event.device == _pointer["device"]) or (event is InputEventMouseButton and _pointer["kind"] == "mouse" and event.button_index == _pointer["index"])
-		if release_matches and not event.pressed:
-			_finish_gesture(event.position, event is InputEventScreenTouch and event.canceled)
+	if event is InputEventScreenTouch:
+		var finger := Vector2i(event.device, event.index)
+		if event.pressed and not event.canceled:
+			_touches_down[finger] = true
+			if _pointer != null:
+				_cancel_gesture()
+				get_viewport().set_input_as_handled()
+			return
+		_touches_down.erase(finger)
+	if _pointer == null or event.device != _pointer.device:
+		return
+	# Track in viewport coordinates even when the moving card leaves the
+	# pointer. The release belongs to this gesture, including when canceled.
+	if _pointer is InputEventScreenTouch:
+		if event is not InputEventScreenTouch and event is not InputEventScreenDrag:
+			return
+		if event.index != _pointer.index:
+			return
+	elif event is not InputEventMouseMotion:
+		if event is not InputEventMouseButton or event.button_index != MOUSE_BUTTON_LEFT or event.pressed:
+			return
+	get_viewport().set_input_as_handled()
+	if event is InputEventMouseMotion or event is InputEventScreenDrag:
+		_track_drag(event.position)
+	else:
+		_finish_gesture(event.position, event.canceled)
 
 func _track_drag(position: Vector2) -> void:
 	_drag = position - _origin
-	if _axis.is_empty() and _drag.length() >= 4.0:
-		_axis = "horizontal" if absf(_drag.x) > absf(_drag.y) * 1.25 else "vertical"
-	if _axis == "vertical" or (_axis == "horizontal" and absf(_drag.y) > SWIPE_VERTICAL_LIMIT and absf(_drag.y) > absf(_drag.x) * 0.75):
-		_axis = "vertical"
+	if _axis == DragAxis.UNDECIDED and _drag.length() >= 4.0:
+		_axis = DragAxis.HORIZONTAL if absf(_drag.x) > absf(_drag.y) * 1.25 else DragAxis.VERTICAL
+	if _axis == DragAxis.VERTICAL or (_axis == DragAxis.HORIZONTAL and absf(_drag.y) > SWIPE_VERTICAL_LIMIT and absf(_drag.y) > absf(_drag.x) * 0.75):
+		_axis = DragAxis.VERTICAL
 		_reset_card()
-	elif _axis == "horizontal":
+	elif _axis == DragAxis.HORIZONTAL:
 		card.position.x = clampf(_drag.x, -28.0, 28.0)
 
 func _finish_gesture(position: Vector2, canceled: bool) -> void:
-	_drag = position - _origin
-	_pointer = {}
-	if not canceled and _axis == "horizontal" and absf(_drag.x) >= SWIPE_THRESHOLD:
-		var action: String = "store" if _drag.x < 0 else "equip"
-		card.position.x = 0
+	_track_drag(position)
+	var action: String = ""
+	if _axis == DragAxis.HORIZONTAL and absf(_drag.x) >= SWIPE_THRESHOLD:
+		action = "store" if _drag.x < 0 else "equip"
+	elif _axis == DragAxis.UNDECIDED:
+		action = "store"
+	_cancel_gesture()
+	if not canceled and not action.is_empty():
 		_choose(action)
-	elif not canceled and _axis.is_empty():
-		# Короткое касание карточки — эквивалент явного «Взять».
-		card.position.x = 0
-		_choose("store")
-	else:
-		_reset_card()
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
-		_pointer = {}
-		_axis = ""
-		if card != null:
-			_reset_card()
+		_touches_down.clear()
+		_cancel_gesture()
+
+func _cancel_gesture() -> void:
+	_pointer = null
+	_axis = DragAxis.UNDECIDED
+	_reset_card()
 
 func _reset_card() -> void:
-	card.position.x = 0
+	if card != null:
+		card.position.x = 0
 	_drag = Vector2.ZERO
 
 func _fit_to_content() -> void:

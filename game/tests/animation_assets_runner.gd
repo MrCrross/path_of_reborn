@@ -93,6 +93,7 @@ func _run() -> void:
 	host.queue_free()
 	await process_frame
 	await _frame_contracts()
+	await _rescue_goblin_frames()
 	await _weapon_contracts()
 	if "--force-failure" in OS.get_cmdline_user_args():
 		_check(false, "intentional runner exit-code check")
@@ -135,11 +136,15 @@ func _frame_contracts() -> void:
 	screen._finish_intro()
 	screen.resolver.advance_ticks(1)
 	_check(screen.hero_sprite.sprite_frames == screen.arena_presenter._hero_frames["attack"]["frames"] and screen.hero_sprite.frame == 0, "hero startup begins on the preparation frame")
-	screen.resolver.advance_ticks(18)
-	_check(screen.resolver.tick_count == 19 and screen.hero_sprite.frame == 2, "hero first landed tick 19 uses the branch extension frame")
-	_check(screen.resolver.enemy.current_hp == 17, "hero contact pose follows resolver damage, not a new hit")
-	screen.resolver.advance_ticks(60)
-	_check(screen.resolver.tick_count == 79 and screen.arena_presenter._hero_clip_name == "dodge", "hero second landed tick 79 preserves the higher-priority dodge pose")
+	var hero_startup: int = screen.resolver.hero.definition.attack_startup_ticks
+	var expected_damage := CharacterState.calculate_damage(screen.resolver.hero.strength, screen.resolver.enemy.defense, screen.resolver.enemy.definition.guarded_damage_multiplier)
+	screen.resolver.advance_ticks(hero_startup)
+	_check(screen.resolver.tick_count == 1 + hero_startup and screen.hero_sprite.frame == 2, "the first contact uses the branch extension frame")
+	_check(screen.resolver.enemy.current_hp == screen.resolver.enemy.max_hp - expected_damage, "the contact pose matches one hit")
+	_check(screen.enemy_sprite.sprite_frames == screen.arena_presenter._enemy_frames["hit"]["frames"], "HP refresh preserves the slime's real hit reaction")
+	var attack_interval: int = screen.resolver.hero.definition.attack_cooldown_ticks
+	screen.resolver.advance_ticks(attack_interval)
+	_check(screen.resolver.tick_count == 1 + hero_startup + attack_interval and screen.arena_presenter._hero_clip_name == "dodge", "the second hero contact preserves the higher-priority dodge pose")
 	screen.hero_sprite.set_frame_and_progress(2, 0.5)
 	screen.arena_presenter._on_hero_attack_begun("guarded-startup")
 	_check(screen.hero_sprite.frame == 2 and screen.hero_sprite.frame_progress == 0.5, "an attack blocked by dodge priority does not rewind the dodge")
@@ -173,18 +178,28 @@ func _frame_contracts() -> void:
 	if goblin.arena_presenter._intro_tween != null:
 		goblin.arena_presenter._intro_tween.kill()
 	goblin._finish_intro()
-	goblin.resolver.advance_ticks(37)
+	var battle: CombatResolver = goblin.resolver
+	battle.advance_ticks(battle.phase_ticks_remaining)
 	_check(goblin.enemy_sprite.frame == CombatArenaPresenter.GOBLIN_PREPARE_FRAMES[0], "goblin first startup has an explicit preparation frame")
 	_check(goblin.hero_sprite.sprite_frames == goblin.arena_presenter._hero_frames["dodge"]["frames"], "auto dodge presentation starts from the resolver event")
 	goblin.arena_presenter._on_damage_dealt("goblin_scout", 0)
 	_check(not goblin.arena_presenter._enemy_frames.has("hit") and goblin.enemy_sprite.sprite_frames == goblin.arena_presenter._enemy_frames["attack"]["frames"], "goblin hit during startup uses the explicit no-hit-clip fallback without creating damage")
-	goblin.resolver.advance_ticks(11)
-	_check(goblin.resolver.tick_count == 48 and goblin.enemy_sprite.frame == CombatArenaPresenter.GOBLIN_CONTACT_FRAMES[0], "goblin first contact at tick 48 uses its own contact frame")
-	_check(goblin.resolver.hero.current_hp == goblin.resolver.hero.max_hp, "auto dodge covers the first mapped goblin contact")
-	goblin.resolver.advance_ticks(18)
-	_check(goblin.resolver.tick_count == 66 and goblin.resolver.strike_index == 1 and goblin.enemy_sprite.frame == CombatArenaPresenter.GOBLIN_CONTACT_FRAMES[1], "goblin second contact at tick 66 does not depend on clip timing")
+	_check(goblin.phase_cue.text == "Замах", "The preparation phase has a readable cue near the attacker")
+	goblin._set_pause(true)
+	goblin._set_pause(false)
+	_check(not goblin.enemy_sprite.is_playing(), "Resume preserves a strike frame held by the resolver")
+	battle.advance_ticks(battle.phase_ticks_remaining)
+	_check(battle.enemy_phase == CombatResolver.Phase.ACTIVE and battle.strike_index == 0 and goblin.enemy_sprite.frame == CombatArenaPresenter.GOBLIN_CONTACT_FRAMES[0], "the first slash shows its contact frame on impact")
+	_check(battle.hero.current_hp == battle.hero.max_hp, "auto dodge covers the first mapped goblin contact")
+	battle.advance_ticks(battle.phase_ticks_remaining)
+	battle.advance_ticks(battle.phase_ticks_remaining)
+	_check(battle.enemy_phase == CombatResolver.Phase.ACTIVE and battle.strike_index == 1 and goblin.enemy_sprite.frame == CombatArenaPresenter.GOBLIN_CONTACT_FRAMES[1], "the second slash shows its distinct contact frame on impact")
 	_check(goblin.hero_sprite.sprite_frames == goblin.arena_presenter._hero_frames["hit"]["frames"], "second contact switches to hit only after real dodge expiry")
-	_check(goblin.resolver.hero.current_hp == goblin.resolver.hero.max_hp - 1, "second contact follows the real dodge expiry rather than the animation")
+	var slash_damage := CharacterState.calculate_damage(battle.enemy.strength, battle.hero.defense, battle.enemy.definition.attack_multiplier)
+	_check(battle.hero.current_hp == battle.hero.max_hp - slash_damage, "the second contact lands after dodge expiry")
+	while not battle.is_finished and battle.enemy_phase != CombatResolver.Phase.VULNERABILITY:
+		battle.advance_ticks(battle.phase_ticks_remaining)
+	_check(goblin.phase_cue.text == "Уязвим" and not goblin.telegraph.visible, "The opening replaces the danger warning")
 	goblin.resolver.enemy.current_hp = 1
 	while not goblin.resolver.is_finished and goblin.resolver.tick_count < 200:
 		goblin.resolver.advance_ticks(1)
@@ -193,6 +208,35 @@ func _frame_contracts() -> void:
 	goblin.queue_free()
 	await process_frame
 	fixture_host.queue_free()
+	await process_frame
+
+func _rescue_goblin_frames() -> void:
+	var session := GameSession.new()
+	preload("res://tests/grove_suite.gd").at_guild(session)
+	session.quest_flags["guild_order_completed_hollow_hunt"] = true
+	session.apply_guild_order_command("accept", "road_rescue")
+	session.guild_order["cleared"] = 2
+	session.apply_guild_order_command("depart", "road_rescue")
+	session.select_encounter(session.guild_order_stage()["enemy_id"])
+	session.set_combat_format(GameSession.COMBAT_FORMAT_ACTIVE)
+	var screen: Control = load("res://scenes/combat.tscn").instantiate()
+	screen.configure(session)
+	root.add_child(screen)
+	screen.set_physics_process(false)
+	screen.arena_presenter._intro_tween.kill()
+	screen._finish_intro()
+	var resolver: CombatResolver = screen.resolver
+	var first: CombatResolver.EnemySlot = resolver.enemy_slots[0]
+	_check(resolver.enemy_slots.size() == 2, "The rescue encounter includes the reinforcement")
+	resolver.advance_ticks(first.remaining)
+	_check(screen.enemy_sprite.frame == CombatArenaPresenter.GOBLIN_PREPARE_FRAMES[0], "A rescue scout holds its first windup")
+	resolver.advance_ticks(first.remaining)
+	_check(screen.enemy_sprite.frame == CombatArenaPresenter.GOBLIN_CONTACT_FRAMES[0], "A rescue scout uses its double-slash contact frame")
+	resolver.advance_ticks(first.remaining)
+	_check(screen.enemy_sprite.frame == CombatArenaPresenter.GOBLIN_PREPARE_FRAMES[1], "The second rescue swing has a distinct windup")
+	resolver.advance_ticks(first.remaining)
+	_check(screen.enemy_sprite.frame == CombatArenaPresenter.GOBLIN_CONTACT_FRAMES[1], "The second rescue contact matches the real strike")
+	screen.queue_free()
 	await process_frame
 
 func _weapon_contracts() -> void:

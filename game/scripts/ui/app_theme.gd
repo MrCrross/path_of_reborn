@@ -17,7 +17,7 @@ const COLOR_PANEL_BORDER := Color("49634f")
 const COLOR_HUD := Color("14241be8")
 const COLOR_DANGER := Color("e68c78")
 const COLOR_DANGER_PRESSED := Color("b86e5c")
-const COLOR_DANGER_TEXT := Color("202016")
+const COLOR_DANGER_TEXT := COLOR_TEXT
 const COLOR_HERO_HP := Color("b9d99a")
 const COLOR_ENEMY_HP := Color("e68c78")
 const COLOR_PROGRESS := Color("e4bd6c")
@@ -137,8 +137,9 @@ static func build() -> Theme:
 	theme.set_stylebox("pressed", "DangerButton", flat(Color("47231c"), Color("6d382c")))
 	theme.set_stylebox("disabled", "DangerButton", flat(Color("33201c"), Color("412a24")))
 	theme.set_stylebox("focus", "DangerButton", focus_box())
-	theme.set_color("font_color", "DangerButton", COLOR_DANGER_TEXT)
-	theme.set_color("font_disabled_color", "DangerButton", Color("7d6a63"))
+	for state: String in ["font_color", "font_focus_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color"]:
+		theme.set_color(state, "DangerButton", COLOR_DANGER_TEXT)
+	theme.set_color("font_disabled_color", "DangerButton", COLOR_TEXT_DIM)
 
 	# ProgressBar.
 	theme.set_stylebox("background", "ProgressBar", flat(Color("101a13"), Color("1a2820")))

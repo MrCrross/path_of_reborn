@@ -38,7 +38,7 @@ var session: GameSession
 var _set_fx_tween: Tween
 ## Выбранная в режиме возврата опция: {kind, id, label}.
 var _selected_option: Dictionary = {}
-var _built_signature: String = ""
+var _selected_button: Button
 ## Последнее запрошенное действие commit: {kind, checkpoint_id}. Хранится
 ## и после неудачи — кнопка повтора использует его как payload.
 var _pending_commit: Dictionary = {}
@@ -54,8 +54,13 @@ func handle_back() -> bool:
 	if session.awaiting_return:
 		if preview.visible:
 			_selected_option = {}
+			_pending_commit = {}
+			_hide_error()
 			_refresh_preview()
-			_grab_first_card_focus()
+			if is_instance_valid(_selected_button):
+				_selected_button.grab_focus()
+			else:
+				_grab_first_card_focus()
 			return true
 		return false
 	navigate_requested.emit("world")
@@ -71,26 +76,26 @@ func _ready() -> void:
 	traces_icon.hide()
 	_hide_error()
 	_refresh_all()
+	set_physics_process(session.checkpoints.channel_active or session.checkpoints.has_pending_completion())
 	if session.awaiting_return:
 		back_button.hide()
 		_grab_first_card_focus()
 	else:
-		start_button.grab_focus()
+		_focus_points_or_start()
 
 func _physics_process(_delta: float) -> void:
 	var service: CheckpointService = session.checkpoints
 	if service.channel_active:
-		# Непрерывный progress обновляется отдельно: список не пересобирается.
-		progress_bar.value = float(service.channel_ticks) / CheckpointService.CHANNEL_TICKS * 100.0
 		service.advance_ticks(1)
-	if (
-		service.has_pending_completion()
-		and not _commit_in_flight
-		and not error_box.visible
-	):
-		# Канал завершён (в кадре или staged при загрузке): домен staged снимок,
-		# запись подтверждает GameRoot. После ошибки — только явный повтор.
+		if service.channel_active:
+			progress_bar.value = 100.0 * service.channel_ticks / CheckpointService.CHANNEL_TICKS
+			return
+	set_physics_process(false)
+	if service.has_pending_completion():
 		_request_commit("completion", "")
+	else:
+		_refresh_channel()
+		_refresh_contract()
 
 func _exit_tree() -> void:
 	if session != null and session.checkpoints.channel_active:
@@ -98,15 +103,17 @@ func _exit_tree() -> void:
 
 func _on_start_pressed() -> void:
 	if session.checkpoints.begin():
-		_built_signature = ""
 		_hide_error()
-		_refresh_all()
+		_refresh_channel()
+		_refresh_contract()
+		set_physics_process(true)
 		%CancelButton.grab_focus()
 
 func _on_cancel_pressed() -> void:
 	session.checkpoints.cancel()
-	_built_signature = ""
-	_refresh_all()
+	set_physics_process(false)
+	_refresh_channel()
+	_refresh_contract()
 	start_button.grab_focus()
 
 func _on_back_pressed() -> void:
@@ -141,7 +148,6 @@ func checkpoint_committed(kind: String) -> void:
 	_commit_in_flight = false
 	_pending_commit = {}
 	_hide_error()
-	_built_signature = ""
 	_refresh_all()
 	match kind:
 		"completion":
@@ -183,20 +189,25 @@ func _request_commit(kind: String, checkpoint_id: String) -> void:
 		payload["checkpoint_id"] = checkpoint_id
 	checkpoint_commit_requested.emit(kind, payload)
 
-func _on_option_pressed(option: Dictionary) -> void:
+func _on_option_pressed(option: Dictionary, button: Button = null) -> void:
 	_selected_option = option
+	_selected_button = button
 	_hide_error()
 	_refresh_preview()
 
 func _focus_points_or_start() -> void:
 	# В manage-режиме карточки — HBox (не фокусируемы): основной следующий
 	# шаг — повторная фиксация; иначе — кнопка удаления последней карточки.
-	if start_button.visible:
+	if session.awaiting_return:
+		_grab_first_card_focus()
+	elif start_button.visible and not start_button.disabled:
 		start_button.grab_focus()
 	elif points_list.get_child_count() > 0:
 		var last: Node = points_list.get_child(points_list.get_child_count() - 1)
 		if last is HBoxContainer:
 			(last.get_child(last.get_child_count() - 1) as Button).grab_focus()
+		else:
+			back_button.grab_focus()
 
 func _grab_first_card_focus() -> void:
 	if points_list.get_child_count() > 0:
@@ -235,9 +246,7 @@ func _refresh_channel() -> void:
 	var service: CheckpointService = session.checkpoints
 	start_button.visible = not session.awaiting_return and not service.channel_active
 	start_button.disabled = not service.can_begin()
-	start_button.icon = ArtMap.texture(
-		ArtMap.UI["checkpoint_active"] if service.can_begin() else ArtMap.UI["checkpoint_inactive"]
-	)
+	start_button.icon = ArtMap.texture(ArtMap.UI["checkpoint_inactive"] if start_button.disabled else ArtMap.UI["checkpoint_active"])
 	start_button.add_theme_constant_override("icon_max_width", 20)
 	start_button.expand_icon = true
 	channel_box.visible = service.channel_active
@@ -260,18 +269,8 @@ func _snapshot_label(snapshot: Dictionary) -> String:
 
 func _refresh_points() -> void:
 	var service: CheckpointService = session.checkpoints
-	var signature: String = "return" if session.awaiting_return else "manage"
-	if session.awaiting_return:
-		signature += "|first:%s" % service.first_trace_available
-		for snapshot: Dictionary in service.manual_snapshots:
-			signature += "|%s" % snapshot["checkpoint_id"]
-	else:
-		for snapshot: Dictionary in service.manual_snapshots:
-			signature += "|%s" % snapshot["checkpoint_id"]
-	if signature == _built_signature:
-		return
-	_built_signature = signature
 	_selected_option = {}
+	_selected_button = null
 	for child: Node in points_list.get_children():
 		points_list.remove_child(child)
 		child.queue_free()
@@ -315,7 +314,7 @@ func _add_option_button(option: Dictionary, text: String) -> void:
 	button.icon = ArtMap.texture(ArtMap.UI["checkpoint_spent"])
 	button.add_theme_constant_override("icon_max_width", 20)
 	button.expand_icon = true
-	button.pressed.connect(_on_option_pressed.bind(option))
+	button.pressed.connect(_on_option_pressed.bind(option, button))
 	points_list.add_child(button)
 
 func _build_manage_cards() -> void:
@@ -354,9 +353,14 @@ func _refresh_preview() -> void:
 	preview.visible = session.awaiting_return and not _selected_option.is_empty()
 	if not preview.visible:
 		return
-	var cost: int = 2 if _selected_option.get("kind", "") == "fallback" else 1
+	var service := session.checkpoints
+	var plan := service.restore_plan(String(_selected_option["id"]))
+	if plan.is_empty():
+		preview.hide()
+		return
+	var cost: int = plan["trace_cost"]
 	var next_traces: int = mini(3, session.traces + cost)
-	match String(_selected_option.get("kind", "")):
+	match plan["kind"]:
 		"first_trace":
 			preview_title.text = "Возврат к Первому следу"
 			preview_text.text = (
@@ -372,32 +376,14 @@ func _refresh_preview() -> void:
 		_:
 			preview_title.text = "Возврат к Исходному следу"
 			preview_text.text = (
-				"Цена: +2 Следа (будет %d/3).\nНезакреплённые Кристаллы Эха будут потеряны." % mini(3, session.traces + 2)
+				"Цена: +2 Следа (будет %d/3).\nНезакреплённые Кристаллы Эха будут потеряны." % next_traces
 			)
 			confirm_return.text = "Вернуться · +2 Следа"
 	if next_traces == 3:
 		preview_text.text += "\n3/3: возврат в Лиорен."
-	_refresh_preview_art()
-
-## Миниатюра выбранной точки: фон её локации из того же маппинга, что у
-## основного фона экрана. До подтверждения выбор ничего не расходует.
-func _refresh_preview_art() -> void:
-	var location_id: String = ""
-	var service: CheckpointService = session.checkpoints
-	match String(_selected_option.get("kind", "")):
-		"manual":
-			for snapshot: Dictionary in service.manual_snapshots:
-				if snapshot.get("checkpoint_id", "") == _selected_option.get("id", ""):
-					location_id = String(snapshot.get("location_id", ""))
-					break
-		"first_trace", "fallback":
-			location_id = String(service.first_trace_snapshot.get("location_id", ""))
-	if location_id.is_empty():
-		preview_art.hide()
-		return
-	var background_key: String = "world_lioren" if location_id == "lioren" else "world_forest_edge"
-	preview_art.texture = ArtMap.texture(ArtMap.BACKGROUNDS[background_key])
-	preview_art.show()
+	var snapshot: Dictionary = plan.get("snapshot", service.first_trace_snapshot)
+	var destination: String = GameSession.LOCATION_LIOREN if next_traces == 3 else snapshot["location_id"]
+	preview_art.texture = ArtMap.world_background(destination)
 
 func _play_set_fx() -> void:
 	if _set_fx_tween != null and _set_fx_tween.is_valid():
@@ -408,6 +394,5 @@ func _play_set_fx() -> void:
 	_set_fx_tween = create_tween().set_parallel(true)
 	_set_fx_tween.tween_property(set_fx, "modulate:a", 1.0, 0.15)
 	_set_fx_tween.tween_property(set_fx, "scale", Vector2.ONE, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	var fade := create_tween()
-	fade.tween_property(set_fx, "modulate:a", 0.0, 0.5).set_delay(0.8)
-	fade.tween_callback(set_fx.hide)
+	_set_fx_tween.chain().tween_property(set_fx, "modulate:a", 0.0, 0.5).set_delay(0.45)
+	_set_fx_tween.chain().tween_callback(set_fx.hide)

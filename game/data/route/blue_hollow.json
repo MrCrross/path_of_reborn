@@ -17,8 +17,8 @@
       "collapse_stun_ticks": 105,
       "enemies": [
         {"id": "rodent_front", "actor_id": "stone_rodent"},
-        {"id": "rodent_back", "actor_id": "stone_rodent", "telegraph_offset": 23},
-        {"actor_id": "ash_raven", "telegraph_offset": 46}
+        {"id": "rodent_back", "actor_id": "stone_rodent", "telegraph_offset": 39},
+        {"actor_id": "ash_raven", "telegraph_offset": 88}
       ],
       "xp": 7,
       "rewards": [{"item_id": "old_masonry_shard", "quantity": 2}]
@@ -26,7 +26,7 @@
     "upper_guard": {
       "enemy_id": "river_shieldback",
       "cleared_flag": "hollow_upper_guard_won",
-      "enemies": [{"actor_id": "river_shieldback"}, {"actor_id": "stone_rodent", "telegraph_offset": 32}],
+      "enemies": [{"actor_id": "river_shieldback"}, {"actor_id": "stone_rodent", "telegraph_offset": 52}],
       "xp": 0,
       "rewards": [{"item_id": "river_shieldback_shell", "quantity": 1}]
     },

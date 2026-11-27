@@ -46,17 +46,6 @@ mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="SignalProp" type="TextureRect" parent="StoryArt"]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 140.0
-offset_top = 24.0
-offset_right = 172.0
-offset_bottom = 104.0
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
 [node name="ActionSprite" type="AnimatedSprite2D" parent="StoryArt"]
 unique_name_in_owner = true
 position = Vector2(108, 196)

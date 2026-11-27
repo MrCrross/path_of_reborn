@@ -72,7 +72,9 @@ func _test_river(context: TestContext) -> void:
 	var armor_damage: int = full_hp - combat.enemy.current_hp
 	var definition: ActorDefinition = combat.enemy.definition
 	combat.advance_ticks(definition.telegraph_ticks + definition.startup_ticks + definition.active_ticks + definition.recovery_ticks - combat.tick_count)
-	context.check(combat.is_vulnerable() and combat.request_attack(), "Recovery exposes the joints")
+	context.check(combat.is_vulnerable(), "Recovery exposes the joints")
+	combat.advance_ticks(combat.hero_attack_cooldown)
+	context.check(combat.is_vulnerable() and combat.request_attack(), "A ready attack can exploit the open joints")
 	var hp_before: int = combat.enemy.current_hp
 	combat.advance_ticks(combat.hero.definition.attack_startup_ticks)
 	context.check(hp_before - combat.enemy.current_hp > armor_damage, "The same attack deals more damage on exposed joints")

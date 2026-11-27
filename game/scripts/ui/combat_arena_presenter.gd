@@ -45,6 +45,7 @@ var _hero_unarmed: bool = false
 var _hero_contact_frame: int = UNARMED_CONTACT_FRAME
 var _enemy_busy: bool = false
 var _last_phase: int = -1
+var _paused_sprites: Array[AnimatedSprite2D] = []
 var _battle_tweens: Array[Tween] = []
 var _grove_enemies: Array[GroveEnemyView] = []
 var _pollen_cloud: Sprite2D
@@ -97,7 +98,7 @@ func update_positions() -> void:
 		_update_grove_positions()
 		return
 	telegraph.position = enemy_sprite.position + Vector2(0, 1)
-	var cue_position := (enemy_sprite.position + Vector2(_enemy_head.x - 12.0, _enemy_head.y - 37.0)).round()
+	var cue_position := (enemy_sprite.position + _enemy_head - Vector2(phase_cue.size.x * 0.5, 17.0 + phase_cue.size.y)).round()
 	cue_position.x = clampf(cue_position.x, 0.0, maxf(0.0, arena.size.x - phase_cue.size.x))
 	phase_cue.position = cue_position
 	var bounds := Rect2(Vector2.ZERO, arena.size)
@@ -149,35 +150,32 @@ func _finish_intro() -> void:
 
 func set_pause(open: bool) -> void:
 	if open:
-		hero_sprite.pause()
-		enemy_sprite.pause()
-		if _akari != null:
-			_akari.pause()
-		for enemy_view: GroveEnemyView in _grove_enemies:
-			enemy_view.sprite.pause()
-		if _intro_tween != null and _intro_tween.is_valid():
-			_intro_tween.pause()
-		if _telegraph_pulse != null and _telegraph_pulse.is_valid():
-			_telegraph_pulse.pause()
-		for tween: Tween in _battle_tweens:
-			if tween.is_valid():
-				tween.pause()
+		# Domain-driven strike frames already stand still before the pause.
+		# Resume only animations which were actually playing.
+		for child: Node in arena.get_children():
+			var sprite := child as AnimatedSprite2D
+			if sprite != null and sprite.is_playing():
+				_paused_sprites.append(sprite)
+				sprite.pause()
 	else:
-		hero_sprite.play()
-		if _akari != null:
-			_akari.play()
-		if _grove_enemies.is_empty():
-			enemy_sprite.play()
-		for enemy_view: GroveEnemyView in _grove_enemies:
-			if not enemy_view.defeated and enemy_view.phase in [CombatResolver.Phase.TELEGRAPH, CombatResolver.Phase.VULNERABILITY]:
-				enemy_view.sprite.play(&"default")
-		if _intro_tween != null and _intro_tween.is_valid():
-			_intro_tween.play()
-		if _telegraph_pulse != null and _telegraph_pulse.is_valid():
-			_telegraph_pulse.play()
-		for tween: Tween in _battle_tweens:
-			if tween.is_valid():
+		for sprite: AnimatedSprite2D in _paused_sprites:
+			sprite.play()
+		_paused_sprites.clear()
+	var tweens: Array[Tween] = _battle_tweens.duplicate()
+	tweens.append(_intro_tween)
+	tweens.append(_telegraph_pulse)
+	for tween: Tween in tweens:
+		if tween != null and tween.is_valid():
+			if open:
+				tween.pause()
+			else:
 				tween.play()
+
+func advance_pose() -> void:
+	for index: int in range(_grove_enemies.size()):
+		var slot: CombatResolver.EnemySlot = resolver.enemy_slots[index]
+		if not slot.dormant and not slot.actor.is_dead():
+			_update_grove_attack_frame(_grove_enemies[index], slot)
 
 func refresh() -> void:
 	if resolver == null:
@@ -187,8 +185,11 @@ func refresh() -> void:
 		_refresh_grove_enemies()
 		return
 	enemy_health.set_hp(resolver.enemy.current_hp, resolver.enemy.max_hp)
-	_update_enemy_clip()
-	_update_phase_cue()
+	if not resolver.is_finished and _last_phase != resolver.enemy_phase:
+		_last_phase = resolver.enemy_phase
+		_update_enemy_clip()
+		_update_phase_cue()
+		update_positions()
 
 func finish(player_won: bool) -> void:
 	if not _grove_enemies.is_empty():
@@ -251,17 +252,21 @@ func _on_hero_attack_landed(_run_id: String, target_id: String, _amount: int) ->
 		_spawn_contact_flash(target_id)
 
 func _update_phase_cue() -> void:
-	if resolver == null or resolver.is_finished or _last_phase == resolver.enemy_phase:
-		return
-	_last_phase = resolver.enemy_phase
 	_stop_telegraph_pulse()
 	match resolver.enemy_phase:
 		CombatResolver.Phase.TELEGRAPH:
 			phase_cue.text = "!"
 			phase_cue.add_theme_color_override("font_color", Color("e08a6a"))
 			_start_telegraph_pulse()
+		CombatResolver.Phase.STARTUP:
+			phase_cue.text = "Замах"
+			phase_cue.add_theme_color_override("font_color", Color("ffb095"))
+		CombatResolver.Phase.VULNERABILITY:
+			phase_cue.text = "Уязвим"
+			phase_cue.add_theme_color_override("font_color", AppTheme.COLOR_ACCENT)
 		_:
 			phase_cue.text = ""
+	phase_cue.reset_size()
 
 func _start_telegraph_pulse() -> void:
 	if not telegraph.visible or (_telegraph_pulse != null and _telegraph_pulse.is_valid()):
@@ -405,7 +410,7 @@ func _on_ally_action(action: String) -> void:
 		_battle_tweens.erase(_ally_notice)
 		_ally_notice.kill()
 	_ally_notice = create_tween()
-	_ally_notice.tween_interval(1.8 / float(session.auto_speed if resolver.combat_format == "auto" else 1))
+	_ally_notice.tween_interval(1.8 / float(session.active_encounter_context.get("auto_speed", 1)))
 	_ally_notice.tween_callback(_ally_cue.hide)
 	_ally_notice.tween_callback(_ally_fire.hide)
 	_track_tween(_ally_notice)
@@ -482,8 +487,6 @@ func _update_grove_positions() -> void:
 		var slot: CombatResolver.EnemySlot = resolver.enemy_slots[index]
 		var view: GroveEnemyView = _grove_enemies[index]
 		view.health.follow(view.sprite.position + view.head, bounds)
-		if not view.defeated and not slot.dormant:
-			_update_grove_attack_frame(view, slot)
 		var hazard_at_hero: bool = slot.pollen_slow_ticks > 0 or (slot.actor.definition.id == "bone_warden" and resolver.warden_move == "void")
 		view.warning.position = (hero_sprite.position if hazard_at_hero else view.sprite.position) + Vector2(0, 1)
 		if hazard_at_hero and slot.actor.definition.id == "bone_warden":
@@ -547,11 +550,15 @@ func _refresh_grove_enemies() -> void:
 		view.cue.text = _grove_warning(slot)
 		view.cue.reset_size()
 	_update_grove_positions()
+	advance_pose()
 
 func _update_grove_attack_frame(view: GroveEnemyView, slot: CombatResolver.EnemySlot) -> void:
 	if slot.phase not in [CombatResolver.Phase.STARTUP, CombatResolver.Phase.ACTIVE, CombatResolver.Phase.RECOVERY]:
 		return
 	var definition: ActorDefinition = slot.actor.definition
+	if definition.behavior_id == "goblin":
+		view.sprite.frame = _goblin_frame(slot.phase, slot.strike_index)
+		return
 	var spec: Dictionary = ArtMap.ENEMY_SHEETS[definition.id][_attack_clip(slot)]
 	var contact: int = int(spec["contact_frame"])
 	var last: int = int(spec["count"]) - 1
@@ -685,8 +692,7 @@ func _play_enemy_clip(clip_name: String, force: bool = false) -> void:
 func _on_enemy_clip_finished() -> void:
 	_enemy_busy = false
 	if resolver != null and not resolver.is_finished:
-		_apply_clip(enemy_sprite, _enemy_frames["idle"])
-		enemy_sprite.play(&"default")
+		_update_enemy_clip()
 
 func _update_enemy_clip() -> void:
 	if resolver == null or resolver.is_finished:
@@ -703,13 +709,13 @@ func _update_enemy_clip() -> void:
 			telegraph.hide()
 			enemy_sprite.modulate = Color.WHITE
 			_play_enemy_clip("attack")
-			_set_enemy_strike_frame(false)
+			_hold_goblin_strike_pose()
 		CombatResolver.Phase.ACTIVE:
 			telegraph.hide()
 			enemy_sprite.modulate = Color.WHITE
 			_enemy_busy = false
 			_play_enemy_clip("attack", true)
-			_set_enemy_strike_frame(true)
+			_hold_goblin_strike_pose()
 		CombatResolver.Phase.RECOVERY:
 			telegraph.hide()
 			enemy_sprite.modulate = Color.WHITE
@@ -717,20 +723,21 @@ func _update_enemy_clip() -> void:
 				_play_enemy_clip("idle")
 			elif not _enemy_busy:
 				_play_enemy_clip("attack", true)
-				enemy_sprite.frame = mini(GOBLIN_RECOVER_FRAME, enemy_sprite.sprite_frames.get_frame_count(&"default") - 1)
-				enemy_sprite.frame_progress = 0.0
+				_hold_goblin_strike_pose()
 				_enemy_busy = true
 		CombatResolver.Phase.VULNERABILITY:
 			enemy_sprite.modulate = Color(1.15, 1.05, 0.75)
-			telegraph.modulate = Color(1.2, 1.0, 0.45, 0.9)
-			telegraph.show()
+			telegraph.hide()
 			_enemy_busy = false
 			_play_enemy_clip("idle")
 
-func _set_enemy_strike_frame(contact: bool) -> void:
-	if resolver.enemy.definition.behavior_id != "goblin" or enemy_sprite.sprite_frames != _enemy_frames["attack"]["frames"]:
-		return
-	var roles: Array[int] = GOBLIN_CONTACT_FRAMES if contact else GOBLIN_PREPARE_FRAMES
-	var index: int = clampi(resolver.strike_index, 0, roles.size() - 1)
-	enemy_sprite.frame = mini(roles[index], enemy_sprite.sprite_frames.get_frame_count(&"default") - 1)
-	enemy_sprite.frame_progress = 0.0
+func _hold_goblin_strike_pose() -> void:
+	if resolver.enemy.definition.behavior_id == "goblin" and enemy_sprite.sprite_frames == _enemy_frames["attack"]["frames"]:
+		enemy_sprite.pause()
+		enemy_sprite.set_frame_and_progress(_goblin_frame(resolver.enemy_phase, resolver.strike_index), 0.0)
+
+func _goblin_frame(phase: int, strike: int) -> int:
+	if phase == CombatResolver.Phase.RECOVERY:
+		return GOBLIN_RECOVER_FRAME
+	var roles: Array[int] = GOBLIN_CONTACT_FRAMES if phase == CombatResolver.Phase.ACTIVE else GOBLIN_PREPARE_FRAMES
+	return roles[clampi(strike, 0, roles.size() - 1)]

@@ -42,6 +42,19 @@ func _play_order(label: String) -> bool:
 	_check(int(_game.session.guild_order.get("total", 0)) == 2, "The fixture accepts a two-stage order")
 	await _click(_node("OrderDepart"))
 	await _capture(label + "_stage1")
+	var field: Control = _game.router.current_screen
+	_check(field.name == "World" and field.hero_sprite.is_visible_in_tree(), "A guild expedition uses the world HUD and equipped hero")
+	await _click(field.map_button)
+	_check(_node("MapGrove").disabled, "The world map marks the contract's physical location")
+	await _press_back()
+	field = _game.router.current_screen
+	_check(field.map_button.has_focus() and _node("OrderFight").visible, "Map Back returns to the same contract and map icon")
+	await _click(field.settings_button)
+	await _press_back()
+	field = _game.router.current_screen
+	await _click(field.inventory_button)
+	await _press_back()
+	_check(_node("OrderFight").is_visible_in_tree() and _game.session.guild_order["cleared"] == 0, "Settings and inventory return to the current field")
 	await _click(_node("OrderFight"))
 	var combat: Control = _game.router.current_screen
 	if combat.name != "Combat":

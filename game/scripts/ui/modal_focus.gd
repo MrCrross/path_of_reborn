@@ -9,9 +9,10 @@ var _previous: Control
 func capture(overlay: Control) -> void:
 	if _modes.is_empty():
 		_previous = overlay.get_viewport().gui_get_focus_owner()
-	for node: Node in overlay.get_tree().current_scene.find_children("*", "Control", true, false):
+	var viewport := overlay.get_viewport()
+	for node: Node in viewport.find_children("*", "Control", true, false):
 		var control: Control = node as Control
-		if control != overlay and not overlay.is_ancestor_of(control):
+		if control.get_viewport() == viewport and control != overlay and not overlay.is_ancestor_of(control):
 			if not _modes.has(control):
 				_modes[control] = control.focus_mode
 			control.focus_mode = Control.FOCUS_NONE
@@ -25,3 +26,4 @@ func restore() -> void:
 	_modes.clear()
 	if is_instance_valid(_previous) and _previous.is_visible_in_tree():
 		_previous.grab_focus()
+	_previous = null
