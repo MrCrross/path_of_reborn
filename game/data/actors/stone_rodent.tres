@@ -6,7 +6,7 @@
 script = ExtResource("1_actor")
 id = "stone_rodent"
 display_name = "Каменный грызун"
-max_hp = 8
+max_hp = 11
 strength = 3
 defense = 1
 telegraph_ticks = 42

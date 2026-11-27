@@ -57,18 +57,10 @@ func handle_back() -> bool:
 func _ready() -> void:
 	if session == null:
 		session = GameSession.new()
-	# SafeArea — MarginContainer: прямым детям он навязывает полный rect, из-за
-	# чего панель перекрывала всю сцену. Сценические якоря держит отдельный
-	# полноэкранный оверлей внутри safe area.
-	var overlay := Control.new()
-	overlay.name = "SafeOverlay"
-	dialogue_panel.get_parent().add_child(overlay)
-	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for node: Control in [plan_caption, skip_button, dialogue_panel, hold_area]:
-		node.reparent(overlay)
 	skip_button.text = ""
 	skip_button.icon = ArtMap.texture(ArtMap.UI["skip_cutscene"])
+	skip_button.expand_icon = true
+	skip_button.add_theme_constant_override("icon_max_width", UiIcons.ICON_SIZE)
 	var transparent := StyleBoxEmpty.new()
 	for state: String in ["normal", "hover", "pressed", "disabled"]:
 		skip_button.add_theme_stylebox_override(state, transparent)
@@ -89,6 +81,7 @@ func _ready() -> void:
 	hold_progress_bar.add_theme_stylebox_override("fill", AppTheme.flat(progress_color, Color.TRANSPARENT, 0, 0))
 	var hotspot_box := AppTheme.flat(Color(0.85, 0.71, 0.36, 0.14), AppTheme.COLOR_ACCENT, 1, 3)
 	hotspot_marker.add_theme_stylebox_override("panel", hotspot_box)
+	%HotspotIcon.modulate = AppTheme.COLOR_ACCENT
 	_yui_wait = ArtMap.sprite_frames(ArtMap.YUI["wait"], 2.0)
 	_yui_step = ArtMap.sprite_frames(ArtMap.YUI["step"], 5.0)
 	_hero_push = ArtMap.sprite_frames(ArtMap.HERO_MODERN["push"], 8.0)
@@ -99,8 +92,6 @@ func _ready() -> void:
 	plan_caption.visible = DebugFlags.ui_enabled
 	dialogue_panel.gui_input.connect(_gui_input)
 	story_text.resized.connect(_measure_page_policy)
-	%HotspotLabel.text = ""
-	%HotspotLabel.add_child(_look_icon())
 	runner = DialogueRunner.new()
 	runner.configure(session)
 	runner.first_pass_only = true
@@ -293,15 +284,6 @@ func _on_finished(destination: String) -> void:
 
 ## Presentation measures actual glyphs at the available width. The runner
 ## receives a text-to-pages Callable and stays independent of UI classes.
-func _look_icon() -> TextureRect:
-	var icon := TextureRect.new()
-	icon.texture = UiIcons.texture("next")
-	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	icon.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	icon.position = Vector2(-12, -12)
-	icon.size = Vector2(24, 24)
-	return icon
-
 func _measure_page_policy() -> void:
 	if runner == null or runner.is_finished:
 		return
@@ -400,7 +382,7 @@ func _fit_dialogue_panel() -> void:
 	var font_size: int = story_text.get_theme_font_size("font_size")
 	var text_height: float = ceilf(font.get_height(font_size) * AppTheme.DIALOGUE_TEXT_LINES)
 	story_text.custom_minimum_size.y = text_height
-	var height: float = 3.0 + 18.0 + maxf(text_height, 42.0) + 16.0 + 6.0
+	var height := maxf(75.0, dialogue_panel.get_combined_minimum_size().y)
 	dialogue_panel.offset_top = -7.0 - height
 	dialogue_panel.offset_bottom = -7.0
 

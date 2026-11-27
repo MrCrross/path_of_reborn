@@ -81,10 +81,10 @@ func _setup(
 	_focus_guard.capture(self)
 	_cancel.visible = not cancel_text.is_empty()
 	if _cancel.visible:
-		_confirm.focus_neighbor_left = _confirm.get_path_to(_cancel)
-		_confirm.focus_neighbor_right = _confirm.get_path_to(_cancel)
-		_cancel.focus_neighbor_left = _cancel.get_path_to(_confirm)
-		_cancel.focus_neighbor_right = _cancel.get_path_to(_confirm)
+		_confirm.focus_neighbor_top = _confirm.get_path_to(_cancel)
+		_confirm.focus_neighbor_bottom = _confirm.get_path_to(_cancel)
+		_cancel.focus_neighbor_top = _cancel.get_path_to(_confirm)
+		_cancel.focus_neighbor_bottom = _cancel.get_path_to(_confirm)
 	_confirm.grab_focus()
 
 

@@ -239,6 +239,7 @@ func _refresh_channel() -> void:
 		ArtMap.UI["checkpoint_active"] if service.can_begin() else ArtMap.UI["checkpoint_inactive"]
 	)
 	start_button.add_theme_constant_override("icon_max_width", 20)
+	start_button.expand_icon = true
 	channel_box.visible = service.channel_active
 	if service.channel_active:
 		progress_bar.value = float(service.channel_ticks) / CheckpointService.CHANNEL_TICKS * 100.0
@@ -313,6 +314,7 @@ func _add_option_button(option: Dictionary, text: String) -> void:
 	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	button.icon = ArtMap.texture(ArtMap.UI["checkpoint_spent"])
 	button.add_theme_constant_override("icon_max_width", 20)
+	button.expand_icon = true
 	button.pressed.connect(_on_option_pressed.bind(option))
 	points_list.add_child(button)
 

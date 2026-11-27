@@ -264,7 +264,7 @@ func _normalized(text: String) -> String:
 
 func _test_lioren_and_shop_data(context: TestContext) -> void:
 	var files: Dictionary = {
-		"res://data/narrative/lioren_gates.json": {"last_destination": "shop", "flag": "lioren_shop_unlocked"},
+		"res://data/narrative/lioren_gates.json": {"last_destination": "lioren_map", "flag": "lioren_shop_unlocked"},
 		"res://data/narrative/shop_intro.json": {"last_destination": "shop", "flag": "shop_intro_done"},
 		"res://data/narrative/shop_talk.json": {"last_destination": "shop", "flag": ""},
 		"res://data/narrative/shop_purchase.json": {"last_destination": "shop", "flag": "shop_purchase_briefing_done"},
@@ -273,7 +273,7 @@ func _test_lioren_and_shop_data(context: TestContext) -> void:
 		var runner := DialogueRunner.new()
 		context.check(runner.load_file(path), "Production JSON parses and validates: %s" % path)
 		context.check(runner.entries.size() >= 3, "%s keeps a real scene, not a stub" % path)
-		context.check(runner.entries.back().get("destination", "") == files[path]["last_destination"], "%s exits to the shop route" % path)
+		context.check(runner.entries.back().get("destination", "") == files[path]["last_destination"], "%s exits to its expected route" % path)
 		var flag: String = files[path]["flag"]
 		if not flag.is_empty():
 			var commands: Array = runner.entries.back().get("commands", [])
@@ -297,7 +297,7 @@ func _test_lioren_and_shop_data(context: TestContext) -> void:
 	while not gates.is_finished and guard < 100:
 		gates.tap()
 		guard += 1
-	context.check(gates.is_finished and gates.destination == "shop", "Gates reach the shop route within the bounded loop")
+	context.check(gates.is_finished and gates.destination == "lioren_map", "Gates reach the Lioren map within the bounded loop")
 	context.check(session.world_flags.get(GameSession.WORLD_FLAG_LIOREN_SHOP_UNLOCKED) == true, "Gates open the shop access flag")
 	session.world_flags.erase(GameSession.WORLD_FLAG_LIOREN_SHOP_UNLOCKED)
 	gates.replay_seen_commands = true

@@ -33,7 +33,7 @@
       ]
     },
     "alliance": {
-      "cues": ["DIA_AKARI_022", "DIA_AKARI_024", "DIA_AKARI_025", "DIA_AKARI_026", "DIA_AKARI_027", "DIA_AKARI_028", "DIA_AKARI_029"]
+      "cues": ["DIA_WARDEN_JOINT", "DIA_AKARI_022", "DIA_AKARI_024", "DIA_AKARI_025", "DIA_AKARI_026", "DIA_AKARI_027", "DIA_AKARI_028", "DIA_AKARI_029"]
     }
   },
   "report": {"silver": 60, "echoes": 3},

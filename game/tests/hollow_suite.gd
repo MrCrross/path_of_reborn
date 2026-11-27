@@ -173,6 +173,8 @@ func _test_balance(context: TestContext) -> void:
 			elif enemy_id == "stone_rodent":
 				session.apply_hollow_command("upper_marker")
 				session.apply_hollow_command("cloth")
+				session.choose_upgrade("strength")
+				session.choose_upgrade("max_hp")
 				session.apply_hollow_command("descend")
 			else:
 				var radiant: bool = false
@@ -186,6 +188,9 @@ func _simulate(combat: CombatResolver, active: bool) -> void:
 			for slot: CombatResolver.EnemySlot in combat.enemy_slots:
 				if not slot.actor.is_dead() and slot.phase == CombatResolver.Phase.STARTUP and slot.remaining <= 2:
 					combat.request_dodge()
-			if not combat.request_ability():
+			if combat.enemy.definition.id == "crystal_toad":
+				if combat.is_vulnerable():
+					combat.request_ability()
+			elif not combat.request_ability():
 				combat.request_attack()
 		combat.advance_ticks(1)

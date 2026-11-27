@@ -11,7 +11,7 @@ const TRANSITION_TICKS: int = 12
 const HOLD_TICKS: int = 45
 const PAGE_CHARACTERS: int = 88
 const ALLOWED_KINDS: Array[String] = ["line", "look", "hold", "title"]
-const ALLOWED_DESTINATIONS: Array[String] = ["world", "shop", "lioren"]
+const ALLOWED_DESTINATIONS: Array[String] = ["world", "world_map", "lioren_map", "shop", "lioren"]
 const ALLOWED_ENTERS: Array[String] = ["", "approach", "signal", "rescue_motion", "flash", "night_pause", "threshold", "wing_glitch", "offer_gift", "title"]
 const ALLOWED_COMMANDS: Array[String] = ["set_world_flag", "set_npc_flag"]
 

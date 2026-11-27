@@ -24,12 +24,13 @@
 
 ## Технические решения MVP
 
-- **Scenes:** persistent `GameRoot` с `Title`, `Prologue`, `World`, `Combat`, `Inventory`, `Checkpoint`; маршрутизация через `SceneRouter`. (Reward-экран удалён в итерации 2026-11-20; результат боя — состояние сцены `Combat`.)
+- **Scenes:** persistent `GameRoot` с `Title`, `Prologue`, `World`, `WorldMap`, `Combat`, `Inventory` и `Checkpoint`. Маршрутизация через `SceneRouter`. Результат боя отображается в `Combat`.
+- **Карта мира.** `GameSession` определяет посещённые места и допустимый первый визит. Посещения хранятся в существующих `memory_flags`, общих для временных линий Печати. Для старых профилей учитывается состояние локации и пройденные сюжетные вехи. `GameRoot` сохраняет кандидата профиля перед сменой локации и первым входом в лавку. При отказе записи направление остаётся доступным для повтора. Вход в Гильдию также записывает флаг активного визита для Continue. Общая сцена карты загружает иллюстрацию долины или Лиорена через `ArtMap` и размещает кнопки поверх неё по нормализованным координатам фона.
 - **Domains:** `GameSession`, `CharacterState`, `CombatResolver`, `LootGenerator`, `InventoryService`, `CheckpointService`, `SaveService`, `DialogueRunner`.
 - **Data:** `Resource` для authoring в Godot; сериализуемый save DTO для прогресса; item/enemy definitions отдельно от runtime state.
 - **UI:** `Control` scenes с anchors/safe area; UI подписывается на состояние, а не меняет доменные правила напрямую.
 - **Input:** abstract actions (`primary`, `secondary`, `inventory`, `checkpoint`) с touch mapping; keyboard mapping только для desktop smoke test.
-- **Rendering:** nearest filter, integer scaling, portrait base viewport, performance budget на старом Android.
+- **Rendering:** рисованные текстуры с линейной фильтрацией, дробный масштаб портретной базы 180×320 и проверка бюджета памяти на Android.
 - **Save** хранит локальный профиль v7 в `user://` с миграциями v0–v6 и резервной копией. Награда остаётся в корневом `pending_battle_result` до успешной записи. Один результат относится ко всей встрече. Вехи Рощи, Синего Оврага и Края Ветров входят в снимок Печати. Эхо и память о репликах хранятся в `meta`. [Границы записи Рощи](../reviews/grove_stage_2026_11_22/README.md#маршрут-сохранение-и-баланс) · [Команды Оврага](../design/MVP_BLUE_HOLLOW.md#состояние-и-запись) · [Состояние поста](../design/MVP_WINDS_EDGE.md#состояние-и-запись)
 - **Networking:** отсутствует в MVP; не добавлять multiplayer SDK или серверный backend.
 

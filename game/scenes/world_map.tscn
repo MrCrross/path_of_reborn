@@ -1,0 +1,86 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/world_map_screen.gd" id="1_map"]
+[ext_resource type="Script" path="res://scripts/ui/safe_area.gd" id="2_safe"]
+
+[node name="WorldMap" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_map")
+
+[node name="Base" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.047, 0.094, 0.075, 1)
+
+[node name="StoryBackground" type="TextureRect" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="SafeArea" type="MarginContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+script = ExtResource("2_safe")
+padding = 7
+
+[node name="Column" type="VBoxContainer" parent="SafeArea"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Header" type="HBoxContainer" parent="SafeArea/Column"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Back" type="Button" parent="SafeArea/Column/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Title" type="Label" parent="SafeArea/Column/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 15
+text = "Карта мира"
+
+[node name="Divider" type="ColorRect" parent="SafeArea/Column"]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.41, 0.46, 0.33, 0.6)
+
+[node name="MapBoard" type="Control" parent="SafeArea/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+clip_contents = true
+
+[node name="FirstRoute" type="Button" parent="SafeArea/Column"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 27)
+layout_mode = 2
+theme_type_variation = &"PrimaryButton"
+text = "Продолжить путь"
+
+[node name="TravelError" type="Label" parent="SafeArea/Column"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+text = "Не удалось перейти. Попробуйте ещё раз."
+autowrap_mode = 2

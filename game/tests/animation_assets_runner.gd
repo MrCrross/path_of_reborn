@@ -59,7 +59,7 @@ func _run() -> void:
 		"akari": ArtMap.AKARI_SHEETS,
 		"bone_warden": ArtMap.ENEMY_SHEETS["bone_warden"],
 	})
-	_check(outpost == Vector2i(6, 28), "Six Outpost clips include all 28 frames")
+	_check(outpost == Vector2i(7, 32), "Seven Outpost clips include all 32 frames")
 	clips += outpost.x
 	total_frames += outpost.y
 	var centered_actor := AnimatedSprite2D.new()

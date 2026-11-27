@@ -56,7 +56,7 @@ func handle_back() -> bool:
 			dialogue.stop()
 			_on_dialogue_finished("shop")
 		return true
-	navigate_requested.emit("world")
+	navigate_requested.emit("map_from_shop")
 	return true
 
 func _ready() -> void:
@@ -72,9 +72,13 @@ func _start_entry_scene() -> void:
 		var assessment := "Кристаллы Эха можно продать здесь. Принеси добычу с Тропы, и я назову цену."
 		if crystal != null:
 			_appraisal_id = crystal.instance_id
-			assessment = "За этот Кристалл Эха дам %s за штуку. Остальное решай сам." % UiText.astra(crystal.sale_price_copper)
-		var jacket_price := UiText.astra(int(_find_offer("wanderer_jacket").get("price_copper", 0)))
-		var substitutions := {"{assessment}": assessment, "{jacket_price}": jacket_price}
+			var crystal_name: String = _trade_item_name(crystal, session.get_item_definition(crystal.definition_id))
+			assessment = "За «%s» дам %s за штуку. Остальное решай сам." % [crystal_name, UiText.astra(crystal.sale_price_copper)]
+		var jacket := _find_offer("wanderer_jacket")
+		var recommendation := "Взгляни на снаряжение для дороги."
+		if not jacket.is_empty():
+			recommendation = "Для дороги советую «%s». Для тебя, по поручительству — %s." % [jacket["display_name"], UiText.astra(int(jacket["price_copper"]))]
+		var substitutions := {"{assessment}": assessment, "{jacket_offer}": recommendation}
 		if _play_dialogue("intro", "Оценить кристалл" if crystal != null else "", substitutions):
 			return
 	if session.world_flags.get(GameSession.WORLD_FLAG_SHOP_FIRST_PURCHASE_DONE, false) and not session.world_flags.get(GameSession.WORLD_FLAG_SHOP_PURCHASE_BRIEFING_DONE, false):
@@ -107,6 +111,11 @@ func _first_sellable_crystal() -> ItemInstance:
 func _can_sell(item: ItemInstance) -> bool:
 	return item.sellable and item.sale_price_copper > 0 and not session.inventory.is_equipped(item.instance_id)
 
+func _trade_item_name(item: ItemInstance, definition: ItemDefinition) -> String:
+	var item_name: String = definition.display_name if definition != null else item.definition_id
+	var aspect: String = UiText.aspect(item.aspect_id)
+	return "%s · %s" % [item_name, aspect] if not aspect.is_empty() else item_name
+
 func _find_offer(offer_id: String) -> Dictionary:
 	for offer: Dictionary in session.shop_offers():
 		if offer.get("offer_id") == offer_id:
@@ -127,8 +136,8 @@ func _build_scene() -> void:
 	back_button = Button.new()
 	# По плану размещения — стрелка; подпись держит accessibility-текст, чтобы
 	# шапка не выходила за 180 px при широкой метрике шрифта названия лавки.
-	UiIcons.apply(back_button, "back", "Назад в город")
-	back_button.pressed.connect(func() -> void: navigate_requested.emit("world"))
+	UiIcons.apply(back_button, "back", "К карте мира")
+	back_button.pressed.connect(handle_back)
 	header.add_child(back_button)
 	var title_slot := Control.new()
 	title_slot.custom_minimum_size = Vector2(0, 24)
@@ -171,6 +180,9 @@ func _build_scene() -> void:
 		balance.add_child(icon)
 		var amount := Label.new()
 		amount.custom_minimum_size.y = 24
+		amount.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		amount.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		amount.clip_text = true
 		amount.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		amount.add_theme_font_size_override("font_size", 8)
 		balance.add_child(amount)
@@ -192,11 +204,16 @@ func _build_scene() -> void:
 		portrait_space.custom_minimum_size.y = MERCHANT_PORTRAIT_SPACE + extra_height * COUNTER_EDGE
 	resized.connect(resize_portrait_space)
 	resize_portrait_space.call()
+	var catalog_panel := PanelContainer.new()
+	catalog_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var catalog_style := AppTheme.flat(AppTheme.COLOR_HUD, AppTheme.COLOR_PANEL_BORDER)
+	catalog_style.set_content_margin_all(4)
+	catalog_panel.add_theme_stylebox_override("panel", catalog_style)
+	column.add_child(catalog_panel)
 	_catalog_scroll = ScrollContainer.new()
-	_catalog_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_catalog_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	_catalog_scroll.follow_focus = true
-	column.add_child(_catalog_scroll)
+	catalog_panel.add_child(_catalog_scroll)
 	rows_box = VBoxContainer.new()
 	rows_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	rows_box.add_theme_constant_override("separation", 3)
@@ -268,6 +285,7 @@ func _show_shop_art(appraisal: bool) -> void:
 func _tab_button(caption: String, tab: String) -> Button:
 	var button := Button.new()
 	button.text = caption
+	button.clip_text = true
 	button.custom_minimum_size = Vector2(0, 24)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.add_theme_font_size_override("font_size", 9)
@@ -290,7 +308,7 @@ func _build_deal_card() -> void:
 	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	safe.add_child(center)
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size.x = 156
+	panel.custom_minimum_size.x = 166
 	panel.add_theme_stylebox_override("panel", AppTheme.flat(AppTheme.COLOR_PANEL, AppTheme.COLOR_PANEL_BORDER, 1, 2))
 	center.add_child(panel)
 	var margin := MarginContainer.new()
@@ -464,7 +482,7 @@ func _refresh_rows() -> void:
 		empty.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		empty.add_theme_font_size_override("font_size", 8)
 		empty.add_theme_color_override("font_color", AppTheme.COLOR_TEXT_DIM)
-		empty.text = "Покупок пока нет." if _tab == TAB_BUY else "Кристаллов для продажи нет. Они выпадают из монстров на Тропе."
+		empty.text = "Покупок пока нет." if _tab == TAB_BUY else "Нет предметов для продажи."
 		rows_box.add_child(empty)
 	_catalog_scroll.set_deferred("scroll_vertical", previous_scroll)
 
@@ -486,7 +504,10 @@ func _build_buy_rows() -> void:
 		var row_key: String = "buy:" + offer_id
 		button.set_meta(&"trade_row", row_key)
 		button.icon = ArtMap.item_icon(String(offer.get("item_id", "")))
-		button.expand_icon = false
+		button.clip_text = true
+		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		button.tooltip_text = button.text
+		button.expand_icon = true
 		button.add_theme_constant_override("icon_max_width", UiIcons.ICON_SIZE)
 		button.custom_minimum_size = Vector2(0, 30)
 		button.add_theme_font_size_override("font_size", 8)
@@ -497,31 +518,41 @@ func _build_buy_rows() -> void:
 		rows_box.add_child(button)
 
 func _build_sell_rows() -> void:
+	var equipped_rows: Array[Button] = []
 	for item: ItemInstance in session.inventory.items:
-		if not _can_sell(item):
+		if not item.sellable or item.sale_price_copper <= 0:
 			continue
 		var definition: ItemDefinition = session.get_item_definition(item.definition_id)
 		if definition == null:
 			continue
-		var name: String = definition.display_name
-		var aspect: String = UiText.aspect(item.aspect_id)
-		if not aspect.is_empty():
-			name = "%s · %s" % [name, aspect]
+		var name: String = _trade_item_name(item, definition)
 		var button := Button.new()
-		button.text = "%s ×%d\n%s/шт" % [name, item.quantity, UiText.astra(item.sale_price_copper)]
+		var equipped: bool = session.inventory.is_equipped(item.instance_id)
+		button.text = "%s ×%d\n%s" % [name, item.quantity, "Снимите в рюкзаке" if equipped else UiText.astra(item.sale_price_copper) + "/шт"]
 		var row_key: String = "sell:" + item.instance_id
 		button.set_meta(&"trade_row", row_key)
 		button.icon = ArtMap.item_icon(item.definition_id, item.aspect_id)
+		button.clip_text = true
+		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		button.tooltip_text = button.text
 		UiIcons.tint(button, Color.WHITE)
-		button.expand_icon = false
+		button.expand_icon = true
 		button.add_theme_constant_override("icon_max_width", UiIcons.ICON_SIZE)
 		button.custom_minimum_size = Vector2(0, 30)
 		button.add_theme_font_size_override("font_size", 8)
-		button.accessibility_name = "Продать %s, %d штук по %s" % [name, item.quantity, UiText.astra(item.sale_price_copper)]
-		if item.instance_id == _appraisal_id and not session.world_flags.get(GameSession.WORLD_FLAG_SHOP_FIRST_SALE_DONE, false):
+		button.disabled = equipped
+		button.accessibility_name = "Снимите «%s» в рюкзаке для продажи" % name if equipped else "Продать %s, %d штук по %s" % [name, item.quantity, UiText.astra(item.sale_price_copper)]
+		var appraisal: bool = item.instance_id == _appraisal_id and not session.world_flags.get(GameSession.WORLD_FLAG_SHOP_FIRST_SALE_DONE, false)
+		if appraisal:
 			button.theme_type_variation = &"PrimaryButton"
 		button.pressed.connect(_open_deal.bind({"kind": "sell", "instance_id": item.instance_id, "row_key": row_key}))
 		rows_box.add_child(button)
+		if appraisal:
+			rows_box.move_child(button, 0)
+		if equipped:
+			equipped_rows.append(button)
+	for button: Button in equipped_rows:
+		rows_box.move_child(button, -1)
 
 func _offer_max_qty(offer: Dictionary) -> int:
 	var remaining: int = int(offer.get("remaining", -1))
@@ -531,6 +562,7 @@ func _add_exchange_row(from_coin: String, to_coin: String) -> void:
 	var quote: Dictionary = session.coin_exchange_quote(from_coin, to_coin)
 	var button := Button.new()
 	button.text = _exchange_amounts(from_coin, to_coin, int(quote["spend"]), int(quote["receive"]))
+	button.clip_text = true
 	button.icon = UiIcons.astra(from_coin)
 	UiIcons.tint(button, Color.WHITE)
 	button.add_theme_constant_override("icon_max_width", UiIcons.ICON_SIZE)
@@ -628,7 +660,7 @@ func _refresh_deal() -> void:
 		_item_details.present_instance(item.instance_id)
 	_item_details.meta_label.hide()
 	_item_details.description_label.hide()
-	_item_details.custom_minimum_size.y = 100 if buying else 86
+	_item_details.custom_minimum_size.y = 126 if buying else 112
 	_item_details.compare_label.get_parent().visible = buying
 	_item_details.compare_label.visible = buying and _item_details.model.get("current_item") != null
 	_deal["unit_price_copper"] = unit_price

@@ -11,11 +11,12 @@ var _background: TextureRect
 var _props: Control
 var _action: Button
 var _error: Label
-var _exit: Button
+var _map_button: Button
 var _cues: Array[String] = []
 
-func configure(game_session: GameSession, world: Control, bottom: Control, top_left: Control, background: TextureRect) -> void:
+func configure(game_session: GameSession, world: Control, bottom: Control, map_button: Button, background: TextureRect) -> void:
 	session = game_session
+	_map_button = map_button
 	_background = background
 	_props = Control.new()
 	_props.name = "OutpostProps"
@@ -37,11 +38,6 @@ func configure(game_session: GameSession, world: Control, bottom: Control, top_l
 	_error.add_theme_color_override("font_color", AppTheme.COLOR_DANGER)
 	bottom.add_child(_error)
 	_error.hide()
-	_exit = Button.new()
-	_exit.name = "OutpostExit"
-	UiIcons.apply(_exit, "back", "В Лиорен")
-	top_left.add_child(_exit)
-	_exit.pressed.connect(leave)
 	dialogue = DialogueOverlay.new()
 	dialogue.name = "OutpostDialogue"
 	dialogue.configure(session)
@@ -60,12 +56,11 @@ func refresh(auto_dialogue: bool = true) -> void:
 		"ravens": "В бой с воронами",
 		"warden": "В бой с дозорным",
 		"alliance": "Подтвердить союз",
-		"return": "Вернуться в Лиорен",
 	}
-	_action.text = captions[stage]
+	_action.text = captions.get(stage, "")
 	if not session.seen_cue_ids.has_all(_cues):
 		_action.text = "Продолжить разговор"
-	_action.disabled = session.traces >= 3 and stage != "return"
+	_action.disabled = session.traces >= 3
 	_error.hide()
 	if stage in ["bowl", "seal"]:
 		_add_prop("BowlProp", "bowl", Rect2(8, 14, 48, 42), Vector2(32, 28), Vector2(0.75, -5), stage == "bowl")
@@ -73,7 +68,7 @@ func refresh(auto_dialogue: bool = true) -> void:
 		_add_prop("FireSeal", "fire", Rect2(12, 58, 72, 28), Vector2(50, 19), Vector2(0.57, 0))
 		_add_prop("WatchSign", "sign", Rect2(4, 6, 40, 36), Vector2(22, 20), Vector2(0.57, -2), true)
 	if stage in ["ravens", "warden", "alliance", "return"]:
-		_add_prop("Akari", "akari", Rect2(28, 32, 80, 80), Vector2(50, 50), Vector2(0.43, -9))
+		_add_prop("Akari", "akari", Rect2(34, 30, 78, 82), Vector2(78, 82), Vector2(0.50, -9))
 	_layout_props()
 	_show_shot(false)
 	_focus_action()
@@ -87,21 +82,9 @@ func close_dialogue() -> bool:
 	refresh(false)
 	return true
 
-func leave() -> void:
-	if dialogue.is_active() or ConfirmDialog.has_open(get_parent()):
-		return
-	if session.outpost_stage() == "return" or session.traces >= 3:
-		command_requested.emit("leave")
-		return
-	var confirmation: ConfirmDialog = ConfirmDialog.open(get_parent(), "Вернуться в Лиорен?", "Текущие цели поста сохранятся.", "Вернуться", "Остаться")
-	confirmation.confirmed.connect(func() -> void: command_requested.emit("leave"))
-
-func rejected(command: String) -> void:
+func rejected(_command: String) -> void:
 	_error.show()
-	if command == "leave" and session.outpost_stage() != "return":
-		_exit.grab_focus()
-	else:
-		_focus_action()
+	_focus_action()
 
 func _on_action() -> void:
 	if not session.seen_cue_ids.has_all(_cues):
@@ -111,8 +94,6 @@ func _on_action() -> void:
 	match stage:
 		"ravens", "warden":
 			encounter_requested.emit(GameSession.outpost_node(stage)["enemy_id"])
-		"return":
-			leave()
 		_:
 			command_requested.emit(stage)
 
@@ -132,7 +113,7 @@ func _show_shot(active: bool) -> void:
 	_background.texture = ArtMap.texture(ArtMap.BACKGROUNDS[shot])
 	var story_frame: bool = shot != "world_outpost"
 	_props.visible = not story_frame
-	_action.visible = not active
+	_action.visible = not active and session.outpost_stage() != "return"
 	shot_changed.emit(active, story_frame)
 
 func _add_prop(node_name: String, art_id: String, crop: Rect2, dimensions: Vector2, anchor: Vector2, interactive: bool = false) -> void:
@@ -166,7 +147,7 @@ func _layout_props() -> void:
 		prop.position = (Vector2(_props.size.x * anchor.x, SceneStaging.floor_y(_props.size.y) + anchor.y) - Vector2(prop.size.x * 0.5, prop.size.y)).round()
 
 func _focus_action() -> void:
-	if _action.disabled:
-		_exit.grab_focus()
+	if _action.disabled or not _action.is_visible_in_tree():
+		_map_button.grab_focus()
 	else:
 		_action.grab_focus()

@@ -11,9 +11,12 @@ config_version=5
 [application]
 
 config/name="Path of Reborn"
-config/quit_on_go_back=false
 run/main_scene="res://scenes/game_root.tscn"
+config/quit_on_go_back=false
 config/features=PackedStringArray("4.7")
+boot_splash/bg_color=Color(0.0784314, 0.141176, 0.105882, 1)
+boot_splash/image="res://art/ui/checkpoint_launcher_icon.png"
+config/icon="res://art/ui/checkpoint_launcher_icon.png"
 
 [display]
 
@@ -23,7 +26,6 @@ window/size/window_width_override=360
 window/size/window_height_override=640
 window/stretch/mode="canvas_items"
 window/stretch/aspect="keep_width"
-window/stretch/scale_mode="integer"
 window/handheld/orientation=1
 
 [editor_plugins]
@@ -55,7 +57,6 @@ checkpoint={
 
 [rendering]
 
-textures/canvas_textures/default_texture_filter=0
-textures/vram_compression/import_etc2_astc=true
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true

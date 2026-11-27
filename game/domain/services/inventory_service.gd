@@ -165,6 +165,10 @@ func apply_dto(dto: Dictionary) -> bool:
 		item.level = maxi(1, int(entry.get("level", definition.level)))
 		item.sale_price_copper = maxi(0, int(entry.get("sale_price_copper", definition.sale_price_copper)))
 		item.sellable = bool(entry.get("sellable", definition.sellable))
+		# The starter branch used to have a fixed zero price in existing inventories and Seals.
+		if definition_id == "broken_wanderer_branch" and item.sale_price_copper == 0 and not item.sellable:
+			item.sale_price_copper = definition.sale_price_copper
+			item.sellable = definition.sellable
 		restored_items.append(item)
 		ids[instance_id] = true
 	var restored_equipment: Dictionary = dto.get("equipment", {}).duplicate()

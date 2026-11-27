@@ -6,6 +6,7 @@
 script = ExtResource("1")
 id = "focused_strike"
 display_name = "Точный удар"
+mastered_display_name = "Точный выпад I"
 description = "Рабочая гипотеза: усиленная атака с множителем урона ×1,5."
 unlock_level = 2
 cooldown_ticks = 120

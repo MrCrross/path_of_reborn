@@ -4,21 +4,22 @@ extends Node
 signal command_requested(command: String)
 signal encounter_requested(enemy_id: String)
 signal dialogue_visibility_changed(active: bool, bridge_shot: bool)
+signal checkpoint_requested
 
 var session: GameSession
 var actions: VBoxContainer
 var backdrop: TextureRect
 var dialogue: DialogueOverlay
-var exit_button: Button
+var _map_button: Button
 var props: Control
 var _stage_art: Array[Control] = []
 var _error: Label
 var _resume_button: Button
-var _retry_leave: Button
 var _cue_ids: Array[String] = []
 
-func configure(game_session: GameSession, world: Control, action_parent: Control, top_left: Control, background: TextureRect) -> void:
+func configure(game_session: GameSession, world: Control, action_parent: Control, map_button: Button, background: TextureRect) -> void:
 	session = game_session
+	_map_button = map_button
 	backdrop = background
 	props = Control.new()
 	props.name = "GroveProps"
@@ -30,11 +31,6 @@ func configure(game_session: GameSession, world: Control, action_parent: Control
 	actions = VBoxContainer.new()
 	actions.name = "GroveActions"
 	action_parent.add_child(actions)
-	exit_button = Button.new()
-	exit_button.name = "GroveExit"
-	UiIcons.apply(exit_button, "back", "В Лиорен")
-	top_left.add_child(exit_button)
-	exit_button.pressed.connect(leave)
 	dialogue = DialogueOverlay.new()
 	dialogue.name = "GroveDialogue"
 	dialogue.configure(session)
@@ -59,7 +55,6 @@ func refresh(play_dialogue: bool = true) -> void:
 		prop.queue_free()
 	_stage_art.clear()
 	_resume_button = null
-	_retry_leave = null
 	var stage: String = session.grove_stage()
 	_cue_ids = _pending_cues(stage)
 	if not _cue_ids.is_empty():
@@ -104,7 +99,7 @@ func refresh(play_dialogue: bool = true) -> void:
 			if button != null and button.visible and not button.disabled:
 				button.grab_focus()
 				return
-		exit_button.grab_focus()
+		_map_button.grab_focus()
 
 func committed(command: String) -> void:
 	match command:
@@ -113,32 +108,11 @@ func committed(command: String) -> void:
 		"noise":
 			refresh(false)
 			_rustle_grass()
-		"decline_point":
-			refresh()
-			if not dialogue.is_active():
-				_command("leave")
 		_:
 			refresh()
 
-func rejected(command: String) -> void:
+func rejected(_command: String) -> void:
 	_error.show()
-	if command == "leave":
-		if _retry_leave == null:
-			_retry_leave = _button("GroveRetryLeave", "Повторить выход", _command.bind("leave"))
-		_retry_leave.grab_focus()
-
-func leave() -> void:
-	if dialogue.is_active():
-		return
-	if session.grove_stage() != "clearing" or session.world_flags.get(GameSession.GROVE_SEALED, false):
-		_command("leave")
-	elif session.world_flags.get(GameSession.GROVE_DECLINED_SEAL, false):
-		if not _play_dialogue():
-			_command("leave")
-	else:
-		exit_button.grab_focus()
-		var confirm: ConfirmDialog = ConfirmDialog.open(get_parent(), "Вернуться в Лиорен", "На поляне можно оставить ручную точку Печатью Пути.", "Уйти без точки", "Остаться")
-		confirm.confirmed.connect(_command.bind("decline_point"))
 
 func _pending_cues(stage: String) -> Array[String]:
 	var numbers: Array = []
@@ -150,8 +124,6 @@ func _pending_cues(stage: String) -> Array[String]:
 			numbers.append(13)
 		if session.world_flags.get(GameSession.GROVE_SEALED, false):
 			numbers.append(14)
-		elif session.world_flags.get(GameSession.GROVE_DECLINED_SEAL, false):
-			numbers.append(15)
 	var result: Array[String] = []
 	for number: int in numbers:
 		var cue: String = "DIA_GROVE_%03d" % number
@@ -183,13 +155,13 @@ func _restore_route_shot() -> void:
 
 func _on_dialogue_finished(_destination: String) -> void:
 	refresh(false)
-	if session.world_flags.get(GameSession.GROVE_DECLINED_SEAL, false) and not session.world_flags.get(GameSession.GROVE_SEALED, false):
-		_command("leave")
 
 func _rustle_grass() -> void:
 	var region := AtlasTexture.new()
 	region.atlas = backdrop.texture
-	region.region = Rect2(64, 639, 122, 77)
+	region.filter_clip = true
+	var source_scale := region.atlas.get_size() / Vector2(540, 960)
+	region.region = Rect2(Vector2(64, 639) * source_scale, Vector2(122, 77) * source_scale)
 	var cover: float = maxf(backdrop.size.x / region.atlas.get_width(), backdrop.size.y / region.atlas.get_height())
 	var origin: Vector2 = (backdrop.size - region.atlas.get_size() * cover) * 0.5
 	var grass := TextureRect.new()
@@ -221,13 +193,25 @@ func _clearing() -> void:
 			scratch.default_color = Color("ecd6a4")
 			scratch.points = PackedVector2Array([Vector2(12 + offset, 13), Vector2(15 + offset, 8)])
 			_stage_art[1].add_child(scratch)
-	var gather := _button("GatherFlax", "Лён собран" if flax else "Собрать лён", _command.bind("flax"))
-	gather.disabled = flax
-	var inspect := _button("InspectMarker", "Маркер осмотрен" if marker else "Осмотреть маркер", _command.bind("marker"))
-	inspect.disabled = marker
+	if flax and marker and _cue_ids.is_empty():
+		if not session.world_flags.get(GameSession.GROVE_SEALED, false) and session.checkpoints.can_begin():
+			var seal := _button("GroveSetSeal", "Оставить точку Печати", func() -> void: checkpoint_requested.emit())
+			seal.theme_type_variation = &"MagicButton"
+		return
+	var gather: Button = null
+	var inspect: Button = null
+	if not flax:
+		gather = _button("GatherFlax", "Собрать лунный лён", _command.bind("flax"))
+	if not marker:
+		inspect = _button("InspectMarker", "Осмотреть восточный маркер", _command.bind("marker"))
+	var next_action: Button = gather if gather != null else inspect
+	if next_action != null:
+		next_action.theme_type_variation = &"PrimaryButton"
 	if _cue_ids.is_empty():
-		_hotspot(_stage_art[0], gather)
-		_hotspot(_stage_art[1], inspect)
+		if gather != null:
+			_hotspot(_stage_art[0], gather)
+		if inspect != null:
+			_hotspot(_stage_art[1], inspect)
 
 func _hotspot(prop: Control, action: Button) -> void:
 	var hit := Button.new()

@@ -4,6 +4,7 @@ extends RefCounted
 signal profile_changed
 signal combat_format_changed(format: String)
 signal auto_speed_changed(speed: int)
+signal auto_ability_changed(enabled: bool)
 signal battle_result_claimed(result: Dictionary)
 signal story_reward_claimed(result: Dictionary)
 
@@ -106,6 +107,13 @@ const ITEM_PATHS: Dictionary = {
 }
 const LOCATION_FOREST_EDGE: String = "forest_edge"
 const LOCATION_LIOREN: String = "lioren"
+const MAP_SHOP: String = "shop"
+const MAP_GUILD: String = "guild"
+const MAP_HOLLOW_BASIN: String = "hollow_basin"
+const MAP_HOLLOW_LEDGE: String = "hollow_ledge"
+const MAP_WORLD_LOCATIONS: Array[String] = [LOCATION_FOREST_EDGE, LOCATION_LIOREN, LOCATION_GROVE, LOCATION_HOLLOW, LOCATION_OUTPOST]
+const MAP_CITY_LOCATIONS: Array[String] = [MAP_SHOP, MAP_GUILD]
+const MAP_VISIT_PREFIX: String = "map_visited_"
 const SHOP_CATALOG_PATH: String = "res://data/shop/cricket_twilight.json"
 ## Доступ к лавке открывает сцена ворот Лиорена; живёт в world_flags профиля,
 ## поэтому откатывается Печатью вместе с кошельком и инвентарём.
@@ -166,6 +174,7 @@ var last_deal: Dictionary = {}
 ## Живёт вне откатываемого Checkpoint-профиля: переживает relaunch, новую игру и возвраты.
 var combat_format: String = COMBAT_FORMAT_AUTO
 var auto_speed: int = 1
+var auto_ability: bool = true
 var item_definitions: Dictionary = {}
 var loot_generator: LootGenerator
 var loot_rng: RandomNumberGenerator
@@ -295,6 +304,12 @@ func select_encounter(enemy_id: String, repeat: bool = false) -> bool:
 func start_selected_combat() -> CombatResolver:
 	return start_combat(current_enemy_id, _selected_repeat)
 
+func select_random_repeat_encounter() -> bool:
+	var candidates: Array[String] = route_repeat_enemy_ids()
+	if candidates.is_empty():
+		return false
+	return select_encounter(candidates.pick_random(), true)
+
 ## Полное лечение перед боем — осознанная семантика slice (фиксация в доке);
 ## менять её отдельной задачей с балансом.
 func start_combat(enemy_id: String, repeat: bool = false) -> CombatResolver:
@@ -320,6 +335,10 @@ func start_combat(enemy_id: String, repeat: bool = false) -> CombatResolver:
 	var encounter: Dictionary = expedition_battle_node(context)
 	var slots: Array = encounter.get("enemies", [])
 	var first: Dictionary = slots[0].duplicate() if not slots.is_empty() else {}
+	if context["encounter_mode"] == ENCOUNTER_REPEAT:
+		var repeat_settings: Dictionary = route_definition()["repeat_enemies"][enemy_id]
+		enemy_definition = _scaled_repeat_enemy(enemy_definition, int(repeat_settings["level"]))
+		first["pollen_slow_ticks"] = int(repeat_settings.get("pollen_slow_ticks", 0))
 	if encounter.has("noise_offset") and quest_flags.get("grove_noise", false):
 		first["telegraph_offset"] = int(encounter["noise_offset"])
 	if encounter.has("collapse_stun_ticks") and quest_flags.get(HOLLOW_COLLAPSED, false):
@@ -340,6 +359,7 @@ func start_combat(enemy_id: String, repeat: bool = false) -> CombatResolver:
 	resolver.run_token = context["run_token"]
 	resolver.combat_format = combat_format
 	resolver.auto_attack_enabled = combat_format == COMBAT_FORMAT_AUTO
+	resolver.auto_ability_enabled = resolver.auto_attack_enabled and auto_ability
 	resolver.auto_dodge_enabled = combat_format == COMBAT_FORMAT_AUTO
 	active_resolver = resolver
 	active_encounter_context = context.duplicate(true)
@@ -377,6 +397,11 @@ func set_auto_speed(speed: int) -> bool:
 	auto_speed = speed
 	auto_speed_changed.emit(speed)
 	return true
+
+func set_auto_ability(enabled: bool) -> void:
+	if auto_ability != enabled:
+		auto_ability = enabled
+		auto_ability_changed.emit(enabled)
 
 func combat_format_label() -> String:
 	return "Автобой" if combat_format == COMBAT_FORMAT_AUTO else "Ручной бой"
@@ -533,16 +558,38 @@ func next_route_approach() -> String:
 func route_completion_label() -> String:
 	return String(route_definition().get("completion_label", "Участок пройден"))
 
-## Повторяемые враги — узлы, которые уже пройдены (индекс < next_index).
+## Старые сохранения восстанавливают знакомых врагов по победам, Эху и
+## уже пройденным узлам. Новые встречи записываются в журнал вне отката.
 func route_repeat_enemy_ids() -> Array[String]:
 	var result: Array[String] = []
+	if location_id != LOCATION_FOREST_EDGE or in_combat or awaiting_return or has_pending_reward() or traces == 3 or _claim_in_progress:
+		return result
+	var repeat_enemies: Dictionary = route_definition().get("repeat_enemies", {})
 	var nodes: Array = route_nodes()
 	var limit: int = mini(int(route_state.get("next_index", 0)), nodes.size())
 	for index: int in range(limit):
 		var enemy_id: String = String(nodes[index].get("enemy_id", ""))
-		if not enemy_id.is_empty() and not result.has(enemy_id):
+		if repeat_enemies.has(enemy_id) and not result.has(enemy_id):
+			result.append(enemy_id)
+	for enemy_id: String in repeat_enemies:
+		var sighting_flag: String = repeat_enemies[enemy_id].get("seen_world_flag", "")
+		if not result.has(enemy_id) and (
+			enemy_journal.get(enemy_id, false) or _beaten_encounter_ids.get(enemy_id, false)
+			or claimed_echo_enemy_ids.get(enemy_id, false) or world_flags.get(sighting_flag, false)
+		):
 			result.append(enemy_id)
 	return result
+
+func _scaled_repeat_enemy(definition: ActorDefinition, reference_level: int) -> ActorDefinition:
+	var scaled: ActorDefinition = definition.duplicate()
+	var level_delta: int = hero.level - reference_level
+	var extra_strength: int = maxi(0, hero.strength - hero.definition.strength)
+	var extra_hp: int = maxi(0, hero.max_hp - hero.definition.max_hp)
+	var extra_defense: int = maxi(0, hero.defense - hero.definition.defense)
+	scaled.max_hp = maxi(1, definition.max_hp + 2 * (level_delta + extra_strength))
+	scaled.strength = maxi(1, definition.strength + floori(level_delta / 2.0)
+		+ floori((extra_hp + 4 * extra_defense) / 12.0))
+	return scaled
 
 func _encounter_context_for(enemy_id: String, repeat: bool) -> Dictionary:
 	if not _is_known_enemy(enemy_id):
@@ -590,7 +637,7 @@ func trial_available() -> bool:
 	return route_completed()
 
 func trial_encounter_available() -> bool:
-	return trial_available() and not in_combat and not awaiting_return and not has_pending_reward() and traces < 3 and not _claim_in_progress
+	return location_id == LOCATION_FOREST_EDGE and trial_available() and not in_combat and not awaiting_return and not has_pending_reward() and traces < 3 and not _claim_in_progress
 
 ## --- Settlement: создание pending ---
 
@@ -604,14 +651,18 @@ func settle_combat(run_id: String, enemy_id: String) -> bool:
 	if typeof(context) != TYPE_DICTIONARY or String(context.get("enemy_id", "")) != enemy_id:
 		return false
 	var expedition: Dictionary = expedition_battle_node(context)
-	if expedition.is_empty() and not LOOT_PATHS.has(enemy_id):
+	var repeat_settings: Dictionary = {}
+	if context["encounter_mode"] == ENCOUNTER_REPEAT:
+		repeat_settings = route_definition().get("repeat_enemies", {}).get(enemy_id, {})
+	if expedition.is_empty() and repeat_settings.is_empty() and not LOOT_PATHS.has(enemy_id):
 		return false
 	_settled_run_ids[run_id] = true
 	var enemy_definition: ActorDefinition = load(ACTOR_PATHS[enemy_id])
 	var rewards: Array = expedition.get("rewards", [])
 	var echo_available: bool = false
 	if expedition.is_empty():
-		rewards = loot_generator.generate(load(LOOT_PATHS[enemy_id]), loot_rng).duplicate(true)
+		if LOOT_PATHS.has(enemy_id):
+			rewards = loot_generator.generate(load(LOOT_PATHS[enemy_id]), loot_rng)
 		echo_available = not claimed_echo_enemy_ids.has(enemy_id)
 	else:
 		for slot: Dictionary in expedition["enemies"]:
@@ -646,7 +697,7 @@ func settle_combat(run_id: String, enemy_id: String) -> bool:
 		"route_node_id": String(context.get("route_node_id", "")),
 		"items": items,
 		"choices": {},
-		"xp": int(expedition.get("xp", enemy_definition.xp_reward)),
+		"xp": int(expedition.get("xp", repeat_settings.get("xp", enemy_definition.xp_reward))),
 		"echo_gained": echo_available,
 		"trial_echo_gained": enemy_id == TRIAL_ENEMY_ID and not trial_echo_claimed,
 		"loot_seed": loot_seed,
@@ -881,6 +932,7 @@ func unequip_item(slot_id: String, character_id: String = "haruto") -> bool:
 func abandon_combat() -> void:
 	if not in_combat:
 		return
+	_remember_encounter_enemies(active_resolver)
 	_invalidate_active_resolver()
 	in_combat = false
 	awaiting_return = true
@@ -926,8 +978,7 @@ func sell_item(instance_id: String, quantity: int = 1, expected_price: int = -1,
 
 ## --- Лавка «Сверчок и Сумрак» ---
 
-## Переход между открытыми точками маршрута. Не отменяет канал Печати и не
-## лечит: это перемещение, а не возврат. Доступность точек решает UI по флагам.
+## Базовое перемещение между Тропой и Лиореном. Карта проверяет сюжетный доступ.
 func travel_to(location_id: String) -> bool:
 	if in_combat or has_pending_reward() or awaiting_return or _claim_in_progress:
 		return false
@@ -939,12 +990,133 @@ func travel_to(location_id: String) -> bool:
 		return true
 	if location_id == LOCATION_FOREST_EDGE and traces == 3:
 		return false
+	record_map_visit(self.location_id)
 	self.location_id = location_id
+	record_map_visit(location_id)
 	profile_changed.emit()
 	return true
 
+func record_map_visit(destination: String) -> void:
+	memory_flags[MAP_VISIT_PREFIX + destination] = true
+
+func has_visited_map_location(destination: String) -> bool:
+	if destination == location_id or memory_flags.get(MAP_VISIT_PREFIX + destination, false):
+		return true
+	# Recover visits from progress recorded before the map kept its own history.
+	match destination:
+		LOCATION_FOREST_EDGE:
+			return true
+		LOCATION_LIOREN:
+			return shop_access_unlocked() or seen_cue_ids.has("DIA_CITY_001")
+		LOCATION_GROVE:
+			return seen_cue_ids.has("DIA_GROVE_001") or quest_flags.get(GROVE_HOUNDS_WON, false)
+		LOCATION_HOLLOW:
+			return quest_flags.get(HOLLOW_STARTED, false) or seen_cue_ids.has("DIA_HOLLOW_021")
+		LOCATION_OUTPOST:
+			return seen_cue_ids.has("DIA_AKARI_001") or quest_flags.get(OUTPOST_BOWL, false)
+		MAP_SHOP:
+			return seen_cue_ids.has("DIA_SHOP_001") or world_flags.get(WORLD_FLAG_SHOP_INTRO_DONE, false) or world_flags.get(WORLD_FLAG_SHOP_FIRST_PURCHASE_DONE, false)
+		MAP_GUILD:
+			return guild_visit_active() or seen_cue_ids.has("DIA_GUILD_001") or not guild_rank().is_empty()
+		MAP_HOLLOW_LEDGE:
+			return (location_id == LOCATION_HOLLOW and hollow_stage() == "ledge") or quest_flags.get(HOLLOW_UPPER_MARKER, false)
+		MAP_HOLLOW_BASIN:
+			return quest_flags.get(HOLLOW_ELITE_ENTERED, false) or quest_flags.get(HOLLOW_ELITE_WON, false) or quest_flags.get(HOLLOW_RETREATED, false)
+	return false
+
+func first_unvisited_map_route(city_map: bool) -> String:
+	var destinations: Array[String] = MAP_CITY_LOCATIONS if city_map else MAP_WORLD_LOCATIONS
+	if not city_map and location_id == LOCATION_HOLLOW:
+		destinations = [MAP_HOLLOW_BASIN]
+	for destination: String in destinations:
+		if not has_visited_map_location(destination) and map_travel_blocker(destination).is_empty():
+			return destination
+	return ""
+
+func map_travel_blocker(destination: String) -> String:
+	if destination == location_id:
+		return "current"
+	if destination == MAP_HOLLOW_BASIN and location_id == LOCATION_HOLLOW and hollow_stage() == "elite":
+		return "current"
+	if destination == MAP_HOLLOW_LEDGE and location_id == LOCATION_HOLLOW and hollow_stage() == "ledge":
+		return "current"
+	if in_combat or has_pending_reward() or awaiting_return or _claim_in_progress:
+		return "busy"
+	if checkpoints.channel_active or checkpoints.has_pending_completion():
+		return "checkpoint"
+	if destination == LOCATION_LIOREN:
+		if location_id == LOCATION_FOREST_EDGE and not story_rewards.has(DAIJIRO_SWORD_REWARD_ID):
+			return "daijiro"
+		if location_id == LOCATION_HOLLOW and hollow_stage() == "elite":
+			return "via_ledge"
+		return ""
+	if destination == MAP_SHOP:
+		return "" if can_trade() else "gates"
+	if destination == MAP_GUILD:
+		return "" if can_visit_guild() else "merchant"
+	if destination == MAP_HOLLOW_LEDGE:
+		return "" if location_id == LOCATION_HOLLOW and hollow_stage() == "elite" else "unavailable"
+	if traces >= 3:
+		return "rest"
+	if destination == MAP_HOLLOW_BASIN:
+		if location_id == LOCATION_HOLLOW and hollow_stage() == "ledge" and quest_flags.get(HOLLOW_CLOTH, false) and not quest_flags.get(HOLLOW_ELITE_WON, false):
+			return ""
+		return "unavailable"
+	if location_id != LOCATION_LIOREN:
+		return "via_lioren"
+	match destination:
+		LOCATION_FOREST_EDGE:
+			return ""
+		LOCATION_GROVE:
+			return "" if can_enter_grove() else "registration"
+		LOCATION_HOLLOW:
+			return "" if can_enter_hollow() else "grove_report"
+		LOCATION_OUTPOST:
+			if quest_flags.get(OUTPOST_ALLIANCE, false):
+				return "completed"
+			return "" if can_enter_outpost() else "hollow_report"
+		_:
+			return "unavailable"
+
+## Выполняется GameRoot над кандидатом сохранения после выбора пункта карты.
+func apply_map_travel(destination: String) -> bool:
+	if not map_travel_blocker(destination).is_empty():
+		return false
+	match destination:
+		LOCATION_LIOREN:
+			if location_id in EXPEDITION_LOCATIONS:
+				return apply_expedition_command("leave", location_id)
+			return travel_to(destination)
+		LOCATION_FOREST_EDGE:
+			world_flags.erase(WORLD_FLAG_GUILD_VISIT)
+			return travel_to(destination)
+		LOCATION_GROVE, LOCATION_HOLLOW, LOCATION_OUTPOST:
+			return apply_expedition_command("enter", destination)
+		MAP_HOLLOW_BASIN:
+			return apply_hollow_command("descend")
+		MAP_HOLLOW_LEDGE:
+			return apply_hollow_command("retreat")
+		MAP_SHOP:
+			record_map_visit(destination)
+			return true
+		MAP_GUILD:
+			set_guild_visit_active(true)
+			return guild_visit_active()
+		_:
+			return false
+
+func apply_expedition_command(command: String, route_id: String) -> bool:
+	match route_id:
+		LOCATION_GROVE: return apply_grove_command(command)
+		LOCATION_HOLLOW: return apply_hollow_command(command)
+		LOCATION_OUTPOST: return apply_outpost_command(command)
+		_: return false
+
 func shop_access_unlocked() -> bool:
 	return bool(world_flags.get(WORLD_FLAG_LIOREN_SHOP_UNLOCKED, false))
+
+func should_show_lioren_gates() -> bool:
+	return location_id == LOCATION_LIOREN and story_rewards.has(DAIJIRO_SWORD_REWARD_ID) and not shop_access_unlocked()
 
 func can_trade() -> bool:
 	return location_id == LOCATION_LIOREN and shop_access_unlocked() and not in_combat and not awaiting_return and not has_pending_reward()
@@ -960,6 +1132,7 @@ func set_guild_visit_active(active: bool) -> void:
 		return
 	if active:
 		world_flags[WORLD_FLAG_GUILD_VISIT] = true
+		record_map_visit(MAP_GUILD)
 	else:
 		world_flags.erase(WORLD_FLAG_GUILD_VISIT)
 	profile_changed.emit()
@@ -1029,7 +1202,7 @@ func grove_bandage() -> ItemInstance:
 	return null
 
 func can_enter_grove() -> bool:
-	return guild_visit_active() and guild_rank() == "E" and quest_flags.get(FIRST_GUILD_ORDER_ID, false) and traces < 3 and not checkpoints.channel_active
+	return can_visit_guild() and guild_rank() == "E" and quest_flags.get(FIRST_GUILD_ORDER_ID, false) and traces < 3 and not checkpoints.channel_active
 
 func can_report_grove() -> bool:
 	return guild_visit_active() and guild_rank() == "E" and quest_flags.get(GROVE_FLAX, false) and quest_flags.get(GROVE_MARKER, false) and not quest_flags.get(GROVE_REPORTED, false)
@@ -1042,6 +1215,8 @@ func apply_grove_command(command: String) -> bool:
 		if not can_enter_grove():
 			return false
 		location_id = LOCATION_GROVE
+		record_map_visit(LOCATION_GROVE)
+		record_map_visit(LOCATION_LIOREN)
 		world_flags.erase(WORLD_FLAG_GUILD_VISIT)
 		return true
 	if command == "report":
@@ -1151,7 +1326,7 @@ static func outpost_stage_for(quests: Dictionary) -> String:
 	return "return"
 
 func can_enter_outpost() -> bool:
-	return guild_visit_active() and guild_rank() == "E" and quest_flags.get(HOLLOW_REPORTED, false) and not quest_flags.get(OUTPOST_ALLIANCE, false) and traces < 3
+	return can_visit_guild() and guild_rank() == "E" and quest_flags.get(HOLLOW_REPORTED, false) and not quest_flags.get(OUTPOST_ALLIANCE, false) and traces < 3
 
 func can_report_outpost() -> bool:
 	return guild_visit_active() and guild_rank() == "E" and quest_flags.get(OUTPOST_ALLIANCE, false) and not quest_flags.get(OUTPOST_REPORTED, false)
@@ -1164,6 +1339,8 @@ func apply_outpost_command(command: String) -> bool:
 			if not can_enter_outpost() or not seen_cue_ids.has(OUTPOST_ORDER_CUE):
 				return false
 			location_id = LOCATION_OUTPOST
+			record_map_visit(LOCATION_OUTPOST)
+			record_map_visit(LOCATION_LIOREN)
 			world_flags.erase(WORLD_FLAG_GUILD_VISIT)
 			return true
 		"report":
@@ -1226,7 +1403,7 @@ static func expedition_battle_matches(result: Dictionary, location: String, ques
 			return true
 
 func can_enter_hollow() -> bool:
-	return guild_visit_active() and guild_rank() == "E" and quest_flags.get(GROVE_REPORTED, false) and traces < 3 and not checkpoints.channel_active
+	return can_visit_guild() and guild_rank() == "E" and quest_flags.get(GROVE_REPORTED, false) and traces < 3 and not checkpoints.channel_active
 
 func can_report_hollow() -> bool:
 	return guild_visit_active() and guild_rank() == "E" and quest_flags.get(GROVE_REPORTED, false) and quest_flags.get(HOLLOW_WATER_MARKER, false) and quest_flags.get(HOLLOW_UPPER_MARKER, false) and quest_flags.get(HOLLOW_CLOTH, false) and not quest_flags.get(HOLLOW_REPORTED, false)
@@ -1235,7 +1412,7 @@ func can_place_expedition_checkpoint() -> bool:
 	if location_id == LOCATION_GROVE:
 		return grove_stage() == "clearing"
 	if location_id == LOCATION_HOLLOW:
-		return hollow_stage() == "ledge"
+		return hollow_stage() in ["shelf", "ledge"]
 	if location_id == LOCATION_OUTPOST:
 		return outpost_stage() in ["bowl", "warden", "alliance", "return"]
 	return true
@@ -1248,6 +1425,8 @@ func apply_hollow_command(command: String) -> bool:
 		if not can_enter_hollow() or not seen_cue_ids.has("DIA_HOLLOW_004"):
 			return false
 		location_id = LOCATION_HOLLOW
+		record_map_visit(LOCATION_HOLLOW)
+		record_map_visit(LOCATION_LIOREN)
 		quest_flags[HOLLOW_STARTED] = true
 		world_flags.erase(WORLD_FLAG_GUILD_VISIT)
 		return true
@@ -1280,6 +1459,7 @@ func apply_hollow_command(command: String) -> bool:
 			return false
 		quest_flags.erase(HOLLOW_ELITE_ENTERED)
 		quest_flags[HOLLOW_RETREATED] = true
+		record_map_visit(MAP_HOLLOW_LEDGE)
 		return true
 	if traces >= 3:
 		return false
@@ -1299,6 +1479,7 @@ func apply_hollow_command(command: String) -> bool:
 			if stage != "upper_marker" or not seen_cue_ids.has("DIA_HOLLOW_021"):
 				return false
 			quest_flags[HOLLOW_UPPER_MARKER] = true
+			record_map_visit(MAP_HOLLOW_LEDGE)
 		"cloth":
 			if stage != "ledge" or quest_flags.get(HOLLOW_CLOTH, false) or not seen_cue_ids.has("DIA_HOLLOW_007"):
 				return false
@@ -1307,6 +1488,7 @@ func apply_hollow_command(command: String) -> bool:
 			if stage != "ledge" or not quest_flags.get(HOLLOW_CLOTH, false) or quest_flags.get(HOLLOW_ELITE_WON, false):
 				return false
 			quest_flags[HOLLOW_ELITE_ENTERED] = true
+			record_map_visit(MAP_HOLLOW_BASIN)
 		_:
 			return false
 	return true
@@ -1460,6 +1642,7 @@ func choose_upgrade(upgrade_id: String, character_id: String = "haruto") -> bool
 
 func apply_state_dto(dto: Dictionary) -> void:
 	_invalidate_active_resolver()
+	_selected_repeat = false
 	_claim_in_progress = false
 	var meta: Dictionary = dto["meta"]
 	traces = int(meta["traces"])
@@ -1567,6 +1750,7 @@ func completed_encounter_ids() -> Dictionary:
 func _on_combat_finished(won: bool, resolver: CombatResolver) -> void:
 	if resolver == null or resolver != active_resolver or not resolver.is_active:
 		return
+	_remember_encounter_enemies(resolver)
 	var context: Dictionary = active_encounter_context.duplicate(true)
 	var run_id: String = String(context.get("run_id", ""))
 	var enemy_id: String = String(context.get("enemy_id", ""))
@@ -1579,6 +1763,11 @@ func _on_combat_finished(won: bool, resolver: CombatResolver) -> void:
 	else:
 		awaiting_return = true
 		profile_changed.emit()
+
+func _remember_encounter_enemies(resolver: CombatResolver) -> void:
+	for slot: CombatResolver.EnemySlot in resolver.enemy_slots:
+		if not slot.dormant:
+			enemy_journal[slot.actor.definition.id] = true
 
 func _invalidate_active_resolver() -> void:
 	if active_resolver != null:
@@ -1663,8 +1852,18 @@ static func is_valid_pending_battle_result(result: Dictionary) -> bool:
 		var expected_route: String = EXPEDITION_ROUTES[mode]
 		if result["route_id"] != expected_route or expedition_battle_node(result).get("enemy_id", "") != enemy_id:
 			return false
-	elif mode not in [ENCOUNTER_ROUTE, ENCOUNTER_REPEAT, ENCOUNTER_TRIAL] or result["route_id"] != route_definition().get("route_id", "") or not LOOT_PATHS.has(enemy_id):
-		return false
+	else:
+		if result["route_id"] != route_definition().get("route_id", ""):
+			return false
+		match mode:
+			ENCOUNTER_REPEAT:
+				if not route_definition().get("repeat_enemies", {}).has(enemy_id):
+					return false
+			ENCOUNTER_ROUTE, ENCOUNTER_TRIAL:
+				if not LOOT_PATHS.has(enemy_id):
+					return false
+			_:
+				return false
 	if mode == ENCOUNTER_TRIAL and enemy_id != TRIAL_ENEMY_ID:
 		return false
 	if mode != ENCOUNTER_TRIAL and enemy_id == TRIAL_ENEMY_ID:

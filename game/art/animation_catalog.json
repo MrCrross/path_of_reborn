@@ -1,4 +1,47 @@
 {
+  "characters/animations/haruto_modern_alarm_sheet.png": {
+    "frame": [
+      384,
+      512
+    ],
+    "offset": [
+      0.0,
+      -192.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 2,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          384,
+          512
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          384,
+          0,
+          384,
+          512
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
   "characters/animations/haruto_modern_push_sheet.png": {
     "frame": [
       1383,
@@ -65,6 +108,77 @@
           421,
           580,
           646
+        ]
+      }
+    ]
+  },
+  "characters/animations/haruto_modern_run_sheet.png": {
+    "frame": [
+      384,
+      512
+    ],
+    "offset": [
+      0.0,
+      -192.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 4,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          384,
+          512
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          384,
+          0,
+          384,
+          512
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          768,
+          0,
+          384,
+          512
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          1152,
+          0,
+          384,
+          512
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
         ]
       }
     ]
@@ -755,6 +869,63 @@
       }
     ]
   },
+  "characters/animations/yui_crosswalk_displaced_sheet.png": {
+    "frame": [
+      384,
+      512
+    ],
+    "offset": [
+      0.0,
+      -192.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 3,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          384,
+          512
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          384,
+          0,
+          384,
+          512
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          768,
+          0,
+          384,
+          512
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
   "enemies/animations/moss_slime_idle_sheet.png": {
     "frame": [
       942,
@@ -1129,6 +1300,1780 @@
           343,
           373,
           463
+        ]
+      }
+    ]
+  },
+  "enemies/animations/needle_hound_idle_sheet.png": {
+    "frame": [
+      384,
+      256
+    ],
+    "offset": [
+      0.0,
+      -96.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 2,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          384,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          384,
+          0,
+          384,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "enemies/animations/needle_hound_quill_shot_sheet.png": {
+    "frame": [
+      384,
+      256
+    ],
+    "offset": [
+      0.0,
+      -96.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 4,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          384,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          384,
+          0,
+          384,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          0,
+          256,
+          384,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          384,
+          256,
+          384,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "enemies/animations/needle_hound_leap_sheet.png": {
+    "frame": [
+      384,
+      256
+    ],
+    "offset": [
+      0.0,
+      -96.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 6,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          384,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          384,
+          0,
+          384,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          768,
+          0,
+          384,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          0,
+          256,
+          384,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          384,
+          256,
+          384,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          768,
+          256,
+          384,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "enemies/animations/dust_moth_hover_sheet.png": {
+    "frame": [
+      384,
+      384
+    ],
+    "offset": [
+      0.0,
+      0.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 4,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          384,
+          0,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          0,
+          384,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          384,
+          384,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "enemies/animations/dust_moth_pollen_sheet.png": {
+    "frame": [
+      384,
+      384
+    ],
+    "offset": [
+      0.0,
+      0.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 4,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          384,
+          0,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          0,
+          384,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          384,
+          384,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "enemies/animations/root_weaver_idle_sheet.png": {
+    "frame": [
+      384,
+      384
+    ],
+    "offset": [
+      0.0,
+      -144.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 2,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          384,
+          0,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "enemies/animations/root_weaver_grab_sheet.png": {
+    "frame": [
+      384,
+      384
+    ],
+    "offset": [
+      0.0,
+      -144.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 6,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          384,
+          0,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          768,
+          0,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          0,
+          384,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          384,
+          384,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          768,
+          384,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "enemies/animations/river_shieldback_guard_sheet.png": {
+    "frame": [
+      384,
+      256
+    ],
+    "offset": [
+      0.0,
+      -96.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 2,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          384,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          384,
+          0,
+          384,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "enemies/animations/river_shieldback_claw_attack_sheet.png": {
+    "frame": [
+      384,
+      256
+    ],
+    "offset": [
+      0.0,
+      -96.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 6,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          384,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          384,
+          0,
+          384,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          768,
+          0,
+          384,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          0,
+          256,
+          384,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          384,
+          256,
+          384,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          768,
+          256,
+          384,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "enemies/animations/stone_rodent_idle_sheet.png": {
+    "frame": [
+      320,
+      256
+    ],
+    "offset": [
+      0.0,
+      -96.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 2,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          320,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          320,
+          0,
+          320,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "enemies/animations/stone_rodent_stone_throw_sheet.png": {
+    "frame": [
+      320,
+      256
+    ],
+    "offset": [
+      0.0,
+      -96.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 4,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          320,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          320,
+          0,
+          320,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          0,
+          256,
+          320,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          320,
+          256,
+          320,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "enemies/animations/stone_rodent_stunned_sheet.png": {
+    "frame": [
+      320,
+      256
+    ],
+    "offset": [
+      0.0,
+      -96.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 3,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          320,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          320,
+          0,
+          320,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          640,
+          0,
+          320,
+          256
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "enemies/animations/ash_raven_flap_sheet.png": {
+    "frame": [
+      384,
+      384
+    ],
+    "offset": [
+      0.0,
+      0.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 4,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          384,
+          0,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          768,
+          0,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          1152,
+          0,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "enemies/animations/ash_raven_dive_sheet.png": {
+    "frame": [
+      384,
+      384
+    ],
+    "offset": [
+      0.0,
+      0.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 6,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          384,
+          0,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          768,
+          0,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          0,
+          384,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          384,
+          384,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          768,
+          384,
+          384,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "enemies/animations/crystal_toad_idle_sheet.png": {
+    "frame": [
+      512,
+      384
+    ],
+    "offset": [
+      0.0,
+      -144.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 2,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          512,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          512,
+          0,
+          512,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "enemies/animations/crystal_toad_tongue_sheet.png": {
+    "frame": [
+      512,
+      384
+    ],
+    "offset": [
+      0.0,
+      -144.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 6,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          512,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          512,
+          0,
+          512,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          1024,
+          0,
+          512,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          0,
+          384,
+          512,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          512,
+          384,
+          512,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          1024,
+          384,
+          512,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "enemies/animations/crystal_toad_jump_sheet.png": {
+    "frame": [
+      512,
+      384
+    ],
+    "offset": [
+      0.0,
+      -144.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 6,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          512,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          512,
+          0,
+          512,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          1024,
+          0,
+          512,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          0,
+          384,
+          512,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          512,
+          384,
+          512,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          1024,
+          384,
+          512,
+          384
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "characters/animations/akari_spear_idle_sheet.png": {
+    "frame": [
+      512,
+      512
+    ],
+    "offset": [
+      0.0,
+      -192.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 2,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          512,
+          512
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          512,
+          0,
+          512,
+          512
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "characters/animations/akari_thrust_sheet.png": {
+    "frame": [
+      768,
+      512
+    ],
+    "offset": [
+      64.0,
+      -192.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 6,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          768,
+          512
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          768,
+          0,
+          768,
+          512
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          1536,
+          0,
+          768,
+          512
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          0,
+          512,
+          768,
+          512
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          768,
+          512,
+          768,
+          512
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          1536,
+          512,
+          768,
+          512
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "characters/animations/akari_seal_sheet.png": {
+    "frame": [
+      512,
+      512
+    ],
+    "offset": [
+      0.0,
+      -192.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 4,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          512,
+          512
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          512,
+          0,
+          512,
+          512
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          1024,
+          0,
+          512,
+          512
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          1536,
+          0,
+          512,
+          512
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "enemies/animations/bone_warden_idle_sheet.png": {
+    "frame": [
+      512,
+      640
+    ],
+    "offset": [
+      0.0,
+      -256.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 2,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          512,
+          640
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          512,
+          0,
+          512,
+          640
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "enemies/animations/bone_warden_sweep_sheet.png": {
+    "frame": [
+      512,
+      640
+    ],
+    "offset": [
+      0.0,
+      -256.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 8,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          512,
+          640
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          512,
+          0,
+          512,
+          640
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          1024,
+          0,
+          512,
+          640
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          1536,
+          0,
+          512,
+          640
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          0,
+          640,
+          512,
+          640
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          512,
+          640,
+          512,
+          640
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          1024,
+          640,
+          512,
+          640
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          1536,
+          640,
+          512,
+          640
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "enemies/animations/bone_warden_summon_sheet.png": {
+    "frame": [
+      512,
+      640
+    ],
+    "offset": [
+      0.0,
+      -256.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 6,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          512,
+          640
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          512,
+          0,
+          512,
+          640
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          1024,
+          0,
+          512,
+          640
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          0,
+          640,
+          512,
+          640
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          512,
+          640,
+          512,
+          640
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          1024,
+          640,
+          512,
+          640
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "enemies/animations/bone_warden_stagger_sheet.png": {
+    "frame": [
+      512,
+      640
+    ],
+    "offset": [
+      0.0,
+      -256.0
+    ],
+    "scale": 0.25,
+    "preserve_layout_scale": true,
+    "count": 4,
+    "regions": [
+      {
+        "region": [
+          0,
+          0,
+          512,
+          640
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          512,
+          0,
+          512,
+          640
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          1024,
+          0,
+          512,
+          640
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "region": [
+          1536,
+          0,
+          512,
+          640
+        ],
+        "margin": [
+          0,
+          0,
+          0,
+          0
         ]
       }
     ]

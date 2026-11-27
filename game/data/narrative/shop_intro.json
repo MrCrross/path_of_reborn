@@ -1,5 +1,5 @@
 [
   {"id":"DIA_SHOP_001","speaker":"Дайдзиро","text":"{assessment}","shot":"shop_interior","once":true},
-  {"id":"DIA_SHOP_003","speaker":"Дайдзиро","text":"Для дороги советую Куртку странника. Для тебя, по поручительству — {jacket_price}.","shot":"shop_interior","once":true},
+  {"id":"DIA_SHOP_003","speaker":"Дайдзиро","text":"{jacket_offer}","shot":"shop_interior","once":true},
   {"id":"DIA_SHOP_007","speaker":"Харуто","text":"Дайте взглянуть на цены.","shot":"shop_interior","once":true,"destination":"shop","commands":[{"type":"set_world_flag","key":"shop_intro_done","value":true}]}
 ]

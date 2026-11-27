@@ -7,6 +7,7 @@ const SCENES: Dictionary = {
 	"title": "res://scenes/title.tscn",
 	"prologue": "res://scenes/prologue.tscn",
 	"world": "res://scenes/world.tscn",
+	"world_map": "res://scenes/world_map.tscn",
 	"trail_dialogue": "res://scenes/trail_dialogue.tscn",
 	"combat": "res://scenes/combat.tscn",
 	"inventory": "res://scenes/inventory.tscn",
@@ -29,8 +30,10 @@ func configure(host: Control, session: GameSession) -> void:
 func go_to(scene_id: String) -> bool:
 	var open_hero: bool = scene_id == "hero_profile"
 	var screen_id: String = "characters" if open_hero else scene_id
-	if scene_id == "world_from_guild":
+	if scene_id == "world_from_map":
 		screen_id = "world"
+	elif scene_id in ["lioren_map", "map_from_shop", "map_from_guild", "map_from_lioren"]:
+		screen_id = "world_map"
 	if not SCENES.has(screen_id):
 		return false
 	var packed: PackedScene = load(SCENES[screen_id])
@@ -39,8 +42,19 @@ func go_to(scene_id: String) -> bool:
 		screen.call("configure", _session, true)
 	elif screen.has_method("configure"):
 		screen.call("configure", _session)
-	if scene_id == "world_from_guild":
-		screen.set("focus_guild_on_entry", true)
+	match scene_id:
+		"world_from_map":
+			screen.set("focus_map_on_entry", true)
+		"lioren_map":
+			screen.set("city_map", true)
+		"map_from_lioren":
+			screen.set("initial_destination", GameSession.LOCATION_LIOREN)
+		"map_from_shop":
+			screen.set("city_map", true)
+			screen.set("initial_destination", GameSession.MAP_SHOP)
+		"map_from_guild":
+			screen.set("city_map", true)
+			screen.set("initial_destination", GameSession.MAP_GUILD)
 	if screen.has_signal("navigate_requested"):
 		screen.connect("navigate_requested", go_to)
 	if is_instance_valid(current_screen):

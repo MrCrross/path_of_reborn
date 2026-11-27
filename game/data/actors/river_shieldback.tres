@@ -6,8 +6,8 @@
 script = ExtResource("1_actor")
 id = "river_shieldback"
 display_name = "Речной щитень"
-max_hp = 19
-strength = 4
+max_hp = 25
+strength = 5
 defense = 1
 telegraph_ticks = 36
 startup_ticks = 11

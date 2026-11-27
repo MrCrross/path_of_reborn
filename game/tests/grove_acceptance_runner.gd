@@ -26,11 +26,12 @@ func _run() -> void:
 		_game.session.set_guild_visit_active(false)
 		_game.router.go_to("world")
 		await _frames(6)
-		await _click(_game.router.current_screen.guild_button)
+		await _map_visit("MapGuild")
 		await _capture("01_order")
-		await _click(_node("EnterGrove"))
+		await _click(_game.router.current_screen.back_button)
+		await _map_visit("MapGrove")
 		var world: Control = _game.router.current_screen
-		_check(world.name == "World" and _game.session.location_id == GameSession.LOCATION_GROVE, "Grove is entered from the city Guild")
+		_check(world.name == "World" and _game.session.location_id == GameSession.LOCATION_GROVE, "Grove is entered from the world map")
 		if _game.session.location_id != GameSession.LOCATION_GROVE:
 			break
 		_check(world.grove_route.props.get_child_count() == 2, "Both hounds are visible during the approach")
@@ -74,7 +75,7 @@ func _run() -> void:
 		await _capture("05_kenta")
 		await _read(world.grove_route.dialogue)
 		_check(world.art_background.texture == ArtMap.texture(ArtMap.BACKGROUNDS["grove_bridge"]) and not world.hero_sprite.visible, "Kenta remains in the bridge shot during the decision")
-		_check(not world.traces_label.is_visible_in_tree() and not world.hero_label.is_visible_in_tree() and world.grove_route.exit_button.is_visible_in_tree(), "Bridge choices keep Back while clearing the HUD from Kenta's face")
+		_check(not world.traces_label.is_visible_in_tree() and not world.hero_label.is_visible_in_tree() and world.map_button.is_visible_in_tree(), "Bridge choices keep the map while clearing the HUD from Kenta's face")
 		_check(not world.upgrade_button.visible and world.inventory_button.is_visible_in_tree(), "The route choices have room and upgrades remain reachable from the bag")
 		await _capture("06_kenta_choices")
 		if window_size.y == 800:
@@ -113,7 +114,7 @@ func _run() -> void:
 		await _touch(combat.enemy_health.get_global_rect().get_center())
 		_check(pair.target.instance_id == "dust_moth", "A touch on the first HP bar selects the moth")
 		var weaver: AnimatedSprite2D = combat.arena.get_node("SecondEnemySprite")
-		await _touch(weaver.position + Vector2(23, -14))
+		await _touch(weaver.position + Vector2(18, -14))
 		_check(pair.target.instance_id == "root_weaver", "A touch on the weaver's outer silhouette selects it")
 		await _touch(combat.enemy_health.get_global_rect().get_center())
 		await _capture("07_pollen_warning")
@@ -164,16 +165,16 @@ func _run() -> void:
 			_check(world.grove_route.dialogue.is_active() and world.grove_route.dialogue.runner.current_cue()["id"] == "DIA_GROVE_014", "The Seal line appears after the confirmed write")
 			await _read(world.grove_route.dialogue)
 		await _leave(world, keep_point, window_size.y == 800)
-		world = _game.router.current_screen
-		await _click(world.guild_button)
+		await _map_visit("MapGuild")
 		_check(not _node("ReportGrove").is_visible_in_tree(), "The Guild refuses a partial report")
-		await _click(_node("EnterGrove"))
+		await _click(_game.router.current_screen.back_button)
+		await _map_visit("MapGrove")
 		world = _game.router.current_screen
 		await _click(_node("MoonFlaxProp").get_child(0))
-		_check(not _node("MoonFlaxProp").visible and _node("GatherFlax").disabled, "Gathering by hotspot removes the picked flax from the scene")
+		_check(not _node("MoonFlaxProp").visible and _node("GatherFlax") == null and (_node("MapButton").has_focus() or _node("GroveSetSeal") != null and _node("GroveSetSeal").has_focus()), "Gathering the last objective focuses the Seal or map")
 		await _leave(world, keep_point)
-		await _click(_game.router.current_screen.guild_button)
-		_check(_node("OrderTitle").text == "Можно сдать задание" and _node("ReportGrove").theme_type_variation == &"PrimaryButton" and _node("EnterGrove").theme_type_variation != &"PrimaryButton", "With both objectives ready, reporting is the primary Guild action")
+		await _map_visit("MapGuild")
+		_check(_node("OrderTitle").text == "Можно сдать задание" and _node("ReportGrove").theme_type_variation == &"PrimaryButton" and _node("EnterGrove") == null, "With both objectives ready, reporting is the primary Guild action")
 		await _click(_node("ReportGrove"))
 		var guild: Control = _game.router.current_screen
 		await _capture("12_midori")
@@ -193,7 +194,7 @@ func _run() -> void:
 		_check(not _game.commit_grove_command("report"), "Duplicate report cannot grant another reward")
 		await _read(guild.dialogue)
 		await _continue_profile()
-		_check(_game.router.current_screen.name == "Guild" and _node("OrderTitle").text == "Задание завершено", "Continue shows completed mission")
+		_check(_game.router.current_screen.name == "Guild" and _node("OrderTitle").text == "Следующее задание · Синий Овраг", "Continue shows the next assignment after the completed report")
 		await _capture("14_completed")
 	print("GROVE_ACCEPTANCE checks=%d failures=%d" % [_checks, _failures])
 	quit(1 if _failures > 0 else 0)
@@ -218,26 +219,42 @@ func _continue_profile() -> void:
 func _node(node_name: String) -> Control:
 	return _game.router.current_screen.find_child(node_name, true, false)
 
-func _leave(world: Control, keep_point: bool, fail_final_write: bool = false) -> void:
-	await _click(world.grove_route.exit_button)
+func _map_visit(destination: String) -> void:
+	var screen: Control = _game.router.current_screen
+	if screen.name == "World":
+		await _click(screen.map_button)
+	screen = _game.router.current_screen
+	var city_destination: bool = destination in ["MapShop", "MapGuild", "MapGate"]
+	if city_destination and not screen.city_map:
+		await _click(_node("MapLioren"))
+	elif not city_destination and screen.city_map:
+		await _click(screen.get_node("%Back"))
+	var option: Button = _node(destination)
+	if option == null:
+		option = _node("FirstRoute")
+	await _click(option)
+
+func _leave(_world: Control, keep_point: bool, fail_final_write: bool = false) -> void:
+	await _map_visit("MapLioren")
 	if not keep_point:
+		var map: Control = _game.router.current_screen
 		var dialogs: Array[Node] = get_nodes_in_group(ConfirmDialog.MODAL_GROUP)
 		if not dialogs.is_empty():
 			await _press_key(KEY_I)
 			await _press_key(KEY_C)
-			_check(_game.router.current_screen == world and ConfirmDialog.has_open(world), "Inventory and Seal shortcuts stay behind the exit confirmation")
+			_check(_game.router.current_screen == map and ConfirmDialog.has_open(map), "Inventory and Seal shortcuts stay behind the map confirmation")
 			await _click(dialogs[-1].get_node("%Confirm"))
-		if _game.router.current_screen == world:
-			_check(world.grove_route.dialogue.is_active() and world.grove_route.dialogue.runner.current_cue()["id"] == "DIA_GROVE_015", "Leaving without a Seal records the optional line")
+		if _game.router.current_screen == map:
+			_check(map.dialogue.is_active() and map.dialogue.runner.current_cue()["id"] == "DIA_GROVE_015", "Leaving without a Seal keeps the optional line")
 			if fail_final_write:
 				_block_write()
-			await _read(world.grove_route.dialogue)
+			await _read(map.dialogue)
 			if fail_final_write:
-				var retry: Button = _node("GroveRetryLeave")
-				_check(_game.router.current_screen == world and _node("GroveContinue") == null and retry != null and retry.has_focus(), "Failed final exit replaces the finished dialogue with a focused retry")
+				var retry: Button = _node("MapLioren")
+				_check(_game.router.current_screen == map and _game.session.location_id == GameSession.LOCATION_GROVE and not map.dialogue.is_active() and _node("TravelError").visible and retry.has_focus(), "A failed transition keeps the current location and focuses the map destination for retry")
 				_unblock_write()
 				await _click(retry)
-	_check(_game.session.location_id == GameSession.LOCATION_LIOREN, "World returns to Lioren without defeat")
+	_check(_game.session.location_id == GameSession.LOCATION_LIOREN, "The map returns the player to Lioren")
 
 func _check_pair_framing(presenter: CombatArenaPresenter) -> void:
 	var arena_bounds := Rect2(Vector2.ZERO, presenter.arena.size)

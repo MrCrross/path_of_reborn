@@ -8,6 +8,7 @@ var sound_enabled: bool = true
 var voice_id: String = ""
 var combat_format: String = GameSession.COMBAT_FORMAT_AUTO
 var auto_speed: int = 1
+var auto_ability: bool = true
 var last_error: String = ""
 
 static func path_for_profile(profile_path: String) -> String:
@@ -18,6 +19,7 @@ func load_preferences(path: String, fallback_format: String = GameSession.COMBAT
 	sound_enabled = true
 	voice_id = ""
 	auto_speed = 1
+	auto_ability = true
 	combat_format = fallback_format if fallback_format in [GameSession.COMBAT_FORMAT_AUTO, GameSession.COMBAT_FORMAT_ACTIVE] else GameSession.COMBAT_FORMAT_AUTO
 	if not FileAccess.file_exists(path) and not FileAccess.file_exists(path + ".bak"):
 		return false
@@ -77,6 +79,7 @@ func capture_dto() -> Dictionary:
 		"voice_id": voice_id,
 		"combat_format": combat_format,
 		"auto_speed": auto_speed,
+		"auto_ability": auto_ability,
 	}
 
 func _apply(dto: Dictionary) -> void:
@@ -84,6 +87,7 @@ func _apply(dto: Dictionary) -> void:
 	voice_id = String(dto["voice_id"])
 	combat_format = String(dto["combat_format"])
 	auto_speed = int(dto["auto_speed"])
+	auto_ability = bool(dto.get("auto_ability", true))
 
 func _read(path: String) -> Dictionary:
 	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
@@ -101,6 +105,8 @@ func _valid(dto: Dictionary) -> bool:
 	if typeof(dto.get("sound_enabled")) != TYPE_BOOL or typeof(dto.get("voice_id")) != TYPE_STRING:
 		return false
 	if typeof(dto.get("combat_format")) != TYPE_STRING or dto["combat_format"] not in [GameSession.COMBAT_FORMAT_AUTO, GameSession.COMBAT_FORMAT_ACTIVE]:
+		return false
+	if typeof(dto.get("auto_ability", true)) != TYPE_BOOL:
 		return false
 	return typeof(dto.get("auto_speed")) in [TYPE_INT, TYPE_FLOAT] and int(dto.get("auto_speed", 0)) in AUTO_SPEEDS
 

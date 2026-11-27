@@ -6,6 +6,7 @@ signal claim_requested(result_id: String)
 const VICTORY_FONT_SIZE := 24
 const VICTORY_REACTION_SECONDS := 0.65
 const DEFEAT_TO_CHECKPOINT_SECONDS := 0.8
+const FOCUSED_STRIKE_TUTORIAL := "tutorial_focused_strike"
 
 var session: GameSession
 var resolver: CombatResolver
@@ -42,6 +43,7 @@ var enemy_health: ActorHealthDisplay
 var arena_presenter: CombatArenaPresenter
 
 var _intro_active: bool = false
+var _ability_lesson: bool = false
 var _feedback_ticks: int = 0
 var _pause_open: bool = false
 var _navigating: bool = false
@@ -94,7 +96,16 @@ func _ready() -> void:
 	result_panel.item_requested.connect(_open_details)
 	equipment_strip.configure(session, "combat")
 	UiIcons.apply(attack_button, "attack", "Атака")
-	UiIcons.apply(ability_button, "attack", "Точный выпад I" if session.quest_flags.get(GameSession.GROVE_REPORTED, false) else "Точный удар")
+	var ability: AbilityDefinition = session.hero.first_ability()
+	if ability != null:
+		var mastered: bool = session.quest_flags.get(GameSession.GROVE_REPORTED, false) and not ability.mastered_display_name.is_empty()
+		ability_button.tooltip_text = ability.mastered_display_name if mastered else ability.display_name
+		ability_button.accessibility_name = ability_button.tooltip_text
+		ability_button.text = ability_button.tooltip_text
+	ability_button.custom_minimum_size = Vector2(72, UiIcons.TOUCH_SIZE)
+	ability_button.theme_type_variation = &"PrimaryButton"
+	ability_button.add_theme_font_size_override("font_size", 8)
+	ability_button.add_theme_color_override("font_disabled_color", AppTheme.COLOR_TEXT_DIM)
 	UiIcons.apply(dodge_button, "dodge", "Уклонение")
 	# Короткая подпись режима поверх яркого фона арены: тёмная компактная
 	# подложка, чтобы текст не сливался со светлой листвой.
@@ -118,9 +129,8 @@ func _ready() -> void:
 
 func _physics_process(_delta: float) -> void:
 	_update_marker_positions()
-	if resolver != null and not resolver.is_finished and not _intro_active and not _pause_open:
-		var ticks: int = int(session.active_encounter_context.get("auto_speed", 1)) if _current_combat_format() == GameSession.COMBAT_FORMAT_AUTO else 1
-		resolver.advance_ticks(ticks)
+	if resolver != null and not resolver.is_finished and not _intro_active and not _pause_open and not _ability_lesson:
+		resolver.advance_ticks(_combat_speed())
 		_refresh_cooldowns()
 		if _feedback_ticks > 0:
 			_feedback_ticks -= 1
@@ -151,10 +161,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 			_on_dodge_pressed()
 			return
-		if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_Q:
-			get_viewport().set_input_as_handled()
-			_on_ability_pressed()
-			return
+	if ability_button.is_visible_in_tree() and event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_Q:
+		get_viewport().set_input_as_handled()
+		_on_ability_pressed()
+		return
 	if _is_press(event):
 		if resolver != null and not _intro_active and not _pause_open and not _result_visible and not _details_open and _current_combat_format() == GameSession.COMBAT_FORMAT_ACTIVE:
 			if event is InputEventScreenTouch or event is InputEventMouseButton:
@@ -270,15 +280,27 @@ func _finish_intro() -> void:
 	if not _intro_active:
 		return
 	_intro_active = false
+	_ability_lesson = (
+		session.active_encounter_context.get("route_node_id") == "forest_edge_cart_slime"
+		and not session.seen_cue_ids.has(FOCUSED_STRIKE_TUTORIAL)
+		and _ability_unlocked()
+	)
 	arena_presenter.layout()
+	_refresh_format_ui()
 	_refresh_actions_visibility()
+	if _ability_lesson:
+		equipment_strip.set_suppressed(true)
+		hint_label.text = "Слизь перегородила тропу.\nПримените «%s»." % ability_button.tooltip_text
+		hint_label.show()
+		ability_button.grab_focus()
+		return
 	if _current_combat_format() == GameSession.COMBAT_FORMAT_ACTIVE:
 		_show_feedback("Коснитесь врага для выбора цели" if resolver.enemy_slots.size() > 1 else "Атакуйте и уклоняйтесь вручную")
 		_feedback_ticks = 90
 	if attack_button.visible:
 		attack_button.grab_focus()
-	elif dodge_button.visible:
-		dodge_button.grab_focus()
+	elif ability_button.visible:
+		ability_button.grab_focus()
 	else:
 		pause_button.grab_focus()
 
@@ -286,33 +308,47 @@ func _set_resolver(next_resolver: CombatResolver) -> void:
 	resolver = next_resolver
 	resolver.dodge_resolved.connect(_on_dodge_resolved)
 	resolver.pollen_resolved.connect(_on_pollen_resolved)
+	resolver.ability_used.connect(_on_ability_used)
 	resolver.finished.connect(_on_finished)
 	arena_presenter.bind_resolver(next_resolver)
 
 func _current_combat_format() -> String:
 	return resolver.combat_format if resolver != null else session.current_combat_format()
 
+func _combat_speed() -> int:
+	return int(session.active_encounter_context.get("auto_speed", 1)) if _current_combat_format() == GameSession.COMBAT_FORMAT_AUTO else 1
+
 func _on_attack_pressed() -> void:
 	if _intro_active or _pause_open or _navigating or _result_visible:
 		return
-	if _current_combat_format() != GameSession.COMBAT_FORMAT_ACTIVE:
+	if _ability_lesson or _current_combat_format() != GameSession.COMBAT_FORMAT_ACTIVE:
 		return
 	if resolver != null and not resolver.is_finished and resolver.request_attack():
 		_refresh()
 
 func _on_ability_pressed() -> void:
-	if _intro_active or _pause_open or _navigating or _result_visible:
+	if _intro_active or _pause_open or _navigating or _result_visible or resolver == null:
 		return
-	if _current_combat_format() != GameSession.COMBAT_FORMAT_ACTIVE:
+	var auto: bool = not _ability_lesson and _current_combat_format() == GameSession.COMBAT_FORMAT_AUTO
+	if not (resolver.request_auto_ability() if auto else resolver.request_ability()):
 		return
-	if resolver != null and not resolver.is_finished and resolver.request_ability():
-		_show_feedback("Точный удар")
-		_refresh()
+	if _ability_lesson:
+		_ability_lesson = false
+		equipment_strip.set_suppressed(false)
+		session.seen_cue_ids[FOCUSED_STRIKE_TUTORIAL] = true
+		session.profile_changed.emit()
+		_refresh_format_ui()
+		(pause_button if _current_combat_format() == GameSession.COMBAT_FORMAT_AUTO else attack_button).grab_focus()
+	_refresh()
+
+func _on_ability_used(_ability_id: String) -> void:
+	if _ability_lesson or not resolver.auto_ability_enabled:
+		_show_feedback(ability_button.tooltip_text)
 
 func _on_dodge_pressed() -> void:
 	if _intro_active or _pause_open or _navigating or _result_visible:
 		return
-	if _current_combat_format() != GameSession.COMBAT_FORMAT_ACTIVE:
+	if _ability_lesson or _current_combat_format() != GameSession.COMBAT_FORMAT_ACTIVE:
 		return
 	if resolver != null and not resolver.is_finished and resolver.request_dodge():
 		_refresh()
@@ -354,10 +390,14 @@ func _refresh_format_ui() -> void:
 	var is_auto: bool = current_format == GameSession.COMBAT_FORMAT_AUTO
 	if format_label != null:
 		format_label.text = "Авто ×%d" % int(session.active_encounter_context.get("auto_speed", session.auto_speed)) if is_auto else "Ручной"
+		if _ability_lesson:
+			format_label.text = "Обучение"
 		format_label.reset_size()
 		format_label.visible = not _result_visible
-	equipment_strip.offset_bottom = -8.0 if is_auto else actions.offset_top - 6.0
+	var has_ability: bool = _ability_unlocked()
+	equipment_strip.offset_bottom = -8.0 if is_auto and not has_ability else actions.offset_top - AppTheme.SPACE_COMPACT
 	equipment_strip.offset_top = equipment_strip.offset_bottom - equipment_strip.get_combined_minimum_size().y
+	actions.alignment = BoxContainer.ALIGNMENT_CENTER if is_auto or _ability_lesson else BoxContainer.ALIGNMENT_END
 	if format_switch != null:
 		var next_action: String = "ручной бой" if session.combat_format == GameSession.COMBAT_FORMAT_AUTO else "автобой"
 		format_switch.text = "Включить %s\nсо следующего боя" % next_action
@@ -365,13 +405,17 @@ func _refresh_format_ui() -> void:
 	if speed_switch != null:
 		speed_switch.text = "Скорость автобоя: ×%d\nсо следующего боя" % session.auto_speed
 	if attack_button != null:
-		attack_button.visible = not is_auto
+		attack_button.visible = not is_auto and not _ability_lesson
 	if ability_button != null:
-		ability_button.visible = not is_auto and session.hero.first_ability() != null and session.hero.level >= session.hero.first_ability().unlock_level
+		ability_button.visible = has_ability
 	if dodge_button != null:
-		dodge_button.visible = not is_auto
+		dodge_button.visible = not is_auto and not _ability_lesson
 	if resolver != null:
 		_refresh_cooldowns()
+
+func _ability_unlocked() -> bool:
+	var ability: AbilityDefinition = session.hero.first_ability()
+	return ability != null and session.hero.level >= ability.unlock_level
 
 ## Один владелец паузы gameplay+presentation: resolver стоит, клипы и tweens
 ## замирают на своём кадре; resume продолжает с того же места без catch-up.
@@ -381,11 +425,13 @@ func _set_pause(open: bool) -> void:
 	_pause_open = open
 	pause_layer.visible = open
 	pause_button.visible = not open
-	equipment_strip.set_suppressed(open)
+	equipment_strip.set_suppressed(open or _ability_lesson)
 	_refresh_actions_visibility()
 	arena_presenter.set_pause(open)
 	if open:
 		resume_button.grab_focus()
+	elif _ability_lesson:
+		ability_button.grab_focus()
 	elif attack_button.is_visible_in_tree() and not attack_button.disabled:
 		attack_button.grab_focus()
 	elif dodge_button.is_visible_in_tree() and not dodge_button.disabled:
@@ -523,7 +569,7 @@ func _refresh() -> void:
 func _refresh_actions_visibility() -> void:
 	actions.visible = (
 		resolver != null and not resolver.is_finished and not _intro_active
-		and not _pause_open and _current_combat_format() == GameSession.COMBAT_FORMAT_ACTIVE
+		and not _pause_open and (ability_button.visible or attack_button.visible or dodge_button.visible)
 	)
 
 func _refresh_cooldowns() -> void:
@@ -538,16 +584,26 @@ func _refresh_cooldowns() -> void:
 	attack_cooldown.value = 1.0 - float(resolver.hero_attack_cooldown) / maxi(1, resolver.hero.definition.attack_cooldown_ticks)
 	attack_cooldown.visible = resolver.hero_attack_cooldown > 0 and attack_button.visible
 	ability_button.disabled = (
-		resolver.is_finished
-		or resolver.hero_attack_cooldown > 0
-		or resolver.hero_ability_cooldown > 0
+		not resolver.can_request_ability()
+		or (not resolver.auto_attack_enabled and resolver.hero_attack_cooldown > 0)
 		or _intro_active
 		or _pause_open
 	)
 	var ability: AbilityDefinition = resolver.hero.first_ability()
-	ability_cooldown.max_value = 1.0
-	ability_cooldown.value = 1.0 - float(resolver.hero_ability_cooldown) / maxi(1, ability.cooldown_ticks if ability != null else 1)
-	ability_cooldown.visible = resolver.hero_ability_cooldown > 0 and ability_button.visible
+	if ability != null and ability_button.visible:
+		var remaining: int = resolver.hero_ability_cooldown
+		var caption: String = ability_button.tooltip_text
+		if resolver.ability_queued:
+			caption += "\nСледующий удар"
+		elif remaining > 0:
+			var seconds := ceili(float(remaining) / (Engine.physics_ticks_per_second * _combat_speed()))
+			caption += "\nАвто · %d с" % seconds if resolver.auto_ability_enabled else "\n%d с" % seconds
+		elif resolver.auto_ability_enabled and not _ability_lesson:
+			caption += "\nАвто"
+		if ability_button.text != caption:
+			ability_button.text = caption
+		ability_cooldown.value = 1.0 - float(remaining) / maxi(1, ability.cooldown_ticks)
+		ability_cooldown.visible = remaining > 0
 	dodge_button.disabled = (
 		resolver.is_finished
 		or resolver.dodge_cooldown > 0

@@ -45,7 +45,7 @@ func _open_ravens(session: GameSession) -> void:
 func _test_access(context: TestContext) -> void:
 	var session := GameSession.new()
 	var dialogue := DialogueRunner.new()
-	context.check(dialogue.load_file(GameSession.OUTPOST_NARRATIVE_PATH) and dialogue.entries.size() == 31, "The post and epilogue dialogue load as a valid timeline")
+	context.check(dialogue.load_file(GameSession.OUTPOST_NARRATIVE_PATH) and dialogue.entries.size() == 32, "The post and epilogue dialogue load as a valid timeline")
 	HollowSuite.at_hollow_order(session)
 	context.check(not session.can_enter_outpost(), "The Grove report cannot unlock the outpost")
 	at_outpost_order(session)
@@ -102,7 +102,8 @@ func _test_battles(context: TestContext) -> void:
 		print("OUTPOST_SIM %s ticks=%d HP=%d moves=%s" % [format, boss.tick_count, session.hero.current_hp, str(strikes)])
 		context.check(boss.won and not boss.enemy_slots[1].dormant and boss.enemy_slots[1].actor.is_dead(), "Victory includes the reinforcement in %s" % format)
 		context.check(strikes.slice(0, 3) == ["attack", "summon", "void"] and actions == ["summon_warning", "joint_break"], "Sweep, summoning, void contact and the joint opening occur in order")
-		context.check(DomainSuite.claim_pending(session) and session.outpost_stage() == "alliance" and session.hero.level == 5, "Boss reward advances a normal run to level 5")
+		var expected_level: int = 5 if format == GameSession.COMBAT_FORMAT_ACTIVE else 4
+		context.check(DomainSuite.claim_pending(session) and session.outpost_stage() == "alliance" and session.hero.level == expected_level, "Level 5 requires XP beyond the core route")
 		# The signal closure observes the boss; disconnect to release the reference cycle.
 		for connection: Dictionary in boss.enemy_phase_changed.get_connections():
 			boss.enemy_phase_changed.disconnect(connection["callable"])

@@ -411,18 +411,22 @@ func _test_preferences(context: TestContext) -> void:
 	preferences.sound_enabled = false
 	preferences.combat_format = GameSession.COMBAT_FORMAT_ACTIVE
 	preferences.auto_speed = 2
+	preferences.auto_ability = false
 	context.check(preferences.save_preferences(path), "Preferences save independently: %s" % preferences.last_error)
 	var restored := PreferencesService.new()
 	context.check(restored.load_preferences(path) and not restored.sound_enabled and restored.combat_format == GameSession.COMBAT_FORMAT_ACTIVE and restored.auto_speed == 2, "Restart restores sound, manual combat and auto speed")
+	context.check(not restored.auto_ability, "Restart restores manual use of skills during auto combat")
 	var session := GameSession.new()
 	session.combat_format = restored.combat_format
 	session.auto_speed = restored.auto_speed
+	session.auto_ability = restored.auto_ability
 	session.checkpoints.begin()
 	session.checkpoints.advance_ticks(CheckpointService.CHANNEL_TICKS)
 	session.checkpoints.apply_completion()
 	context.check(not session.capture_profile_dto().has("combat_format") and not session.checkpoints.manual_snapshots[0]["profile"].has("combat_format"), "Neither the profile nor Checkpoint owns combat preferences")
 	session.new_game()
 	context.check(session.combat_format == GameSession.COMBAT_FORMAT_ACTIVE and session.auto_speed == 2, "New game keeps the loaded control preferences")
+	context.check(not session.auto_ability and not session.capture_profile_dto().has("auto_ability") and not session.checkpoints.manual_snapshots.any(func(point: Dictionary) -> bool: return point["profile"].has("auto_ability")), "Skill control stays a preference outside the profile and Checkpoint")
 	preferences.sound_enabled = true
 	preferences.combat_format = GameSession.COMBAT_FORMAT_AUTO
 	preferences.auto_speed = 1
@@ -430,6 +434,10 @@ func _test_preferences(context: TestContext) -> void:
 	_write_text(path, "{broken")
 	var backup := PreferencesService.new()
 	context.check(backup.load_preferences(path) and not backup.sound_enabled and backup.combat_format == GameSession.COMBAT_FORMAT_ACTIVE and backup.auto_speed == 2, "Corrupt primary preferences fall back to the previous .bak")
+	var old_dto := preferences.capture_dto()
+	old_dto.erase("auto_ability")
+	_write_text(path, JSON.stringify(old_dto))
+	context.check(restored.load_preferences(path) and restored.auto_ability, "Older preferences keep full auto combat enabled by default")
 	_cleanup(profile_path)
 	for suffix: String in ["", ".tmp", ".bak"]:
 		if FileAccess.file_exists(path + suffix):
@@ -490,7 +498,17 @@ func _test_sale_persistence(context: TestContext) -> void:
 	session.abandon_combat()
 	context.check(session.checkpoints.restore() and session.wallet[GameSession.COPPER] == 0 and session.inventory.get_item(crystals[0].instance_id).quantity == 3, "Checkpoint rollback restores the wallet and sold crystals together")
 	var branch: ItemInstance = EquipmentModel.slot(session, "weapon")["item"]
-	context.check(not session.sell_item(branch.instance_id) and session.wallet[GameSession.COPPER] == 0, "Equipment without an explicit sellable rule cannot be exchanged")
+	context.check(not session.sell_item(branch.instance_id) and session.wallet[GameSession.COPPER] == 0, "The shop refuses to sell the equipped branch")
+	var legacy: Dictionary = session.capture_profile_dto()
+	for entry: Dictionary in legacy["inventory"]["items"]:
+		if entry["instance_id"] == branch.instance_id:
+			entry["sale_price_copper"] = 0
+			entry["sellable"] = false
+	var branch_id: String = branch.instance_id
+	session.apply_profile_dto(legacy)
+	var sword: ItemInstance = session.inventory.add(session.get_item_definition("training_sword"), 1)[0]
+	context.check(session.equip_item(sword.instance_id) and session.sell_item(branch_id), "The branch from an older save can be sold after equipping the sword")
+	context.check(session.wallet[GameSession.COPPER] == 2 and not session.sell_item(branch_id), "The branch pays two copper exactly once")
 	_cleanup(path)
 
 func _test_shop_purchase_persistence(context: TestContext) -> void:

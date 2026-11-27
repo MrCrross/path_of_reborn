@@ -12,13 +12,13 @@ const HALL_PLAN := Vector2(180, 320)
 var session: GameSession
 var dialogue: DialogueOverlay
 var _report_button: Button
-var _grove_button: Button
-var _hollow_button: Button
+
 var _hollow_report_button: Button
-var _outpost_button: Button
+
 var _outpost_report_button: Button
 var _outpost_epilogue_button: Button
 var _epilogue_map: Line2D
+var _briefing_stage: bool = false
 var _report_view: CombatResultView
 var _dialogue_kind: String = ""
 var _route_map: TextureRect
@@ -30,25 +30,28 @@ var _route_map: TextureRect
 func configure(game_session: GameSession) -> void:
 	session = game_session
 
+func configure_as_briefing_stage() -> void:
+	_briefing_stage = true
+
 func _ready() -> void:
+	if _briefing_stage:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		$SafeArea.hide()
+		_build_stage()
+		return
 	if session == null or not session.guild_visit_active():
 		navigate_requested.emit.call_deferred("world")
 		return
 	%Badge.texture = ArtMap.texture(ArtMap.GUILD_ART["badge"])
 	%Error.add_theme_color_override("font_color", AppTheme.COLOR_DANGER)
+	UiIcons.apply(back_button, "back", "К карте мира")
 	back_button.pressed.connect(handle_back)
 	register_button.pressed.connect(func() -> void: guild_registration_requested.emit())
 	var desk: VBoxContainer = register_button.get_parent()
-	_grove_button = _order_button(desk, "EnterGrove", "В Рощу")
-	_grove_button.pressed.connect(func() -> void: grove_command_requested.emit("enter"))
 	_report_button = _order_button(desk, "ReportGrove", "Сдать задание")
 	_report_button.pressed.connect(_start_report)
-	_hollow_button = _order_button(desk, "EnterHollow", "В Синий Овраг")
-	_hollow_button.pressed.connect(_start_hollow_departure)
 	_hollow_report_button = _order_button(desk, "ReportHollow", "Сдать отчёт об Овраге")
 	_hollow_report_button.pressed.connect(_start_hollow_report)
-	_outpost_button = _order_button(desk, "EnterOutpost", "На Край Ветров")
-	_outpost_button.pressed.connect(_start_outpost_departure)
 	_outpost_report_button = _order_button(desk, "ReportOutpost", "Сдать отчёт о посте")
 	_outpost_report_button.pressed.connect(_start_outpost_report)
 	_outpost_epilogue_button = _order_button(desk, "OutpostEpilogue", "Прочитать письмо")
@@ -65,18 +68,7 @@ func _ready() -> void:
 	_route_map.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_route_map.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	%Badge.get_parent().add_child(_route_map)
-	_epilogue_map = Line2D.new()
-	_epilogue_map.name = "EpilogueMap"
-	_epilogue_map.points = PackedVector2Array([Vector2(114, 102), Vector2(124, 96), Vector2(124, 87), Vector2(133, 80), Vector2(145, 78)])
-	_epilogue_map.width = 2.0
-	_epilogue_map.default_color = Color("41978e")
-	_epilogue_map.hide()
-	add_child(_epilogue_map)
-	$Merchant.texture = ArtMap.texture(ArtMap.DAIJIRO_MERCHANT_STILL)
-	$Kenta.texture = ArtMap.texture(ArtMap.GUILD_ART["kenta"])
-	$Midori.texture = ArtMap.texture(ArtMap.GUILD_ART["midori"])
-	$Goro.texture = ArtMap.texture(ArtMap.GUILD_ART["goro"])
-	resized.connect(_layout_actors)
+	_build_stage()
 
 	dialogue = DialogueOverlay.new()
 	dialogue.name = "RegistrationDialogue"
@@ -92,6 +84,22 @@ func _ready() -> void:
 		_show_desk()
 		_resume_story.call_deferred()
 
+func _build_stage() -> void:
+	_epilogue_map = Line2D.new()
+	_epilogue_map.name = "EpilogueMap"
+	_epilogue_map.points = PackedVector2Array([Vector2(114, 102), Vector2(124, 96), Vector2(124, 87), Vector2(133, 80), Vector2(145, 78)])
+	_epilogue_map.width = 2.0
+	_epilogue_map.default_color = Color("41978e")
+	_epilogue_map.hide()
+	add_child(_epilogue_map)
+	$Merchant.texture = ArtMap.texture(ArtMap.DAIJIRO_MERCHANT_STILL)
+	$Kenta.texture = ArtMap.texture(ArtMap.GUILD_ART["kenta"])
+	$Midori.texture = ArtMap.texture(ArtMap.GUILD_ART["midori"])
+	$Goro.texture = ArtMap.texture(ArtMap.GUILD_ART["goro"])
+	$Shizuka.texture = ArtMap.texture(ArtMap.GUILD_ART["shizuka"])
+	$Akari.texture = ArtMap.texture(ArtMap.OUTPOST_PROPS["akari"])
+	resized.connect(_layout_actors)
+
 func handle_back() -> bool:
 	if dialogue != null and dialogue.is_active() and _dialogue_kind != "registration":
 		dialogue.stop()
@@ -104,7 +112,7 @@ func handle_back() -> bool:
 		dialogue.stop()
 	if session != null:
 		session.set_guild_visit_active(false)
-	navigate_requested.emit("world_from_guild")
+	navigate_requested.emit("map_from_guild")
 	return true
 
 func registration_rejected() -> void:
@@ -118,12 +126,6 @@ func _on_dialogue_finished(_destination: String) -> void:
 	match _dialogue_kind:
 		"report", "hollow_report", "outpost_report":
 			_present_report()
-		"hollow_departure":
-			_show_desk()
-			hollow_command_requested.emit("enter")
-		"outpost_departure":
-			_show_desk()
-			outpost_command_requested.emit("enter")
 		"outpost_epilogue":
 			_show_desk()
 			outpost_command_requested.emit("finish")
@@ -137,9 +139,6 @@ func _claim_report() -> void:
 		_: grove_command_requested.emit("report")
 
 func outpost_command_committed(command: String) -> void:
-	if command == "enter":
-		navigate_requested.emit("world")
-		return
 	_show_desk()
 	if command == "report":
 		_start_outpost_epilogue()
@@ -153,39 +152,22 @@ func outpost_command_rejected(command: String) -> void:
 			%Error.show()
 			_outpost_epilogue_button.text = "Повторить запись"
 			_outpost_epilogue_button.grab_focus()
-		_:
-			%Error.show()
-			_outpost_button.grab_focus()
 
-func hollow_command_committed(command: String) -> void:
-	if command == "enter":
-		navigate_requested.emit("world")
-	else:
-		_show_desk()
-		_show_hollow_growth()
+func hollow_command_committed(_command: String) -> void:
+	_show_desk()
+	_show_hollow_growth()
 
-func hollow_command_rejected(command: String) -> void:
-	if command == "report":
-		_report_view.claim_button.text = "Повторить запись"
-		_report_view.claim_button.grab_focus()
-	else:
-		%Error.show()
-		_hollow_button.grab_focus()
+func hollow_command_rejected(_command: String) -> void:
+	_report_view.claim_button.text = "Повторить запись"
+	_report_view.claim_button.grab_focus()
 
-func grove_command_committed(command: String) -> void:
-	if command == "enter":
-		navigate_requested.emit("world")
-	else:
-		_show_desk()
-		_show_growth()
+func grove_command_committed(_command: String) -> void:
+	_show_desk()
+	_show_growth()
 
 func grove_command_rejected(_command: String) -> void:
-	if _report_view.visible:
-		_report_view.claim_button.text = "Повторить запись"
-		_report_view.claim_button.grab_focus()
-	else:
-		%Error.show()
-		_grove_button.grab_focus()
+	_report_view.claim_button.text = "Повторить запись"
+	_report_view.claim_button.grab_focus()
 
 func _order_button(desk: VBoxContainer, node_name: String, caption: String) -> Button:
 	var button := Button.new()
@@ -218,12 +200,6 @@ func _present_report() -> void:
 		_:
 			_report_view.present_guild_report(session, GameSession.grove_definition()["report"])
 
-func _start_outpost_departure() -> void:
-	if not session.can_enter_outpost():
-		return
-	if not _play_outpost_dialogue("outpost_departure", "На Край Ветров", [GameSession.OUTPOST_ORDER_CUE]):
-		outpost_command_requested.emit("enter")
-
 func _start_outpost_report() -> void:
 	if not session.can_report_outpost():
 		return
@@ -244,12 +220,6 @@ func _play_outpost_dialogue(kind: String, caption: String, cue_ids: Array) -> bo
 	dialogue.runner.changed.connect(_show_dialogue_shot)
 	_show_dialogue_shot()
 	return true
-
-func _start_hollow_departure() -> void:
-	if not session.can_enter_hollow():
-		return
-	if not _play_hollow_dialogue("hollow_departure", "В Синий Овраг", ["DIA_HOLLOW_ORDER", "DIA_HOLLOW_001", "DIA_HOLLOW_002", "DIA_HOLLOW_003", "DIA_HOLLOW_004"]):
-		hollow_command_requested.emit("enter")
 
 func _start_hollow_report() -> void:
 	if not session.can_report_hollow():
@@ -283,8 +253,6 @@ func _resume_story() -> void:
 		_start_report()
 	elif session.quest_flags.get(GameSession.HOLLOW_REPORTED, false):
 		_show_hollow_growth()
-	elif session.can_enter_hollow() and session.seen_cue_ids.has("DIA_HOLLOW_ORDER") and not session.seen_cue_ids.has("DIA_HOLLOW_004"):
-		_start_hollow_departure()
 	else:
 		_show_growth()
 
@@ -299,7 +267,7 @@ func _show_growth() -> void:
 		$SafeArea.hide()
 
 func _show_desk() -> void:
-	_show_shot("guild_hall")
+	show_shot("guild_hall")
 	$SafeArea.show()
 	$SafeArea/Column/Order.show()
 	_report_view.hide()
@@ -323,17 +291,13 @@ func _show_desk() -> void:
 	]
 	_route_map.visible = registered
 	%Error.hide()
-	_grove_button.visible = registered
-	_grove_button.disabled = not session.can_enter_grove()
-	_grove_button.tooltip_text = "Снимите Следы отдыхом в Лиорене" if session.traces >= 3 else ""
-	_grove_button.theme_type_variation = &"" if ready_to_report or reported else &"PrimaryButton"
 	_report_button.visible = ready_to_report
 	var hollow_ready: bool = session.can_report_hollow()
 	var hollow_reported: bool = session.quest_flags.get(GameSession.HOLLOW_REPORTED, false)
-	_hollow_button.visible = reported
-	_hollow_button.disabled = not session.can_enter_hollow()
-	_hollow_button.theme_type_variation = &"" if hollow_ready or hollow_reported else &"PrimaryButton"
 	_hollow_report_button.visible = hollow_ready
+	if reported and not session.quest_flags.get(GameSession.HOLLOW_STARTED, false):
+		%OrderTitle.text = "Следующее задание · Синий Овраг"
+		%Objectives.text = "Восстановите два маркера. Вылазка доступна на карте мира."
 	if session.quest_flags.get(GameSession.HOLLOW_STARTED, false):
 		%OrderTitle.text = "Отчёт об Овраге принят" if hollow_reported else "Синий Овраг"
 		if hollow_reported:
@@ -347,8 +311,6 @@ func _show_desk() -> void:
 		_route_map.texture = ArtMap.texture(ArtMap.HOLLOW_PROPS["cloth"] if session.quest_flags.get(GameSession.HOLLOW_CLOTH, false) else ArtMap.GROVE_PROPS["map"])
 	var outpost_reported: bool = session.quest_flags.get(GameSession.OUTPOST_REPORTED, false)
 	var outpost_finished: bool = session.quest_flags.get(GameSession.OUTPOST_FINISHED, false)
-	_outpost_button.visible = hollow_reported and not session.quest_flags.get(GameSession.OUTPOST_ALLIANCE, false)
-	_outpost_button.disabled = not session.can_enter_outpost()
 	_outpost_report_button.visible = session.can_report_outpost()
 	_outpost_epilogue_button.visible = outpost_reported and not outpost_finished
 	if _outpost_report_button.visible:
@@ -356,11 +318,13 @@ func _show_desk() -> void:
 		%Objectives.text = "✓ Сигнальная чаша осмотрена\n✓ Костяной дозорный побеждён"
 	elif outpost_reported:
 		%OrderTitle.text = "Глава завершена" if outpost_finished else "Отчёт о посте принят"
-		%Objectives.text = "Путь продолжается\nСледующая цель · архив Гильдии" if outpost_finished else "Дайдзиро принёс письмо"
+		%Objectives.text = "В следующей главе · архив Гильдии" if outpost_finished else "Дайдзиро принёс письмо"
 	if _outpost_report_button.visible or outpost_reported:
 		_route_map.texture = ArtMap.item_icon("old_watch_badge")
 	register_button.visible = session.can_register_with_guild()
-	if register_button.visible:
+	if outpost_finished:
+		back_button.grab_focus()
+	elif register_button.visible:
 		register_button.grab_focus()
 	elif _report_button.visible:
 		_report_button.grab_focus()
@@ -370,28 +334,24 @@ func _show_desk() -> void:
 		_outpost_report_button.grab_focus()
 	elif _outpost_epilogue_button.visible:
 		_outpost_epilogue_button.grab_focus()
-	elif _outpost_button.visible and not _outpost_button.disabled:
-		_outpost_button.grab_focus()
-	elif _hollow_button.visible and not _hollow_button.disabled:
-		_hollow_button.grab_focus()
-	elif _grove_button.visible and not _grove_button.disabled:
-		_grove_button.grab_focus()
 	else:
 		back_button.grab_focus()
 
 func _show_dialogue_shot() -> void:
 	if dialogue.runner != null and not dialogue.runner.is_finished:
-		_show_shot(dialogue.runner.current_shot())
+		show_shot(dialogue.runner.current_shot())
 
-func _show_shot(shot: String) -> void:
+func show_shot(shot: String) -> void:
 	var background_key: String = shot if shot in ["guild_registration", "outpost_letter"] else "guild_hall"
 	if shot == "outpost_map":
 		background_key = "outpost_letter"
 	backdrop.texture = ArtMap.texture(ArtMap.BACKGROUNDS[background_key])
 	$Merchant.visible = shot in ["guild_opening", "hollow_daijiro"]
 	$Kenta.visible = shot == "guild_opening"
-	$Midori.visible = shot not in ["guild_registration", "outpost_letter", "outpost_map"]
+	$Midori.visible = shot not in ["guild_registration", "hollow_daijiro", "hollow_shizuka", "outpost_letter", "outpost_map"]
 	$Goro.visible = shot == "guild_mentor"
+	$Shizuka.visible = shot == "hollow_shizuka"
+	$Akari.visible = shot == "guild_akari"
 	_epilogue_map.visible = shot == "outpost_map"
 	_layout_actors()
 
@@ -403,11 +363,16 @@ func _layout_actors() -> void:
 	_epilogue_map.scale = Vector2.ONE * art_scale
 	# Keep the two foreground figures inside the narrower crop on tall screens.
 	var pair_scale: float = minf(art_scale, size.x / HALL_PLAN.x * 1.16)
-	$Merchant.position = Vector2(size.x * (60.0 / HALL_PLAN.x), origin.y + 231.0 * art_scale).round()
+	var merchant_x: float = 0.5 if $Merchant.visible and not $Kenta.visible else 60.0 / HALL_PLAN.x
+	$Merchant.position = Vector2(size.x * merchant_x, origin.y + 231.0 * art_scale).round()
 	$Kenta.position = Vector2(size.x * (122.0 / HALL_PLAN.x), origin.y + 229.0 * art_scale).round()
 	$Midori.position = (origin + Vector2(143, 151) * art_scale).round()
 	$Goro.position = (origin + Vector2(82, 231) * art_scale).round()
+	$Shizuka.position = Vector2(size.x * 0.50, origin.y + 231.0 * art_scale).round()
+	$Akari.position = Vector2(size.x * 0.34, origin.y + 231.0 * art_scale).round()
 	$Merchant.scale = Vector2.ONE * 0.39 * pair_scale
 	$Kenta.scale = Vector2.ONE * 0.52 * pair_scale
 	$Midori.scale = Vector2.ONE * 0.44 * art_scale
 	$Goro.scale = Vector2.ONE * 0.56 * art_scale
+	$Shizuka.scale = Vector2.ONE * 0.38 * pair_scale
+	$Akari.scale = Vector2.ONE * pair_scale

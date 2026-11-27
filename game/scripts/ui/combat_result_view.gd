@@ -174,7 +174,7 @@ func _build_card() -> void:
 	column.add_child(item_row)
 	var icon := TextureRect.new()
 	icon.texture = ArtMap.item_icon(item_id, aspect_id)
-	icon.custom_minimum_size = Vector2(24, 24)
+	icon.custom_minimum_size = Vector2(34, 34)
 	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -319,6 +319,9 @@ func _reset_card() -> void:
 	_drag = Vector2.ZERO
 
 func _fit_to_content() -> void:
+	var width := 154.0 if card != null and card.visible else 132.0
+	offset_left = -width * 0.5
+	offset_right = width * 0.5
 	offset_top = offset_bottom - get_combined_minimum_size().y
 
 func show_write_error() -> void:

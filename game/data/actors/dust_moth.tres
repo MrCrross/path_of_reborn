@@ -6,8 +6,8 @@
 script = ExtResource("1_actor")
 id = "dust_moth"
 display_name = "Пыльный мотылёк"
-max_hp = 7
-strength = 2
+max_hp = 11
+strength = 3
 defense = 0
 behavior_id = "dust_moth"
 telegraph_ticks = 34

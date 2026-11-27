@@ -64,6 +64,9 @@ func can_begin() -> bool:
 		and not session.is_moving
 	)
 
+func has_point_at(location_id: String) -> bool:
+	return manual_snapshots.any(func(snapshot: Dictionary) -> bool: return snapshot["location_id"] == location_id)
+
 func begin() -> bool:
 	if not can_begin():
 		return false
@@ -235,7 +238,8 @@ func _restore_profile(snapshot: Dictionary, trace_cost: int) -> void:
 	session.awaiting_return = false
 	session.in_combat = false
 	if session.traces == 3:
-		session.location_id = "lioren"
+		session.location_id = GameSession.LOCATION_LIOREN
+		session.record_map_visit(session.location_id)
 	session.profile_changed.emit()
 	changed.emit()
 
@@ -253,6 +257,7 @@ func _apply_fallback() -> void:
 	session.awaiting_return = false
 	session.in_combat = false
 	if session.traces == 3:
-		session.location_id = "lioren"
+		session.location_id = GameSession.LOCATION_LIOREN
+		session.record_map_visit(session.location_id)
 	session.profile_changed.emit()
 	changed.emit()

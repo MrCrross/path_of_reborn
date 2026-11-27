@@ -6,7 +6,7 @@
 script = ExtResource("1_actor")
 id = "needle_hound"
 display_name = "Иглопёс"
-max_hp = 9
+max_hp = 14
 strength = 3
 defense = 1
 behavior_id = "needle_hound"

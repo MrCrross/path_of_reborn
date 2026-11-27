@@ -4,19 +4,21 @@ extends Node
 signal command_requested(command: String)
 signal encounter_requested(enemy_id: String)
 signal shot_changed(dialogue_active: bool, story_frame: bool)
+signal checkpoint_requested
 
 var session: GameSession
 var dialogue: DialogueOverlay
 var _actions: VBoxContainer
 var _props: Control
 var _background: TextureRect
-var _exit_button: Button
+var _map_button: Button
 var _resume_button: Button
 var _error: Label
 var _cue_ids: Array[String] = []
 
-func configure(game_session: GameSession, world: Control, action_parent: Control, top_left: Control, background: TextureRect) -> void:
+func configure(game_session: GameSession, world: Control, action_parent: Control, map_button: Button, background: TextureRect) -> void:
 	session = game_session
+	_map_button = map_button
 	_background = background
 	_props = Control.new()
 	_props.name = "HollowProps"
@@ -28,11 +30,6 @@ func configure(game_session: GameSession, world: Control, action_parent: Control
 	_actions = VBoxContainer.new()
 	_actions.name = "HollowActions"
 	action_parent.add_child(_actions)
-	_exit_button = Button.new()
-	_exit_button.name = "HollowExit"
-	UiIcons.apply(_exit_button, "back", "В Лиорен")
-	top_left.add_child(_exit_button)
-	_exit_button.pressed.connect(leave)
 	dialogue = DialogueOverlay.new()
 	dialogue.name = "HollowDialogue"
 	dialogue.configure(session)
@@ -46,9 +43,6 @@ func refresh(play_dialogue: bool = true) -> void:
 			child.queue_free()
 	_resume_button = null
 	var stage: String = session.hollow_stage()
-	var exit_caption: String = "Назад к уступу" if stage == "elite" else "В Лиорен"
-	_exit_button.tooltip_text = exit_caption
-	_exit_button.accessibility_name = exit_caption
 	var node: Dictionary = GameSession.hollow_node(stage)
 	_cue_ids.assign(node.get("cues", []))
 	if stage == "upper_marker":
@@ -75,6 +69,7 @@ func refresh(play_dialogue: bool = true) -> void:
 				var crop: Rect2 = ArtMap.GROVE_PROP_CROPS[path]
 				_prop("MarkerProp", ArtMap.crop(path, crop), crop.size, Vector2(0.66, 0.60), marker)
 			"shelf":
+				_offer_checkpoint()
 				if not session.quest_flags.get(GameSession.HOLLOW_COLLAPSED, false):
 					var collapse := _button("CollapseShelf", "Обрушить полку", _command.bind("collapse"))
 					var crop := Rect2(28, 16, 40, 24)
@@ -86,11 +81,9 @@ func refresh(play_dialogue: bool = true) -> void:
 					_prop("ClothProp", ArtMap.texture(ArtMap.HOLLOW_PROPS["cloth"]), Vector2(24, 24), Vector2(0.69, 0.48), inspect)
 				else:
 					if not session.quest_flags.get(GameSession.HOLLOW_ELITE_WON, false):
-						_button("DescendToElite", "К гнезду жабы", _confirm_descent)
-					_button("ReturnToLioren", "В Лиорен", leave)
+						_offer_checkpoint()
 			"elite":
-				_button("RetreatFromBasin", "Назад к уступу", _command.bind("retreat"))
-				_fight_button(node, "Элитная цель · повышенный риск")
+				_fight_button(node, "Два удара подряд. После второго — Точный выпад.")
 	_error = Label.new()
 	_error.text = "Запись не удалась. Попробуйте ещё раз."
 	_error.add_theme_color_override("font_color", AppTheme.COLOR_DANGER)
@@ -112,18 +105,6 @@ func close_dialogue() -> bool:
 	refresh(false)
 	return true
 
-func leave() -> void:
-	if dialogue.is_active() or ConfirmDialog.has_open(get_parent()):
-		return
-	if session.hollow_stage() == "elite":
-		_command("retreat")
-		return
-	if session.quest_flags.get(GameSession.HOLLOW_CLOTH, false) or session.traces >= 3:
-		_command("leave")
-		return
-	var confirm: ConfirmDialog = ConfirmDialog.open(get_parent(), "Вернуться в Лиорен?", "Восстановленные маркеры сохранятся.", "Вернуться", "Остаться")
-	confirm.confirmed.connect(_command.bind("leave"))
-
 func rejected(_command_id: String) -> void:
 	_error.show()
 
@@ -131,13 +112,10 @@ func _command(command: String) -> void:
 	if not dialogue.is_active():
 		command_requested.emit(command)
 
-func _confirm_descent() -> void:
-	_actions.get_node("DescendToElite").grab_focus()
-	var message: String = "Элитная цель. Основное задание можно сдать без победы над жабой."
-	if session.checkpoints.can_begin():
-		message += " На уступе можно оставить точку Печати."
-	var confirm: ConfirmDialog = ConfirmDialog.open(get_parent(), "Гнездо Кристальной жабы", message, "Спуститься", "Остаться")
-	confirm.confirmed.connect(_command.bind("descend"))
+func _offer_checkpoint() -> void:
+	if session.checkpoints.can_begin() and not session.checkpoints.has_point_at(session.location_id):
+		var seal := _button("HollowSetSeal", "Оставить точку Печати", func() -> void: checkpoint_requested.emit())
+		seal.theme_type_variation = &"MagicButton"
 
 func _play_dialogue() -> void:
 	if dialogue.play(GameSession.HOLLOW_NARRATIVE_PATH, "", false, {}, _cue_ids):
@@ -199,6 +177,7 @@ func _fight_button(node: Dictionary, hint: String) -> void:
 	if not hint.is_empty():
 		var label := Label.new()
 		label.text = hint
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.add_theme_font_size_override("font_size", 9)
 		_actions.add_child(label)
@@ -210,7 +189,7 @@ func _button(node_name: String, caption: String, callback: Callable) -> Button:
 	button.name = node_name
 	button.text = caption
 	button.custom_minimum_size.y = UiIcons.TOUCH_SIZE
-	button.disabled = session.traces >= 3 and node_name not in ["ReturnToLioren", "RetreatFromBasin"]
+	button.disabled = session.traces >= 3
 	button.add_theme_font_size_override("font_size", 9)
 	button.pressed.connect(callback)
 	_actions.add_child(button)
@@ -222,4 +201,4 @@ func _focus_action() -> void:
 		if button != null and not button.disabled:
 			button.grab_focus()
 			return
-	_exit_button.grab_focus()
+	_map_button.grab_focus()

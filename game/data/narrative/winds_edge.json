@@ -11,6 +11,7 @@
   {"id": "DIA_AKARI_017", "speaker": "Харуто", "text": "На стене у маркера. Знаешь владельца?", "shot": "world_outpost", "once": true},
   {"id": "DIA_AKARI_019", "speaker": "Акари", "text": "Акари Кагура. И если сейчас выйдет дозорный, не становись между мной и его первым ударом.", "shot": "world_outpost", "once": true},
   {"id": "DIA_WARDEN_001", "speaker": "Акари", "text": "Не бей по рёбрам! Это не тело, это доспех с памятью. По суставам!", "shot": "world_outpost", "once": true},
+  {"id": "DIA_WARDEN_JOINT", "speaker": "Харуто / мысли", "text": "Акари поддела сустав копьём. Мне хватило одного точного удара.", "shot": "outpost_joint", "once": true},
   {"id": "DIA_AKARI_022", "speaker": "Акари", "text": "Этот ключ принадлежал моему наставнику. Сёме Кагура. Он не грабил караван. Он вёл его через перевал, потому что думал, что сможет остановить то, что открылось внутри.", "shot": "outpost_key", "once": true},
   {"id": "DIA_AKARI_024", "speaker": "Акари", "text": "Я видела его на мертвеце из каравана. И сейчас вижу похожий на твоей руке. Не делай удивлённое лицо — ты сам поднял ткань и пришёл именно сюда.", "shot": "outpost_key", "once": true},
   {"id": "DIA_AKARI_025", "speaker": "Харуто", "text": "Я не знаю, почему они похожи. Но если ответ есть в Лиорене, я помогу его найти.", "shot": "outpost_key", "once": true},
@@ -19,7 +20,7 @@
   {"id": "DIA_AKARI_028", "speaker": "Акари", "text": "Я иду с тобой до архива. Не в твою партию, не в твою свиту и не в твою легенду.", "shot": "outpost_key", "once": true},
   {"id": "DIA_AKARI_029", "speaker": "Харуто", "text": "До архива — отличный масштаб. У меня пока и планы на жизнь примерно такой длины.", "shot": "outpost_key", "once": true},
   {"id": "DIA_EPILOGUE_001", "speaker": "Мидори", "text": "Сигнальный огонь проверен, дозорный механизм остановлен, заказ закрыт. Вы оба живы. Не смотрите так, я действительно включаю это в хороший отчёт.", "shot": "guild_hall", "once": true},
-  {"id": "DIA_EPILOGUE_002", "speaker": "Акари", "text": "Мне нужен архив каравана Сёмы Кагура.", "shot": "guild_hall", "once": true},
+  {"id": "DIA_EPILOGUE_002", "speaker": "Акари", "text": "Мне нужен архив каравана Сёмы Кагура.", "shot": "guild_akari", "once": true},
   {"id": "DIA_EPILOGUE_003", "speaker": "Мидори", "text": "Архив закрыт не потому, что я против. Для него нужен знак старого дозора и разрешение Горо. Первое у вас есть.", "shot": "guild_hall", "once": true},
   {"id": "DIA_EPILOGUE_005", "speaker": "Мидори", "text": "Получим честным запросом. Не взламывайте дверь, пока я отвернусь.", "shot": "guild_hall", "once": true},
   {"id": "DIA_EPILOGUE_006", "speaker": "Дайдзиро", "text": "Прежде чем вы пойдёте к Горо… Взгляните на это. Лист был среди старых расписок. Имени получателя нет.", "shot": "outpost_letter", "once": true},
@@ -27,7 +28,7 @@
   {"id": "DIA_EPILOGUE_010", "speaker": "Дайдзиро", "text": "Да. Сейчас перестаю. Не прошу считать это достаточным.", "shot": "outpost_letter", "once": true},
   {"id": "DIA_EPILOGUE_011", "speaker": "Мидори", "text": "Дата на четыре дня позже официальной гибели Сёмы.", "shot": "outpost_letter", "once": true},
   {"id": "DIA_EPILOGUE_012", "speaker": "Акари", "text": "Значит, либо отчёт лжёт, либо письмо. И я хочу знать, кто получил выгоду от каждой версии.", "shot": "outpost_letter", "once": true},
-  {"id": "DIA_EPILOGUE_014", "speaker": "Акари", "text": "До архива, помнишь?", "shot": "guild_hall", "once": true},
+  {"id": "DIA_EPILOGUE_014", "speaker": "Акари", "text": "До архива, помнишь?", "shot": "guild_akari", "once": true},
   {"id": "DIA_EPILOGUE_015", "speaker": "Харуто", "text": "До архива. И никаких скрытых находок.", "shot": "guild_hall", "once": true},
   {"id": "DIA_OUTPOST_MAP", "speaker": "", "text": "На карте Мидори проступает новая линия. Она начинается у поста и уходит за перевал.", "shot": "outpost_map", "once": true, "destination": "world"}
 ]

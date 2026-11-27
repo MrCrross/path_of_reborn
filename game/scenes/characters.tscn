@@ -275,7 +275,7 @@ color = Color(0.02, 0.03, 0.05, 0.8)
 [node name="SafeArea" type="MarginContainer" parent="ItemDetailsLayer"]
 mouse_filter = 2
 script = ExtResource("2")
-padding = 12
+padding = 7
 
 [node name="Center" type="VBoxContainer" parent="ItemDetailsLayer/SafeArea"]
 layout_mode = 2
@@ -284,6 +284,6 @@ alignment = 1
 
 [node name="ItemDetails" type="PanelContainer" parent="ItemDetailsLayer/SafeArea/Center"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 216)
+custom_minimum_size = Vector2(0, 240)
 layout_mode = 2
 script = ExtResource("4")

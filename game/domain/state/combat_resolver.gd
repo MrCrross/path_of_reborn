@@ -74,6 +74,7 @@ var _tempo_ticks: int = 0
 var slowed_ticks: int = 0
 var hero_attack_cooldown: int = 0
 var hero_ability_cooldown: int = 0
+var ability_queued: bool = false
 var dodge_ticks_remaining: int = 0
 var dodge_cooldown: int = 0
 var tick_count: int = 0
@@ -98,6 +99,7 @@ var _hero_strike_is_ability: bool = false
 ## Автоматические базовые атаки (подтверждённый режим по умолчанию). Ручной
 ## запрос через request_attack() использует тот же путь и общий cooldown.
 var auto_attack_enabled: bool = true
+var auto_ability_enabled: bool = true
 ## Полный автобой: попытки уклонения принадлежат resolver'у; в активном режиме
 ## источником dodge является игрок через request_dodge() (общий путь защиты).
 var auto_dodge_enabled: bool = false
@@ -152,13 +154,26 @@ func request_attack() -> bool:
 	return true
 
 func request_ability() -> bool:
-	var ability: AbilityDefinition = hero.first_ability()
-	if ability == null or hero.level < ability.unlock_level or not is_active or is_finished or hero_attack_cooldown > 0 or _hero_strike_started or hero_ability_cooldown > 0:
+	if not can_request_ability() or hero_attack_cooldown > 0 or _hero_strike_started:
 		return false
+	var ability: AbilityDefinition = hero.first_ability()
+	ability_queued = false
 	_hero_strike_multiplier = ability.damage_multiplier
 	hero_ability_cooldown = ability.cooldown_ticks
 	_begin_hero_strike(true)
 	ability_used.emit(ability.id)
+	return true
+
+func can_request_ability() -> bool:
+	var ability: AbilityDefinition = hero.first_ability()
+	return is_active and not is_finished and not ability_queued and hero_ability_cooldown == 0 and ability != null and hero.level >= ability.unlock_level
+
+## В автобое нажатие во время замаха заменяет следующий обычный удар навыком.
+func request_auto_ability() -> bool:
+	if not auto_attack_enabled or not can_request_ability():
+		return false
+	if not request_ability():
+		ability_queued = true
 	return true
 
 func request_dodge() -> bool:
@@ -172,6 +187,7 @@ func invalidate() -> void:
 	if not is_active:
 		return
 	is_active = false
+	ability_queued = false
 	_hero_strike_started = false
 	_hero_strike_ticks_remaining = 0
 	dodge_ticks_remaining = 0
@@ -205,8 +221,10 @@ func advance_ticks(count: int) -> void:
 		dodge_cooldown = maxi(0, dodge_cooldown - 1)
 		auto_dodge_cooldown = maxi(0, auto_dodge_cooldown - 1)
 		if auto_attack_enabled and hero_attack_cooldown == 0 and not _hero_strike_started:
-			if hero_ability_cooldown == 0 and request_ability():
-				continue
+			if ability_queued or auto_ability_enabled:
+				ability_queued = false
+				if request_ability():
+					continue
 			_begin_hero_strike()
 
 func is_vulnerable() -> bool:

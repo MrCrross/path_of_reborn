@@ -2,6 +2,16 @@
   "route_id": "forest_edge_slice",
   "prototype": true,
   "completion_label": "Участок пройден",
+  "repeat_enemies": {
+    "moss_slime": {"level": 1, "seen_world_flag": "first_slime_spotted"},
+    "goblin_scout": {"level": 2, "seen_world_flag": "daijiro_spotted"},
+    "needle_hound": {"level": 2, "xp": 4},
+    "dust_moth": {"level": 2, "xp": 4, "pollen_slow_ticks": 90},
+    "root_weaver": {"level": 2, "xp": 4},
+    "river_shieldback": {"level": 3, "xp": 4},
+    "stone_rodent": {"level": 3, "xp": 4},
+    "ash_raven": {"level": 3, "xp": 4}
+  },
   "nodes": [
     {
       "node_id": "forest_edge_slime",

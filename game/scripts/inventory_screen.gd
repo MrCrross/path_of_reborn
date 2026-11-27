@@ -185,15 +185,15 @@ func _refresh_list() -> void:
 func _build_card(item: ItemInstance) -> Control:
 	var definition: ItemDefinition = session.get_item_definition(item.definition_id)
 	var card := Button.new()
-	card.custom_minimum_size = Vector2(36, 40)
+	card.custom_minimum_size = Vector2(44, 52)
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	card.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	card.add_theme_font_size_override("font_size", 9)
 	var icon: Texture2D = ArtMap.item_icon(item.definition_id, item.aspect_id)
 	if icon != null:
 		card.icon = icon
-		card.add_theme_constant_override("icon_max_width", 24)
-		card.expand_icon = false
+		card.add_theme_constant_override("icon_max_width", 36)
+		card.expand_icon = true
 	var equipped: bool = session.inventory.is_equipped(item.instance_id)
 	card.text = "?" if icon == null else ""
 	card.tooltip_text = "%s · %s%s" % [definition.display_name, UiText.rarity(definition.rarity_id), " · Надето" if equipped else ""]

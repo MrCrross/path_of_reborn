@@ -14,9 +14,7 @@ func _run() -> void:
 		_game.session.set_guild_visit_active(false)
 		_game.router.go_to("world")
 		await _frames(6)
-		await _click(_game.router.current_screen.guild_button)
-		await _read(_game.router.current_screen.dialogue)
-		await _click(_node("EnterOutpost"))
+		await _map_visit("MapOutpost")
 		await _read(_game.router.current_screen.dialogue)
 		if not _check(_game.session.location_id == GameSession.LOCATION_OUTPOST, "Hollow report unlocks travel"):
 			break
@@ -79,13 +77,15 @@ func _run() -> void:
 		_check(_game.session.inventory.filter("quest").is_empty() and _game.session.hero.level == 4, "A failed boss claim leaves items, XP and the stage untouched")
 		_unblock_write()
 		await _click(combat.result_panel.claim_button)
-		_check(_game.session.inventory.filter("quest").size() == 2 and _game.session.hero.level == 5, "Boss loot is delivered atomically with level 5")
+		var expected_level: int = 5 if window_size.y == 844 else 4
+		_check(_game.session.inventory.filter("quest").size() == 2 and _game.session.hero.level == expected_level, "Boss loot and route-dependent XP are delivered atomically")
 		world = _game.router.current_screen
 		await _capture("07_alliance")
 		await _read(world.outpost_route.dialogue)
-		await _click(_node("OutpostAction"))
-		_check(_game.session.location_id == GameSession.LOCATION_LIOREN and _game.session.quest_flags.has(GameSession.OUTPOST_ALLIANCE), "The fixed alliance conversation returns to Lioren")
-		await _click(_game.router.current_screen.guild_button)
+		await _map_visit("MapLioren")
+		_check(_game.session.location_id == GameSession.LOCATION_LIOREN and _game.session.quest_flags.has(GameSession.OUTPOST_ALLIANCE), "The map returns to Lioren after the alliance")
+		await _map_visit("MapGuild")
+		await _read(_game.router.current_screen.dialogue)
 		await _click(_node("ReportOutpost"))
 		var guild: Control = _game.router.current_screen
 		await _read(guild.dialogue)

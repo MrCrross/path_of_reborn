@@ -77,7 +77,7 @@ func configure(target_session: GameSession, arena_node: Control, hero: AnimatedS
 func bind_resolver(next_resolver: CombatResolver) -> void:
 	resolver = next_resolver
 	_last_phase = -1
-	if uses_expedition_art():
+	if _uses_enemy_slot_presentation():
 		_build_grove_enemies()
 		resolver.enemy_phase_changed.connect(_on_grove_actor_changed)
 		resolver.target_changed.connect(_on_grove_actor_changed)
@@ -119,7 +119,7 @@ func layout() -> void:
 			for index: int in range(_grove_enemies.size()):
 				_grove_enemies[index].sprite.position = _grove_anchor(index)
 	if _grove_enemies.is_empty():
-		telegraph.scale = Vector2.ONE
+		telegraph.scale = Vector2.ONE / ArtMap.DETAIL_SCALE
 	update_positions()
 
 func start_intro() -> void:
@@ -347,11 +347,11 @@ func _setup_art() -> void:
 	_apply_clip(enemy_sprite, _enemy_frames["idle"])
 	enemy_sprite.play(&"default")
 	hero_sprite.animation_finished.connect(_reset_hero_to_idle)
-	if not uses_expedition_art():
+	if not _uses_enemy_slot_presentation():
 		enemy_sprite.animation_finished.connect(_on_enemy_clip_finished)
 
-func uses_expedition_art() -> bool:
-	return session.location_id in GameSession.EXPEDITION_LOCATIONS
+func _uses_enemy_slot_presentation() -> bool:
+	return session.location_id in GameSession.EXPEDITION_LOCATIONS or ArtMap.GROVE_STILLS.has(session.current_enemy_id) or ArtMap.HOLLOW_STILLS.has(session.current_enemy_id)
 
 func _build_outpost_ally() -> void:
 	_akari = AnimatedSprite2D.new()
@@ -367,7 +367,7 @@ func _build_outpost_ally() -> void:
 	_ally_fire.name = "AkariSeal"
 	_ally_fire.z_index = 1
 	_ally_fire.texture = ArtMap.crop(ArtMap.OUTPOST_PROPS["fire"], Rect2(12, 58, 72, 28))
-	_ally_fire.scale = Vector2.ONE * 0.65
+	_ally_fire.scale = Vector2.ONE * 0.65 / ArtMap.DETAIL_SCALE
 	_ally_fire.hide()
 	arena.add_child(_ally_fire)
 	_ally_cue = Label.new()
@@ -390,7 +390,7 @@ func _play_akari_idle() -> void:
 func _on_ally_action(action: String) -> void:
 	var thrust: bool = action in ["hold", "joint_break"]
 	if thrust:
-		_apply_clip(_akari, _akari_clips["thrust"])
+		_apply_clip(_akari, _akari_clips["seal" if action == "hold" else "thrust"])
 		_akari.play(&"default")
 		_ally_fire.position = _grove_anchor(1 if action == "hold" else 0) + Vector2(0, 1)
 	_ally_fire.visible = thrust
@@ -414,7 +414,7 @@ func _build_grove_enemies() -> void:
 	_pollen_cloud = Sprite2D.new()
 	_pollen_cloud.name = "PollenCloud"
 	_pollen_cloud.texture = ArtMap.crop(ArtMap.FX["moth_pollen"], Rect2(28, 38, 40, 22))
-	_pollen_cloud.scale = Vector2.ONE * 1.4
+	_pollen_cloud.scale = Vector2.ONE * 1.4 / ArtMap.DETAIL_SCALE
 	_pollen_cloud.z_index = 2
 	_pollen_cloud.hide()
 	arena.add_child(_pollen_cloud)
@@ -457,6 +457,12 @@ func _build_grove_enemies() -> void:
 		_grove_enemies.append(view)
 
 func _grove_anchor(index: int) -> Vector2:
+	if session.location_id == GameSession.LOCATION_FOREST_EDGE:
+		var slot: CombatResolver.EnemySlot = resolver.enemy_slots[index]
+		var anchor: Vector2 = SceneStaging.hollow_enemy_anchor(arena.size, index, 1)
+		if slot.pollen_slow_ticks > 0 or slot.actor.definition.id == "ash_raven":
+			anchor.y -= 28.0
+		return anchor.round()
 	if session.location_id == GameSession.LOCATION_OUTPOST:
 		return SceneStaging.outpost_enemy_anchor(arena.size, index, resolver.enemy_slots[0].actor.definition.id == "bone_warden").round()
 	if session.location_id == GameSession.LOCATION_HOLLOW:
@@ -532,7 +538,7 @@ func _refresh_grove_enemies() -> void:
 		view.warning.modulate = Color(1.0, 0.8, 0.35, 0.8) if species == "dust_moth" else Color(1.0, 0.55, 0.45, 0.8)
 		if is_void:
 			view.warning.modulate = Color(0.81, 0.50, 1.0, 0.9)
-		view.warning.scale = Vector2.ONE * (0.98 if is_void else 0.76)
+		view.warning.scale = Vector2.ONE * (0.98 if is_void else 0.76) / ArtMap.DETAIL_SCALE
 		view.cue.add_theme_color_override("font_color", Color("e8c2ff") if is_void else Color("ffe3a2"))
 		view.cue.text = _grove_warning(slot)
 		view.cue.reset_size()
@@ -576,7 +582,10 @@ func _grove_warning(slot: CombatResolver.EnemySlot) -> String:
 		"river_shieldback": return "Уязвим" if slot.phase == CombatResolver.Phase.VULNERABILITY else "Удар клешнёй"
 		"stone_rodent": return "Бросок"
 		"ash_raven": return "Пикирование"
-		"crystal_toad": return "Прыжок" if slot.strike_index == 1 else "Удар языком"
+		"crystal_toad":
+			if slot.phase == CombatResolver.Phase.VULNERABILITY:
+				return "Броня раскрылась"
+			return "2 · Прыжок" if slot.strike_index == 1 else "1 · Удар языком"
 		"bone_warden":
 			if slot.phase == CombatResolver.Phase.VULNERABILITY:
 				return "Уязвим"

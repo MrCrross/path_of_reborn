@@ -53,7 +53,7 @@ func _ready() -> void:
 	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	content.add_theme_constant_override("separation", 3)
 	scroll.add_child(content)
-	icon_rect = _icon(content, 40)
+	icon_rect = _icon(content, 56)
 	meta_label = _label(content, 8, true)
 	meta_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	equipped_badge = _label(content, 8)

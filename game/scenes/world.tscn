@@ -166,30 +166,11 @@ theme_type_variation = &"PrimaryButton"
 theme_override_font_sizes/font_size = 9
 text = "Выбрать улучшение"
 
-[node name="TravelButton" type="Button" parent="Margin/Column/BottomColumn"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-custom_minimum_size = Vector2(0, 24)
-theme_override_font_sizes/font_size = 9
-text = "В Лиорен"
-
-[node name="ShopButton" type="Button" parent="Margin/Column/BottomColumn"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-custom_minimum_size = Vector2(0, 24)
-theme_override_font_sizes/font_size = 9
-text = "В лавку"
-
 [node name="RepeatsButton" type="Button" parent="Margin/Column/BottomColumn"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-custom_minimum_size = Vector2(0, 20)
-theme_override_font_sizes/font_size = 9
-text = "Повторы и испытание"
-tooltip_text = "Добровольный выбор встреч: повторы и испытание"
+custom_minimum_size = Vector2(24, 24)
 
 [node name="MainActionButton" type="Button" parent="Margin/Column/BottomColumn"]
 unique_name_in_owner = true
@@ -226,71 +207,17 @@ visible = false
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 
-[node name="EncounterSheet" type="Control" parent="."]
-unique_name_in_owner = true
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Dim" type="ColorRect" parent="EncounterSheet"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.03, 0.04, 0.05, 0.55)
-
-[node name="Panel" type="PanelContainer" parent="EncounterSheet"]
-layout_mode = 1
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -72.0
-offset_top = -70.0
-offset_right = 72.0
-offset_bottom = 70.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_type_variation = &"HudPanel"
-
-[node name="Column" type="VBoxContainer" parent="EncounterSheet/Panel"]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="SheetCaption" type="Label" parent="EncounterSheet/Panel/Column"]
-layout_mode = 2
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 11
-text = "Выбор встречи"
-
-[node name="SheetRows" type="VBoxContainer" parent="EncounterSheet/Panel/Column"]
+[node name="MapButton" type="Button" parent="Margin/Column/BottomColumn/NavBar"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 4
-
-[node name="SheetClose" type="Button" parent="EncounterSheet/Panel/Column"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 26)
-layout_mode = 2
-text = "Закрыть"
 
 [connection signal="pressed" from="Margin/Column/TopBar/Row/LeftZone/SettingsButton" to="." method="_on_settings_pressed"]
 [connection signal="pressed" from="Margin/Column/TopBar/Row/RightZone/BalanceButton" to="." method="_on_balance_pressed"]
 [connection signal="pressed" from="Margin/Column/BottomColumn/UpgradeButton" to="." method="_on_hero_profile_pressed"]
-[connection signal="pressed" from="Margin/Column/BottomColumn/TravelButton" to="." method="_on_travel_pressed"]
-[connection signal="pressed" from="Margin/Column/BottomColumn/ShopButton" to="." method="_on_shop_pressed"]
 [connection signal="pressed" from="Margin/Column/BottomColumn/MainActionButton" to="." method="_on_main_action_pressed"]
 [connection signal="pressed" from="Margin/Column/BottomColumn/RepeatsButton" to="." method="_on_repeats_pressed"]
-[connection signal="gui_input" from="EncounterSheet/Dim" to="." method="_on_sheet_dismiss"]
-[connection signal="pressed" from="EncounterSheet/Panel/Column/SheetClose" to="." method="_on_sheet_close_pressed"]
 [connection signal="pressed" from="Margin/Column/BottomColumn/NavBar/InventoryButton" to="." method="_on_inventory_pressed"]
 [connection signal="pressed" from="Margin/Column/BottomColumn/NavBar/CheckpointButton" to="." method="_on_checkpoint_pressed"]
 [connection signal="pressed" from="Margin/Column/BottomColumn/NavBar/CharactersButton" to="." method="_on_characters_pressed"]
 [connection signal="pressed" from="Margin/Column/BottomColumn/NavBar/RestButton" to="." method="_on_rest_pressed"]
+[connection signal="pressed" from="Margin/Column/BottomColumn/NavBar/MapButton" to="." method="_on_map_pressed"]

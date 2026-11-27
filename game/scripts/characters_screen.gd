@@ -224,10 +224,10 @@ func _refresh_progression(state: CharacterState) -> void:
 		if has_next and ability.unlock_level == state.level + 1:
 			%NextGain.text += "\nОткроется «%s»" % ability.display_name
 		elif state.level >= ability.unlock_level:
-			if state == session.hero and session.quest_flags.get(GameSession.GROVE_REPORTED, false):
-				ability_lines.append("Точный выпад I · бонус в окно уязвимости")
+			if state == session.hero and session.quest_flags.get(GameSession.GROVE_REPORTED, false) and not ability.mastered_display_name.is_empty():
+				ability_lines.append("%s · бонус в окно уязвимости" % ability.mastered_display_name)
 			else:
-				ability_lines.append("%s · готова в бою" % ability.display_name)
+				ability_lines.append("%s · доступен в бою" % ability.display_name)
 		else:
 			ability_lines.append("%s · ур. %d" % [ability.display_name, ability.unlock_level])
 	if state == session.hero and session.quest_flags.get(GameSession.HOLLOW_TEMPO, false):

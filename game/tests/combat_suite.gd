@@ -41,6 +41,8 @@ func run() -> Array[Dictionary]:
 	results.append(_run_case("reentrant_claim_is_refused_before_internal_signals", _test_reentrant_claim_guard))
 	results.append(_run_case("commands_and_checkpoint_respect_pending_and_return", _test_incompatible_command_guards))
 	results.append(_run_case("route_advance_uses_only_saved_winning_route_context", _test_pending_route_context))
+	results.append(_run_case("random_repeats_use_seen_enemies_and_survive_return", _test_random_repeat_pool))
+	results.append(_run_case("repeat_stats_scale_and_expedition_species_results_persist", _test_repeat_scaling))
 	results.append(_run_case("trial_echo_flag_survives_checkpoint_rollback", _test_trial_echo_rollback))
 	results.append(_run_case("starting_branch_wins_slime_and_story_goblin_in_both_modes", _test_branch_reachable_both_modes))
 	results.append(_run_case("auto_speed_preserves_events_seed_and_single_loot_roll", _test_auto_speed_determinism))
@@ -424,6 +426,66 @@ func _test_pending_route_context(context: TestContext) -> void:
 	context.check(repeat_session.pending_battle_result.get("encounter_mode", "") == GameSession.ENCOUNTER_REPEAT, "A beaten earlier enemy is a repeat")
 	DomainSuite.claim_pending(repeat_session)
 	context.check(repeat_session.route_state.get("next_index", 0) == 1, "Repeat claim cannot advance the canonical route")
+
+func _test_random_repeat_pool(context: TestContext) -> void:
+	var session := GameSession.new()
+	context.check(not session.select_random_repeat_encounter(), "A fresh profile has no known enemies")
+	var first: CombatResolver = session.start_combat("moss_slime")
+	if first == null:
+		context.check(false, "First story fight is available")
+		return
+	context.check(not session.select_random_repeat_encounter(), "An active fight blocks another encounter")
+	session.abandon_combat()
+	var service := SaveService.new()
+	var restored := GameSession.new()
+	restored.apply_state_dto(service.capture(session))
+	context.check(not restored.select_random_repeat_encounter(), "A defeat blocks repeats until return")
+	context.check(restored.checkpoints.restore(), "Return through First Trace restores the Trail")
+	context.check(restored.select_random_repeat_encounter() and restored.current_enemy_id == "moss_slime", "A seen enemy can recur after reload and rollback without a win")
+	restored.claimed_echo_enemy_ids["ash_raven"] = true
+	restored.claimed_echo_enemy_ids["bone_warden"] = true
+	context.check(restored.route_repeat_enemy_ids() == ["moss_slime", "ash_raven"], "Old saves use earned Echo to recover ordinary species")
+	var drawn: Dictionary = {}
+	seed(731)
+	for attempt: int in range(32):
+		if restored.select_random_repeat_encounter():
+			drawn[restored.current_enemy_id] = true
+	context.check(drawn.size() == 2 and drawn.has_all(["moss_slime", "ash_raven"]), "Random draws come only from known ordinary enemies")
+	context.check(restored.travel_to(GameSession.LOCATION_LIOREN) and not restored.select_random_repeat_encounter(), "Lioren has no random encounters")
+
+func _test_repeat_scaling(context: TestContext) -> void:
+	var session := GameSession.new()
+	var moth_definition: ActorDefinition = load(GameSession.ACTOR_PATHS["dust_moth"])
+	var base_hp: int = moth_definition.max_hp
+	var base_strength: int = moth_definition.strength
+	session.enemy_journal["dust_moth"] = true
+	var lower: CombatResolver = session.start_combat("dust_moth", true)
+	if lower == null:
+		context.check(false, "A known expedition species can be fought on the Trail")
+		return
+	context.check(lower.enemy.max_hp < base_hp and lower.enemy.strength < base_strength, "An early hero meets a weaker version")
+	session.abandon_combat()
+	session.checkpoints.restore()
+	session.hero.gain_xp(76)
+	session.choose_upgrade("strength")
+	session.choose_upgrade("max_hp")
+	var upper: CombatResolver = session.start_combat("dust_moth", true)
+	if upper == null:
+		context.check(false, "A known species stays available after return")
+		return
+	context.check(upper.enemy.max_hp > base_hp and upper.enemy.strength > base_strength, "A progressed hero meets a stronger version")
+	context.check(moth_definition.max_hp == base_hp and moth_definition.strength == base_strength, "Scaling leaves the shared story definition intact")
+	context.check(upper.enemy_slots[0].pollen_slow_ticks > 0, "The solo repeat retains the moth's pollen attack")
+	upper.advance_ticks(1800)
+	context.check(upper.won and session.pending_battle_result.get("encounter_mode", "") == GameSession.ENCOUNTER_REPEAT, "The progressed auto hero can win a scaled repeat")
+	var service := SaveService.new()
+	var dto: Dictionary = service.capture(session)
+	var restored := GameSession.new()
+	context.check(service.validate(dto), "A repeat with a species from an expedition is a valid pending result")
+	restored.apply_state_dto(dto)
+	context.check(not restored.select_random_repeat_encounter(), "A restored pending result blocks the next repeat")
+	context.check(DomainSuite.claim_pending(restored) and restored.last_settlement.get("xp", 0) == 4, "The restored repeat grants the configured experience")
+	context.check(restored.route_state["next_index"] == 0 and restored.quest_flags.is_empty(), "Repeat rewards do not advance the story")
 
 func _test_trial_echo_rollback(context: TestContext) -> void:
 	var session := GameSession.new()

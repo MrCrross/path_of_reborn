@@ -74,7 +74,7 @@ func _test_actor_definitions(context: TestContext) -> void:
 		context.check(hero.strength == 3, "Haruto starts with 3 strength")
 		context.check(hero.defense == 2, "Haruto starts with 2 defense")
 		context.check(hero.mana == 1, "Haruto starts with 1 mana")
-		context.check(hero.xp_thresholds == [4, 8, 12, 44], "Haruto uses the chapter XP table up to level 5")
+		context.check(hero.xp_thresholds == [4, 30, 19, 23], "Haruto unlocks Focused Strike early and gains later levels at expedition milestones")
 
 func _test_item_contract(context: TestContext) -> void:
 	var modifier := StatModifierDefinition.new()
@@ -158,7 +158,7 @@ func _test_xp_and_upgrades(context: TestContext) -> void:
 	remainder.gain_xp(5)
 	context.check(remainder.level == 2 and remainder.experience == 1, "XP remainder survives level-up")
 	var multiple := _hero()
-	multiple.gain_xp(12)
+	multiple.gain_xp(34)
 	context.check(multiple.level == 3 and multiple.experience == 0, "One grant can cross several thresholds")
 	context.check(multiple.pending_upgrade_choices == 2, "Each gained level has its own choice")
 	context.check(multiple.choose_upgrade("max_hp"), "Max HP upgrade is available")
@@ -175,7 +175,9 @@ func _test_damage_formula(context: TestContext) -> void:
 func _test_shop_and_travel(context: TestContext) -> void:
 	var session := GameSession.new()
 	context.check(session.location_id == GameSession.LOCATION_FOREST_EDGE, "New game starts on the trail")
+	context.check(session.has_visited_map_location(GameSession.LOCATION_FOREST_EDGE) and not session.has_visited_map_location(GameSession.LOCATION_LIOREN) and session.first_unvisited_map_route(false).is_empty(), "A new profile knows only the Trail and has no first travel route")
 	context.check(session.travel_to("unknown_place") == false, "Unknown location is refused")
+	context.check(session.map_travel_blocker(GameSession.LOCATION_LIOREN) == "daijiro" and not session.apply_map_travel(GameSession.LOCATION_LIOREN), "The map gates Lioren until Daijiro's sword")
 	# Лавка закрыта до сцены ворот.
 	context.check(not session.buy_item("wanderer_jacket"), "Purchase before the gates scene is refused")
 	session.world_flags[GameSession.WORLD_FLAG_LIOREN_SHOP_UNLOCKED] = true
@@ -201,9 +203,17 @@ func _test_shop_and_travel(context: TestContext) -> void:
 	returning.location_id = GameSession.LOCATION_LIOREN
 	returning.traces = 3
 	context.check(not returning.can_trade() and not returning.travel_to(GameSession.LOCATION_FOREST_EDGE), "A forced arrival needs rest and leaves the shop closed before the introduction")
-	context.check(returning.checkpoints.rest() and returning.travel_to(GameSession.LOCATION_FOREST_EDGE), "Rest opens the return to the Trail without a sword or shop access")
+	context.check(returning.map_travel_blocker(GameSession.LOCATION_FOREST_EDGE) == "rest" and not returning.apply_map_travel(GameSession.LOCATION_FOREST_EDGE), "The map blocks returning to the Trail before rest")
+	context.check(returning.checkpoints.rest() and returning.apply_map_travel(GameSession.LOCATION_FOREST_EDGE), "Rest opens the map route to the Trail without a sword or shop access")
 	returning.travel_to(GameSession.LOCATION_LIOREN)
 	returning.world_flags[GameSession.WORLD_FLAG_LIOREN_SHOP_UNLOCKED] = true
+	context.check(not returning.has_visited_map_location(GameSession.MAP_SHOP) and returning.first_unvisited_map_route(true) == GameSession.MAP_SHOP, "The gates allow a first visit without revealing a shop pin")
+	var before_shop: Dictionary = returning.capture_profile_dto()
+	context.check(returning.apply_map_travel(GameSession.MAP_SHOP) and returning.has_visited_map_location(GameSession.MAP_SHOP), "Entering the shop records the discovery")
+	returning.apply_profile_dto(before_shop)
+	var restored := GameSession.new()
+	restored.apply_state_dto(SaveService.new().capture(returning))
+	context.check(restored.has_visited_map_location(GameSession.MAP_SHOP) and restored.first_unvisited_map_route(true).is_empty(), "Discovered places are retained after profile rollback and save DTO reload")
 	returning.wallet[GameSession.COPPER] = 12
 	context.check(not returning.buy_item("wanderer_jacket", 1, 11) and returning.wallet[GameSession.COPPER] == 12, "A stale buy quote changes neither the balance nor the offer")
 	context.check(returning.can_trade() and returning.buy_item("wanderer_jacket", 1, 12) and not returning.world_flags.has(GameSession.WORLD_FLAG_SHOP_FIRST_SALE_DONE), "A funded player can buy before the first sale")

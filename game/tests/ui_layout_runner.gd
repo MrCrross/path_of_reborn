@@ -51,6 +51,13 @@ func _test_prologue_hold(screen: Control) -> void:
 			"hold":
 				break
 			"look":
+				await _settle()
+				var hotspot: Rect2 = screen.hotspot_marker.get_global_rect()
+				var arrow: TextureRect = screen.get_node("%HotspotIcon")
+				var icon_rect: Rect2 = arrow.get_global_rect()
+				_check(arrow.is_visible_in_tree() and icon_rect.size == Vector2(16, 16)
+					and hotspot.encloses(icon_rect) and hotspot.get_center().is_equal_approx(icon_rect.get_center()),
+					"The high-resolution Look arrow stays small and centered in its hotspot")
 				runner.look()
 			_:
 				runner.tap()
@@ -60,9 +67,9 @@ func _test_prologue_hold(screen: Control) -> void:
 	_check(
 		prompt.visible and not screen.dialogue_panel.visible
 		and is_equal_approx(rect.get_center().x, _host.size.x * 0.5)
-		and rect.size.y == 24.0 and rect.size.x < 60.0
+		and rect.size.y >= 24.0 and rect.end.y >= _host.size.y - 20.0
 		and Rect2(Vector2.ZERO, _host.size).encloses(rect),
-		"Rescue is a centered, content-sized action outside the dialogue panel: %s" % rect
+		"Rescue is centered near the bottom and has a full touch target: %s" % rect
 	)
 	_check(not screen.hold_progress_bar.visible, "Rescue hides the progress track until pressed")
 	var touch := InputEventScreenTouch.new()
@@ -101,6 +108,11 @@ func _run() -> void:
 			_bounds(screen)
 			if id == "prologue":
 				screen.runner.advance_ticks(60)
+				var reply_rect: Rect2 = screen.dialogue_panel.get_global_rect()
+				_check(screen.story_text.is_visible_in_tree() and not screen.story_text.text.is_empty()
+					and reply_rect.position.y > _host.size.y * 0.5
+					and reply_rect.grow(0.5).encloses(screen.story_text.get_global_rect()),
+					"The first spoken line is visible inside the lower dialogue panel: %s, %s" % [reply_rect, screen.story_text.get_global_rect()])
 				var panel_box: StyleBox = screen.dialogue_panel.get_theme_stylebox("panel")
 				_check(panel_box is StyleBoxFlat and panel_box.get_border_width_min() == 1, "Dialogue panel in Tokyo uses one thin shared outline")
 				_check(screen.story_text.is_visible_in_tree() and screen.story_text.get_parent() == screen.dialogue_panel.get_node("Margin/Column"), "Dialogue text uses one shared panel without a nested underlay")
@@ -151,6 +163,13 @@ func _run() -> void:
 				_check(root.gui_get_focus_owner() != null, "%s has initial keyboard focus" % id)
 			if id == "characters":
 				await _test_character_catalog(screen, session)
+			if id == "settings":
+				for row: Button in [screen.sound_toggle, screen.voice_option, screen.format_option, screen.speed_option, screen.ability_option]:
+					var style: StyleBox = row.get_theme_stylebox("disabled" if row.disabled else "normal")
+					_check(row.size.y >= 24 and style.get_margin(SIDE_LEFT) == AppTheme.SPACE_INSET
+						and style.get_margin(SIDE_RIGHT) == AppTheme.SPACE_INSET,
+						"Settings rows use shared insets and keep a full touch area")
+				_check(screen.format_option.get_theme_constant("arrow_margin") == AppTheme.SPACE_INSET, "Settings arrows use the same right inset")
 			if id == "inventory":
 				var item_id: String = session.inventory.filter("weapon")[0].instance_id
 				screen._on_item_pressed(item_id)
@@ -219,7 +238,8 @@ func _run() -> void:
 				session.route_state["next_index"] = 1
 				screen._refresh()
 				await _settle()
-				_check(screen.repeats_button.visible, "Repeat encounters stay available via the sheet entry")
+				_check(screen.repeats_button.visible, "A known enemy unlocks the random fight button")
+				_check(screen.hero_health.get_index() < screen.details_layer.get_index(), "Actor HP draws underneath modal details")
 				var nav_rail: Rect2 = screen.inventory_button.get_parent().get_global_rect()
 				_check(
 					nav_rail.encloses(screen.repeats_button.get_global_rect()) and not screen.repeats_button.get_global_rect().intersects(screen.equipment_strip.get_global_rect()),
@@ -242,28 +262,20 @@ func _run() -> void:
 				done_session.route_state["completed"] = true
 				done_screen._refresh()
 				_check("К испытанию" in done_screen.main_action_button.text, "Completed route promotes the next trial challenge")
-				_check(done_screen.repeats_button.visible and done_screen.repeats_button.icon != null and "Повторы" in done_screen.repeats_button.tooltip_text, "Completed route keeps repeats as secondary access")
-				var sheet_navigations: Dictionary = {"count": 0}
+				_check(done_screen.repeats_button.visible and done_screen.repeats_button.icon != null and "Случайный бой" == done_screen.repeats_button.tooltip_text, "Completed route keeps a labeled random fight action")
+				var encounter_navigations: Dictionary = {"count": 0}
 				done_screen.navigate_requested.connect(
-					func(_destination: String) -> void: sheet_navigations["count"] = int(sheet_navigations["count"]) + 1
+					func(_destination: String) -> void: encounter_navigations["count"] = int(encounter_navigations["count"]) + 1
 				)
 				done_screen._on_main_action_pressed()
-				_check(done_session.current_enemy_id == GameSession.TRIAL_ENEMY_ID and int(sheet_navigations["count"]) == 1, "Main action directly starts the trial")
+				_check(done_session.current_enemy_id == GameSession.TRIAL_ENEMY_ID and int(encounter_navigations["count"]) == 1, "Main action directly starts the trial")
 				done_screen._navigating = false
 				done_session.trial_echo_claimed = true
 				done_screen._refresh()
-				_check("Выбор встречи" in done_screen.main_action_button.text, "Claimed trial restores the general encounter choice")
+				_check(done_screen.main_action_button.text == "Случайный бой", "Claimed trial opens random fights through the main action")
 				done_screen._on_main_action_pressed()
-				_check(done_screen._sheet_open, "General choice opens the encounter sheet")
-				var sheet_buttons: Array = done_screen.sheet_rows.get_children()
-				_check(sheet_buttons.size() >= 2, "Sheet offers repeats plus the voluntary trial")
-				_check(
-					sheet_buttons[done_screen.sheet_rows.get_child_count() - 1] is Button and "Испытание" in (sheet_buttons[sheet_buttons.size() - 1] as Button).text,
-					"Trial row is labeled as a voluntary challenge"
-				)
-				(sheet_buttons[0] as Button).pressed.emit()
-				_check(int(sheet_navigations["count"]) == 2, "Sheet selection starts exactly one additional encounter")
-				_check(not done_screen._sheet_open, "Sheet closes after selection")
+				_check(done_session.current_enemy_id in done_session.route_repeat_enemy_ids(), "Main action picks a known enemy after the trial")
+				_check(int(encounter_navigations["count"]) == 2, "Main action starts the repeat directly")
 				_host.remove_child(done_screen)
 				done_screen.free()
 			if id == "combat":
@@ -360,6 +372,7 @@ func _run() -> void:
 					if help != null:
 						help._confirm.pressed.emit()
 						await _settle()
+					_check(screen.result_panel.card.size.x > 132.0, "Loot has a wider touch surface than the battle summary")
 					screen.result_panel.detail_button.pressed.emit()
 					_check(screen.details_layer.is_visible_in_tree(), "The information button opens the details sheet")
 					screen._on_press_began()
@@ -371,7 +384,7 @@ func _run() -> void:
 					screen.result_panel._choose("store")
 				_check(screen.result_panel.can_claim() and not screen.result_panel.card.visible, "The level card follows all loot")
 				_check(int(combat_navigations["count"]) == 0 and session.hero.level == 1, "Picking the last item waits for the level confirmation")
-				_check(_result_text(screen.result_panel).contains("8 XP") and _result_text(screen.result_panel).contains("Точный удар"), "The level card shows the correct XP remaining and new ability")
+				_check(_result_text(screen.result_panel).contains("30 XP") and _result_text(screen.result_panel).contains("Точный удар"), "The level card shows the correct XP remaining and new ability")
 				screen.result_panel.claim_button.pressed.emit()
 				_check(int(combat_navigations["count"]) == 1, "Confirming the level claims and navigates exactly once")
 				_check(session.pending_battle_result.is_empty(), "Claim closes the pending result")
@@ -409,6 +422,8 @@ func _run() -> void:
 	await _test_checkpoint_presentation()
 	await _test_result_gestures()
 	await _test_combat_mode_is_fixed_at_start()
+	await _test_ability_controls()
+	await _test_shop_appraisal_data()
 	await _test_battle_result_without_loot()
 	await _test_equipment_surfaces()
 	print("UI_RESULT: checks=%d failed=%d" % [_checks, _failed])
@@ -729,7 +744,7 @@ func _result_text(view: CombatResultView) -> String:
 func _test_battle_result_without_loot() -> void:
 	for capped: bool in [false, true]:
 		var session := GameSession.new()
-		session.hero.gain_xp(68 if capped else 4)
+		session.hero.gain_xp(76 if capped else 4)
 		session.select_encounter("moss_slime")
 		var resolver: CombatResolver = session.start_combat("moss_slime")
 		resolver.advance_ticks(600)
@@ -744,7 +759,7 @@ func _test_battle_result_without_loot() -> void:
 		_check(_result_text(result).contains("HP %d/" % saved_hp) and _result_text(result).contains("+0 Эхо"), "Summary reads the saved HP and actual Echo reward")
 		result.summary_button.pressed.emit()
 		_check(result.can_claim() and not result.card.visible and screen.get_node_or_null("ConfirmDialog") == null, "With no loot, OK goes straight to level without the gesture tutorial")
-		var expected: String = "Максимальный уровень" if capped else "До ур. 3 ост. 4 XP"
+		var expected: String = "Максимальный уровень" if capped else "До ур. 3 ост. 26 XP"
 		_check(_result_text(result).contains(expected) and not _result_text(result).contains("Выбор ×"), "Level card handles cap and XP without a level gain")
 		_host.remove_child(screen)
 		screen.free()
@@ -778,6 +793,56 @@ func _test_combat_mode_is_fixed_at_start() -> void:
 		_host.remove_child(screen)
 		screen.free()
 
+func _test_ability_controls() -> void:
+	var session := GameSession.new()
+	session.hero.gain_xp(4)
+	session.set_auto_ability(false)
+	session.seen_cue_ids["tutorial_focused_strike"] = true
+	session.select_encounter("moss_slime")
+	var screen: Control = await _screen("combat", session)
+	screen.set_physics_process(false)
+	screen._finish_intro()
+	await _settle()
+	_check(screen.ability_button.is_visible_in_tree() and not screen.attack_button.visible and not screen.dodge_button.visible, "Auto HUD shows the unlocked skill after the lesson")
+	_check(screen.resolver.auto_attack_enabled and screen.resolver.auto_dodge_enabled and not screen.resolver.auto_ability_enabled, "Manual skills preserve basic auto attacks and defense")
+	_check(not screen.actions.get_global_rect().intersects(screen.equipment_strip.get_global_rect()), "The auto skill stays below equipment")
+	screen.resolver.advance_ticks(1)
+	var key := InputEventKey.new()
+	key.physical_keycode = KEY_Q
+	key.pressed = true
+	root.push_input(key, true)
+	_check(screen.resolver.ability_queued and screen.ability_button.disabled and "Следующий удар" in screen.ability_button.text, "Q queues the skill during an auto attack")
+	screen.resolver.advance_ticks(screen.resolver.hero_attack_cooldown)
+	screen._refresh_cooldowns()
+	_check(screen.ability_cooldown.visible and screen.ability_button.disabled and "2 с" in screen.ability_button.text, "The landed skill starts the visible timer and disables recast")
+	screen._set_pause(true)
+	_check(not screen.actions.is_visible_in_tree(), "Pause hides combat controls")
+	screen._set_pause(false)
+	screen.resolver.advance_ticks(screen.resolver.hero_ability_cooldown)
+	screen._refresh_cooldowns()
+	_check(not screen.ability_cooldown.visible and not screen.ability_button.disabled and screen.ability_button.text == "Точный удар", "The skill becomes available again after its timer")
+	_host.remove_child(screen)
+	screen.free()
+
+func _test_shop_appraisal_data() -> void:
+	var session := GameSession.new()
+	var crystal: ItemDefinition = session.get_item_definition("echo_crystal").duplicate()
+	crystal.display_name = "Кристалл проверки"
+	session.item_definitions[crystal.id] = crystal
+	session.inventory.add(crystal, 1, "moss", {"sale_price_copper": 37})
+	var jacket: ItemDefinition = session.get_item_definition("wanderer_jacket").duplicate()
+	jacket.display_name = "Куртка проверки"
+	session.item_definitions[jacket.id] = jacket
+	var screen: Control = await _screen("shop", session)
+	var entries: Array = screen.dialogue.runner.entries
+	var assessment: String = entries[0]["text"]
+	var recommendation: String = entries[1]["text"]
+	var offer: Dictionary = screen._find_offer("wanderer_jacket")
+	_check(crystal.display_name in assessment and UiText.aspect("moss") in assessment and UiText.astra(37) in assessment, "Appraisal uses the real crystal name, aspect and instance price")
+	_check(jacket.display_name in recommendation and UiText.astra(offer["price_copper"]) in recommendation, "Daijiro quotes the same jacket name and price as the catalog")
+	_host.remove_child(screen)
+	screen.free()
+
 func _test_equipment_surfaces() -> void:
 	var session := GameSession.new()
 	var inventory: Control = await _screen("inventory", session)
@@ -786,9 +851,12 @@ func _test_equipment_surfaces() -> void:
 	var branch_id: String = session.inventory.equipment_for("haruto")["weapon"]
 	session.unequip_item("weapon")
 	await _settle()
-	for slot_id: String in ArtMap.EMPTY_SLOT_ICONS:
+	for slot_id: String in ArtMap.INVENTORY_SLOT_TILES:
 		var slot_button: Button = inventory.equipment_strip.slot_buttons[slot_id]
-		_check(slot_button.text.is_empty() and slot_button.icon.resource_path.ends_with(ArtMap.EMPTY_SLOT_ICONS[slot_id]), "Empty %s slot uses its own raster icon" % slot_id)
+		var tile := slot_button.get_theme_stylebox("normal") as StyleBoxTexture
+		_check(slot_button.text.is_empty() and slot_button.icon == null
+			and tile != null and tile.texture.resource_path.ends_with(ArtMap.INVENTORY_SLOT_TILES[slot_id]),
+			"Empty %s slot shows the illustrated tile" % slot_id)
 	inventory.equipment_strip.slot_buttons["weapon"].pressed.emit()
 	_check(inventory.filter_id == "weapon", "A12 empty weapon slot filters the existing backpack")
 	inventory._on_filter_selected(0)
@@ -798,6 +866,11 @@ func _test_equipment_surfaces() -> void:
 	session.equip_item(charms[0].instance_id)
 	await _settle()
 	_check(inventory.equipment_strip.slot_buttons["weapon"].icon != null and inventory.equipment_strip.slot_buttons["charm"].icon != null, "A12 occupied slots show real item icons")
+	var weapon_tile := inventory.equipment_strip.slot_buttons["weapon"].get_theme_stylebox("normal") as StyleBoxTexture
+	var charm_tile := inventory.equipment_strip.slot_buttons["charm"].get_theme_stylebox("normal") as StyleBoxTexture
+	_check(weapon_tile != null and weapon_tile.texture.resource_path.ends_with(ArtMap.INVENTORY_WEAPON_PLATE)
+		and charm_tile != null and charm_tile.texture.resource_path.ends_with(ArtMap.INVENTORY_SLOT_PLATE),
+		"Occupied slots keep the illustrated plates without the placeholder glyphs")
 	_check("Надето" in inventory.equipment_strip.slot_buttons["weapon"].accessibility_name, "A12 slot accessibility names the equipped state")
 	inventory.equipment_strip.slot_buttons["weapon"].pressed.emit()
 	await _settle()

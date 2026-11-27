@@ -1,7 +1,7 @@
 class_name UiIcons
 extends RefCounted
 
-## Curated, offline Pixelarticons subset (MIT). No HTTP or Iconify runtime.
+## Локальные векторные пиктограммы, рассчитанные на дробный масштаб интерфейса.
 const ROOT := "res://art/ui/icons/"
 const TOUCH_SIZE := 24
 const ICON_SIZE := 16
@@ -31,7 +31,7 @@ static func apply(button: Button, action: String, label: String, primary: bool =
 static func apply_texture(button: Button, icon: Texture2D, label: String, primary: bool = false) -> void:
 	button.text = ""
 	button.icon = icon
-	button.expand_icon = false
+	button.expand_icon = true
 	button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	button.add_theme_constant_override("icon_max_width", ICON_SIZE)
 	button.custom_minimum_size = Vector2(TOUCH_SIZE, TOUCH_SIZE)

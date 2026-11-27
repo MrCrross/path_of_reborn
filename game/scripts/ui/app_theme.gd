@@ -25,6 +25,9 @@ const COLOR_DIALOGUE_BG := Color("111a24e8")
 const COLOR_DIALOGUE_BORDER := Color("8fa3c0")
 const COLOR_DIALOGUE_TEXT := Color("e9e4d8")
 const DIALOGUE_TEXT_LINES := 3
+const SPACE_COMPACT := 4
+const SPACE_INSET := 8
+const SPACE_SECTION := 12
 
 static func dialogue_speaker_color(speaker: String) -> Color:
 	return COLOR_ACCENT if speaker == "Харуто" else COLOR_MAGIC
@@ -33,7 +36,7 @@ static func dialogue_speaker_color(speaker: String) -> Color:
 static func build() -> Theme:
 	var theme := Theme.new()
 	theme.default_font = ThemeDB.fallback_font
-	theme.default_font_size = 10
+	theme.default_font_size = 9
 	theme.set_color("font_color", "Label", COLOR_TEXT)
 	theme.set_color("font_color", "Button", COLOR_TEXT)
 
@@ -47,6 +50,30 @@ static func build() -> Theme:
 	theme.set_stylebox("disabled", "Button", flat(Color("141d17"), Color("1d2b20")))
 	theme.set_stylebox("focus", "Button", focus_box())
 	theme.set_color("font_disabled_color", "Button", COLOR_TEXT_DIM.darkened(0.25))
+	for control_type: String in ["CheckButton", "OptionButton"]:
+		var variation := StringName("Settings" + control_type)
+		theme.set_type_variation(variation, control_type)
+		theme.set_constant("h_separation", variation, SPACE_INSET)
+		for state: String in ["normal", "hover", "pressed", "disabled", "focus"]:
+			var row_box := theme.get_stylebox(state, "Button").duplicate() as StyleBoxFlat
+			row_box.content_margin_left = SPACE_INSET
+			row_box.content_margin_right = SPACE_INSET
+			row_box.content_margin_top = SPACE_COMPACT
+			row_box.content_margin_bottom = SPACE_COMPACT
+			theme.set_stylebox(state, variation, row_box)
+		for state: String in ["font_color", "font_hover_color", "font_focus_color", "font_pressed_color", "font_hover_pressed_color"]:
+			theme.set_color(state, variation, COLOR_TEXT)
+		theme.set_color("font_disabled_color", variation, COLOR_TEXT_DIM)
+	theme.set_constant("arrow_margin", "SettingsOptionButton", SPACE_INSET)
+	theme.set_type_variation("SettingsPopupMenu", "PopupMenu")
+	var popup_box := flat(COLOR_PANEL, COLOR_PANEL_BORDER)
+	popup_box.set_content_margin_all(SPACE_COMPACT)
+	theme.set_stylebox("panel", "SettingsPopupMenu", popup_box)
+	theme.set_stylebox("hover", "SettingsPopupMenu", flat(COLOR_PANEL_LIGHT, COLOR_PANEL_BORDER, 0))
+	theme.set_color("font_color", "SettingsPopupMenu", COLOR_TEXT)
+	theme.set_color("font_hover_color", "SettingsPopupMenu", COLOR_TEXT)
+	theme.set_constant("v_separation", "SettingsPopupMenu", SPACE_SECTION)
+	theme.set_constant("h_separation", "SettingsPopupMenu", SPACE_INSET)
 	theme.set_type_variation("CompactMultilineButton", "Button")
 	for state: String in ["normal", "hover", "pressed", "disabled", "focus"]:
 		var box := theme.get_stylebox(state, "Button").duplicate() as StyleBoxFlat
@@ -117,8 +144,8 @@ static func build() -> Theme:
 	theme.set_stylebox("background", "ProgressBar", flat(Color("101a13"), Color("1a2820")))
 	theme.set_stylebox("fill", "ProgressBar", flat(COLOR_PROGRESS, COLOR_PROGRESS.lightened(0.1)))
 
-	theme.set_constant("separation", "HBoxContainer", 4)
-	theme.set_constant("separation", "VBoxContainer", 4)
+	theme.set_constant("separation", "HBoxContainer", SPACE_COMPACT)
+	theme.set_constant("separation", "VBoxContainer", SPACE_COMPACT)
 	return theme
 
 

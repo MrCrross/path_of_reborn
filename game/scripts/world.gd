@@ -23,29 +23,21 @@ var session: GameSession
 @onready var checkpoint_button: Button = %CheckpointButton
 @onready var characters_button: Button = %CharactersButton
 @onready var rest_button: Button = %RestButton
-@onready var encounter_sheet: Control = %EncounterSheet
-@onready var sheet_rows: VBoxContainer = %SheetRows
-@onready var sheet_close: Button = %SheetClose
-@onready var travel_button: Button = %TravelButton
-@onready var shop_button: Button = %ShopButton
+@onready var map_button: Button = %MapButton
 
 var hero_health: ActorHealthDisplay
 var equipment_strip: EquipmentStrip
 var details_layer: Control
 var details_view: ItemDetailsView
 var gates_dialogue: DialogueOverlay
-var guild_button: Button
 var grove_route: GroveRouteView
 var hollow_route: HollowRouteView
 var outpost_route: OutpostRouteView
-var focus_guild_on_entry: bool = false
-var _travel_actions: HBoxContainer
-var _tutorial: ConfirmDialog
+var focus_map_on_entry: bool = false
 var _shown_background: String = ""
 var _hero_still_id: String = ""
 var _main_enemy_id: String = "moss_slime"
 var _navigating: bool = false
-var _sheet_open: bool = false
 var _inventory_badge: Label
 var _balance_exact: bool = false
 var _focus_guard := ModalFocus.new()
@@ -65,17 +57,8 @@ func handle_back() -> bool:
 	if details_layer != null and details_layer.visible:
 		_close_item_details()
 		return true
-	if _sheet_open:
-		_close_encounter_sheet()
-		return true
-	if grove_route != null:
-		grove_route.leave()
-		return true
-	if hollow_route != null:
-		hollow_route.leave()
-		return true
-	if outpost_route != null:
-		outpost_route.leave()
+	if session.location_id in GameSession.EXPEDITION_LOCATIONS:
+		_on_map_pressed()
 		return true
 	return false
 
@@ -84,7 +67,6 @@ func _ready() -> void:
 		session = GameSession.new()
 	UiIcons.apply_texture(settings_button, ArtMap.texture(ArtMap.UI["settings"]), "Настройки")
 	settings_button.theme_type_variation = &"HudIconButton"
-	settings_button.add_theme_constant_override("icon_max_width", UiIcons.TOUCH_SIZE)
 	UiIcons.tint(settings_button, Color.WHITE)
 	balance_button.icon = UiIcons.astra(GameSession.COPPER)
 	balance_button.add_theme_constant_override("icon_max_width", 16)
@@ -101,7 +83,7 @@ func _ready() -> void:
 	main_action_button.focus_mode = Control.FOCUS_ALL
 	main_action_button.icon = UiIcons.texture("next")
 	main_action_button.add_theme_constant_override("icon_max_width", 12)
-	main_action_button.expand_icon = false
+	main_action_button.expand_icon = true
 	for state: String in ["normal", "hover", "pressed", "disabled", "focus"]:
 		var box: StyleBoxFlat = main_action_button.get_theme_stylebox(state).duplicate()
 		box.expand_margin_left = -24.0
@@ -112,31 +94,26 @@ func _ready() -> void:
 	UiIcons.apply(inventory_button, "inventory", "Рюкзак")
 	UiIcons.apply_texture(characters_button, ArtMap.texture(ArtMap.UI["characters"]), "Персонажи")
 	UiIcons.apply_texture(
-		checkpoint_button, ArtMap.texture(ArtMap.UI["path_seal"]), "Печать Пути"
+		checkpoint_button, ArtMap.texture(ArtMap.UI["path_seal_nav"]), "Печать Пути"
 	)
 	UiIcons.apply(rest_button, "rest", "Отдохнуть · снять Следы")
+	UiIcons.apply(map_button, "path", "Карта мира")
+	map_button.text = "Карта мира"
+	map_button.expand_icon = false
+	map_button.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	map_button.add_theme_constant_override("icon_max_width", 12)
+	map_button.add_theme_constant_override("h_separation", 2)
+	map_button.add_theme_font_size_override("font_size", 8)
 	var nav_bar: Control = inventory_button.get_parent()
-	UiIcons.apply(repeats_button, "repeat", "Повторы и испытание")
+	UiIcons.apply(repeats_button, "repeat", "Случайный бой")
 	repeats_button.reparent(nav_bar)
 	upgrade_button.custom_minimum_size = Vector2(0, 22)
 	upgrade_button.add_theme_font_size_override("font_size", 8)
 	nav_bar.move_child(checkpoint_button, 0)
 	nav_bar.move_child(inventory_button, 1)
 	nav_bar.move_child(characters_button, 2)
+	nav_bar.move_child(map_button, 3)
 	var bottom: Control = nav_bar.get_parent()
-	_travel_actions = HBoxContainer.new()
-	_travel_actions.alignment = BoxContainer.ALIGNMENT_END
-	bottom.add_child(_travel_actions)
-	bottom.move_child(_travel_actions, travel_button.get_index())
-	for route_button: Button in [travel_button, shop_button]:
-		route_button.reparent(_travel_actions, false)
-		route_button.custom_minimum_size.x = 64
-	guild_button = Button.new()
-	guild_button.name = "GuildButton"
-	guild_button.text = "Гильдия"
-	guild_button.custom_minimum_size.y = UiIcons.TOUCH_SIZE
-	guild_button.pressed.connect(_on_guild_pressed)
-	_travel_actions.add_child(guild_button)
 	equipment_strip = EquipmentStrip.new()
 	equipment_strip.name = "EquipmentStrip"
 	nav_bar.get_parent().add_child(equipment_strip)
@@ -152,6 +129,7 @@ func _ready() -> void:
 	hero_health.name = "HeroHealth"
 	hero_health.setup("hero")
 	add_child(hero_health)
+	move_child(hero_health, hero_sprite.get_index() + 1)
 	gates_dialogue = DialogueOverlay.new()
 	gates_dialogue.name = "GatesDialogue"
 	gates_dialogue.configure(session)
@@ -165,23 +143,25 @@ func _ready() -> void:
 	if session.location_id == GameSession.LOCATION_GROVE:
 		grove_route = GroveRouteView.new()
 		add_child(grove_route)
-		grove_route.configure(session, self, bottom, _top_left, art_background)
+		grove_route.configure(session, self, bottom, map_button, art_background)
 		grove_route.command_requested.connect(func(command: String) -> void: grove_command_requested.emit(command))
+		grove_route.checkpoint_requested.connect(_on_checkpoint_pressed)
 		grove_route.encounter_requested.connect(_on_grove_encounter)
 		grove_route.dialogue_visibility_changed.connect(_show_grove_dialogue_shot)
 		grove_route.refresh.call_deferred()
 	elif session.location_id == GameSession.LOCATION_HOLLOW:
 		hollow_route = HollowRouteView.new()
 		add_child(hollow_route)
-		hollow_route.configure(session, self, bottom, _top_left, art_background)
+		hollow_route.configure(session, self, bottom, map_button, art_background)
 		hollow_route.command_requested.connect(func(command: String) -> void: hollow_command_requested.emit(command))
+		hollow_route.checkpoint_requested.connect(_on_checkpoint_pressed)
 		hollow_route.encounter_requested.connect(_on_grove_encounter)
 		hollow_route.shot_changed.connect(_show_grove_dialogue_shot)
 		hollow_route.refresh.call_deferred()
 	elif session.location_id == GameSession.LOCATION_OUTPOST:
 		outpost_route = OutpostRouteView.new()
 		add_child(outpost_route)
-		outpost_route.configure(session, self, bottom, _top_left, art_background)
+		outpost_route.configure(session, self, bottom, map_button, art_background)
 		outpost_route.command_requested.connect(func(command: String) -> void: outpost_command_requested.emit(command))
 		outpost_route.encounter_requested.connect(_on_grove_encounter)
 		outpost_route.shot_changed.connect(_show_grove_dialogue_shot)
@@ -191,12 +171,16 @@ func _ready() -> void:
 	_refresh_hero_art()
 	if not resized.is_connected(_layout_scene):
 		resized.connect(_layout_scene)
-	if focus_guild_on_entry and guild_button.visible:
-		guild_button.grab_focus()
+	if focus_map_on_entry:
+		_focus_map.call_deferred()
 	else:
 		inventory_button.grab_focus()
 	_try_start_gates_dialogue()
 	_show_trail_tutorial.call_deferred()
+
+func _focus_map() -> void:
+	if not _has_modal():
+		map_button.grab_focus()
 
 func _build_item_details() -> void:
 	details_layer = Control.new()
@@ -285,7 +269,7 @@ func _layout_scene() -> void:
 		_inventory_badge.position = Vector2(inventory_button.size.x - 9, -2)
 
 func _on_main_action_pressed() -> void:
-	if _navigating or _sheet_open or gates_dialogue.is_active() or is_instance_valid(_tutorial):
+	if _navigating or details_layer.visible or gates_dialogue.is_active() or ConfirmDialog.has_open(self):
 		return
 	# Лиорен — безопасная зона: свободное касание по городу не начинает бой.
 	if session.location_id != GameSession.LOCATION_FOREST_EDGE:
@@ -299,13 +283,16 @@ func _on_main_action_pressed() -> void:
 		main_action_button.disabled = true
 		navigate_requested.emit("merchant" if approach == "daijiro_cart" else "trail_dialogue")
 		return
-	if session.route_completed() and _main_enemy_id.is_empty():
-		_open_encounter_sheet()
-		return
-	if session.select_encounter(_main_enemy_id):
-		_navigating = true
-		main_action_button.disabled = true
-		navigate_requested.emit("combat")
+	if _main_enemy_id.is_empty():
+		_on_repeats_pressed()
+	elif session.select_encounter(_main_enemy_id):
+		_enter_combat()
+
+func _enter_combat() -> void:
+	_navigating = true
+	main_action_button.disabled = true
+	repeats_button.disabled = true
+	navigate_requested.emit("combat")
 
 func _show_grove_dialogue_shot(active: bool, bridge_shot: bool) -> void:
 	$Margin.visible = not active
@@ -321,9 +308,7 @@ func _on_grove_encounter(enemy_id: String) -> void:
 		navigate_requested.emit("combat")
 
 func grove_command_committed(command: String) -> void:
-	if command == "leave":
-		navigate_requested.emit("world_from_guild")
-	elif grove_route != null:
+	if grove_route != null:
 		_refresh()
 		grove_route.committed(command)
 
@@ -331,10 +316,8 @@ func grove_command_rejected(command: String) -> void:
 	if grove_route != null:
 		grove_route.rejected(command)
 
-func hollow_command_committed(command: String) -> void:
-	if command == "leave":
-		navigate_requested.emit("world_from_guild")
-	elif hollow_route != null:
+func hollow_command_committed(_command: String) -> void:
+	if hollow_route != null:
 		_refresh()
 		hollow_route.refresh()
 
@@ -342,10 +325,8 @@ func hollow_command_rejected(command: String) -> void:
 	if hollow_route != null:
 		hollow_route.rejected(command)
 
-func outpost_command_committed(command: String) -> void:
-	if command == "leave":
-		navigate_requested.emit("world_from_guild")
-	else:
+func outpost_command_committed(_command: String) -> void:
+	if outpost_route != null:
 		_refresh()
 		outpost_route.refresh()
 
@@ -353,45 +334,15 @@ func outpost_command_rejected(command: String) -> void:
 	outpost_route.rejected(command)
 
 func _on_repeats_pressed() -> void:
-	if _navigating:
+	if _navigating or details_layer.visible or gates_dialogue.is_active() or ConfirmDialog.has_open(self):
 		return
-	_open_encounter_sheet()
+	if session.select_random_repeat_encounter():
+		_enter_combat()
 
-func _on_sheet_enemy_pressed(enemy_id: String) -> void:
-	if _navigating:
+func _on_map_pressed() -> void:
+	if _navigating or _has_modal():
 		return
-	if session.select_encounter(enemy_id, enemy_id != GameSession.TRIAL_ENEMY_ID):
-		_close_encounter_sheet()
-		_navigating = true
-		navigate_requested.emit("combat")
-
-func _on_travel_pressed() -> void:
-	if _navigating or gates_dialogue.is_active():
-		return
-	var target: String = (
-		GameSession.LOCATION_FOREST_EDGE
-		if session.location_id == GameSession.LOCATION_LIOREN
-		else GameSession.LOCATION_LIOREN
-	)
-	if not session.travel_to(target):
-		return
-	_refresh()
-	_layout_scene()
-	if session.location_id == GameSession.LOCATION_LIOREN:
-		_try_start_gates_dialogue()
-	else:
-		_show_trail_tutorial()
-
-func _on_shop_pressed() -> void:
-	if _navigating or not session.can_trade():
-		return
-	navigate_requested.emit("shop")
-
-func _on_guild_pressed() -> void:
-	if _navigating or gates_dialogue.is_active() or not session.can_visit_guild():
-		return
-	session.set_guild_visit_active(true)
-	navigate_requested.emit("guild")
+	navigate_requested.emit("world_map")
 
 func _on_dialogue_command(command: Dictionary) -> void:
 	var key: String = String(command.get("key", ""))
@@ -404,29 +355,21 @@ func _on_dialogue_command(command: Dictionary) -> void:
 ## после закрытия приложения — естественное: вход определяется флагом лавки, а
 ## прочитанные реплики пропускаются runner'ом.
 func _try_start_gates_dialogue() -> void:
-	if gates_dialogue.is_active():
+	if gates_dialogue.is_active() or not session.should_show_lioren_gates():
 		return
-	# Сцена ворот принадлежит Лиорену: на Тропе экран мира может открываться
-	# сразу после подарка, и диалог не должен блокировать переезд «В Лиорен».
-	if session.location_id != GameSession.LOCATION_LIOREN:
-		return
-	if not session.story_rewards.has(GameSession.DAIJIRO_SWORD_REWARD_ID):
-		return
-	if session.shop_access_unlocked():
-		return
-	if gates_dialogue.play("res://data/narrative/lioren_gates.json", "В лавку", true):
+	if gates_dialogue.play("res://data/narrative/lioren_gates.json", "К карте Лиорена", true):
 		$Margin.hide()
 		hero_sprite.hide()
 		hero_health.hide()
 
-func _on_gates_finished(_destination: String) -> void:
-	navigate_requested.emit("shop")
+func _on_gates_finished(destination: String) -> void:
+	navigate_requested.emit(destination)
 
 func _show_trail_tutorial() -> void:
 	if session.location_id != GameSession.LOCATION_FOREST_EDGE or session.awaiting_return or session.traces == 3:
 		return
 	if session.trial_encounter_available() and not session.trial_echo_claimed:
-		_tutorial = ConfirmDialog.tutorial(self, session, "tutorial_trail_trial", "Испытание на Тропе",
+		ConfirmDialog.tutorial(self, session, "tutorial_trail_trial", "Испытание на Тропе",
 			"Разведчик отступил. Перед усиленным гоблином можно выбрать улучшение. Здоровье восстановится перед следующим боем.")
 
 func _on_settings_pressed() -> void:
@@ -458,7 +401,7 @@ func _on_rest_pressed() -> void:
 
 func _gui_input(event: InputEvent) -> void:
 	# Касание/клик по свободной игровой области начинает следующую встречу.
-	# STOP-контролы (навигация, слоты, листы) обрабатывают своё раньше.
+	# STOP-контролы (навигация, слоты) обрабатывают своё раньше.
 	var pressed: bool = event is InputEventScreenTouch and event.pressed
 	pressed = pressed or (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed and event.device != InputEvent.DEVICE_ID_EMULATION)
 	if pressed:
@@ -467,7 +410,7 @@ func _gui_input(event: InputEvent) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if _sheet_open or details_layer.visible or gates_dialogue.is_active() or ConfirmDialog.has_open(self) or (grove_route != null and grove_route.dialogue.is_active()) or (hollow_route != null and hollow_route.dialogue.is_active()) or (outpost_route != null and outpost_route.dialogue.is_active()):
+	if _has_modal():
 		return
 	if event.is_action_pressed("primary"):
 		get_viewport().set_input_as_handled()
@@ -479,52 +422,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		_on_checkpoint_pressed()
 
-## --- Sheet выбора встречи: повторы и испытание, добровольно ---
-
-func _open_encounter_sheet() -> void:
-	for child: Node in sheet_rows.get_children():
-		sheet_rows.remove_child(child)
-		child.queue_free()
-	for enemy_id: String in session.route_repeat_enemy_ids():
-		sheet_rows.add_child(_sheet_button(
-			"Повторить: %s" % UiText.enemy_name(enemy_id),
-			enemy_id
-		))
-	if session.trial_encounter_available():
-		var trial_bonus: String = "первый раз: суммарно +2 Эхо" if not session.trial_echo_claimed else "Эхо за первый раз уже получено"
-		sheet_rows.add_child(_sheet_button(
-			"Испытание: %s — %s; Эхо не откатывается Печатью" % [UiText.enemy_name(GameSession.TRIAL_ENEMY_ID), trial_bonus],
-			GameSession.TRIAL_ENEMY_ID
-		))
-	if sheet_rows.get_child_count() == 0:
-		return
-	encounter_sheet.show()
-	_sheet_open = true
-	_focus_guard.capture(encounter_sheet)
-	sheet_close.grab_focus()
-
-func _sheet_button(label: String, enemy_id: String) -> Button:
-	var button := Button.new()
-	button.text = label
-	button.custom_minimum_size = Vector2(0, 26)
-	button.add_theme_font_size_override("font_size", 9)
-	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	button.pressed.connect(_on_sheet_enemy_pressed.bind(enemy_id))
-	return button
-
-func _close_encounter_sheet() -> void:
-	encounter_sheet.hide()
-	_sheet_open = false
-	_focus_guard.restore()
-	inventory_button.grab_focus()
-
-func _on_sheet_close_pressed() -> void:
-	_close_encounter_sheet()
-
-func _on_sheet_dismiss(event: InputEvent) -> void:
-	if (event is InputEventScreenTouch and event.pressed) or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
-		get_viewport().set_input_as_handled()
-		_close_encounter_sheet()
+func _has_modal() -> bool:
+	return details_layer.visible or gates_dialogue.is_active() or ConfirmDialog.has_open(self) or (
+		(grove_route != null and grove_route.dialogue.is_active())
+		or (hollow_route != null and hollow_route.dialogue.is_active())
+		or (outpost_route != null and outpost_route.dialogue.is_active())
+	)
 
 func _refresh() -> void:
 	if session.location_id != _shown_background:
@@ -560,8 +463,8 @@ func _refresh() -> void:
 		main_action_button.tooltip_text = "Следующий вызов: усиленный гоблин"
 	else:
 		_main_enemy_id = ""
-		main_action_button.text = "Выбор встречи"
-		main_action_button.tooltip_text = "Повторы и испытание"
+		main_action_button.text = "Случайный бой"
+		main_action_button.tooltip_text = "Касание по свободной области начинает бой со знакомым врагом"
 	main_action_button.disabled = combat_blocked or _navigating
 	if combat_blocked:
 		locked_label.text = (
@@ -574,23 +477,12 @@ func _refresh() -> void:
 	locked_label.visible = not locked_label.text.is_empty()
 	locked_label.get_parent().visible = locked_label.visible
 
-	repeats_button.tooltip_text = "Повторы и испытание"
-	repeats_button.accessibility_name = repeats_button.tooltip_text
 	var in_city: bool = session.location_id == GameSession.LOCATION_LIOREN
 	var in_expedition: bool = session.location_id in GameSession.EXPEDITION_LOCATIONS
 	equipment_strip.set_suppressed(in_city or in_expedition)
 	checkpoint_button.visible = session.can_place_expedition_checkpoint()
-	repeats_button.visible = not in_city and not in_expedition and not combat_blocked and not session.route_repeat_enemy_ids().is_empty()
-	var has_daijiro_sword: bool = session.story_rewards.has(GameSession.DAIJIRO_SWORD_REWARD_ID)
-	travel_button.visible = not in_expedition and (in_city or has_daijiro_sword) and not session.awaiting_return
-	travel_button.disabled = in_city and session.traces == 3
-	travel_button.text = "На Тропу" if in_city else "В Лиорен"
-	travel_button.accessibility_name = travel_button.text
-	shop_button.visible = session.can_trade()
-	guild_button.visible = session.can_visit_guild()
-	travel_button.custom_minimum_size.x = 0 if guild_button.visible else 64
-	shop_button.custom_minimum_size.x = travel_button.custom_minimum_size.x
-	_travel_actions.visible = travel_button.visible or shop_button.visible or guild_button.visible
+	repeats_button.visible = not session.route_repeat_enemy_ids().is_empty()
+	repeats_button.disabled = _navigating
 	rest_button.visible = session.location_id == "lioren" and session.traces > 0
 	_inventory_badge.visible = session.hero.pending_upgrade_choices > 0 or session.pending_receive_fx
 	upgrade_button.visible = not in_expedition and session.hero.pending_upgrade_choices > 0 and not combat_blocked

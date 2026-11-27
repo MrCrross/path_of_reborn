@@ -6,7 +6,7 @@
 script = ExtResource("1_actor")
 id = "root_weaver"
 display_name = "Корневой плетун"
-max_hp = 12
+max_hp = 18
 strength = 4
 defense = 1
 behavior_id = "root_weaver"

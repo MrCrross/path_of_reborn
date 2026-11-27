@@ -34,6 +34,7 @@ func _ready() -> void:
 	preferences.load_preferences(preferences_path, save_service.peek_combat_format(save_path))
 	session.combat_format = preferences.combat_format
 	session.auto_speed = preferences.auto_speed
+	session.auto_ability = preferences.auto_ability
 	AudioServer.set_bus_mute(0, not preferences.sound_enabled)
 	router = SceneRouter.new()
 	router.configure(screen_host, session)
@@ -85,11 +86,11 @@ static func route_for_continue(target: GameSession) -> String:
 			return "merchant"
 	if target.guild_visit_active():
 		return "guild"
-	if target.can_trade() and (
-		not target.world_flags.get(GameSession.WORLD_FLAG_SHOP_INTRO_DONE, false)
-		or (target.world_flags.get(GameSession.WORLD_FLAG_SHOP_FIRST_PURCHASE_DONE, false) and not target.world_flags.get(GameSession.WORLD_FLAG_SHOP_PURCHASE_BRIEFING_DONE, false))
-	):
-		return "shop"
+	if target.can_trade():
+		if target.seen_cue_ids.has("DIA_SHOP_001") and not target.world_flags.get(GameSession.WORLD_FLAG_SHOP_INTRO_DONE, false):
+			return "shop"
+		if target.world_flags.get(GameSession.WORLD_FLAG_SHOP_FIRST_PURCHASE_DONE, false) and not target.world_flags.get(GameSession.WORLD_FLAG_SHOP_PURCHASE_BRIEFING_DONE, false):
+			return "shop"
 	return "world"
 
 func _on_screen_added(screen: Control) -> void:
@@ -116,6 +117,8 @@ func _on_screen_added(screen: Control) -> void:
 		screen.connect("hollow_command_requested", _on_hollow_command_requested)
 	if screen.has_signal("outpost_command_requested"):
 		screen.connect("outpost_command_requested", _on_outpost_command_requested)
+	if screen.has_signal("travel_requested"):
+		screen.connect("travel_requested", _on_travel_requested)
 	if screen.has_signal("open_bag_requested"):
 		screen.connect("open_bag_requested", _on_open_bag_requested)
 
@@ -246,6 +249,28 @@ func _on_outpost_command_requested(command: String) -> void:
 		screen.call("outpost_command_rejected", command)
 
 func _commit_expedition_command(command: String, route_id: String) -> bool:
+	return _commit_route_change(func(candidate: GameSession) -> bool: return candidate.apply_expedition_command(command, route_id))
+
+func _on_travel_requested(destination: String) -> void:
+	var map: Control = router.current_screen
+	if not session.map_travel_blocker(destination).is_empty():
+		map.call("travel_rejected")
+	elif destination == GameSession.MAP_SHOP and session.has_visited_map_location(destination):
+		router.go_to("shop")
+	elif _commit_route_change(func(candidate: GameSession) -> bool: return candidate.apply_map_travel(destination)):
+		match destination:
+			GameSession.LOCATION_LIOREN:
+				router.go_to("world" if session.should_show_lioren_gates() else "lioren_map")
+			GameSession.MAP_SHOP:
+				router.go_to("shop")
+			GameSession.MAP_GUILD:
+				router.go_to("guild")
+			_:
+				router.go_to("world")
+	else:
+		map.call("travel_rejected")
+
+func _commit_route_change(apply: Callable) -> bool:
 	if _restoring or _expedition_commit_active or _claim_commit_active or _checkpoint_commit_active or _shop_commit_active:
 		return false
 	if session.in_combat or session.checkpoints.channel_active or session.checkpoints.has_pending_completion():
@@ -253,16 +278,13 @@ func _commit_expedition_command(command: String, route_id: String) -> bool:
 	_expedition_commit_active = true
 	var candidate := GameSession.new()
 	candidate.apply_state_dto(save_service.capture(session))
-	var applied: bool = false
-	match route_id:
-		GameSession.LOCATION_GROVE: applied = candidate.apply_grove_command(command)
-		GameSession.LOCATION_HOLLOW: applied = candidate.apply_hollow_command(command)
-		GameSession.LOCATION_OUTPOST: applied = candidate.apply_outpost_command(command)
-	if not applied or not save_service.save(candidate, save_path):
+	if not apply.call(candidate) or not save_service.save(candidate, save_path):
 		_expedition_commit_active = false
 		return false
 	_restoring = true
+	var receive_fx: bool = session.pending_receive_fx
 	session.apply_state_dto(save_service.capture(candidate))
+	session.pending_receive_fx = receive_fx
 	_restoring = false
 	_expedition_commit_active = false
 	_connect_session_signals()
@@ -419,6 +441,7 @@ func _on_continue_requested() -> void:
 		return
 	session.combat_format = preferences.combat_format
 	session.auto_speed = preferences.auto_speed
+	session.auto_ability = preferences.auto_ability
 	AudioServer.set_bus_mute(0, not preferences.sound_enabled)
 	_connect_session_signals()
 	_was_awaiting_return = session.awaiting_return
@@ -435,6 +458,8 @@ func _connect_session_signals() -> void:
 		session.combat_format_changed.connect(_on_combat_format_changed)
 	if not session.auto_speed_changed.is_connected(_on_auto_speed_changed):
 		session.auto_speed_changed.connect(_on_auto_speed_changed)
+	if not session.auto_ability_changed.is_connected(_on_auto_ability_changed):
+		session.auto_ability_changed.connect(_on_auto_ability_changed)
 	if not session.checkpoints.changed.is_connected(_autosave):
 		session.checkpoints.changed.connect(_autosave)
 	_observe_inventory()
@@ -456,6 +481,12 @@ func _on_auto_speed_changed(speed: int) -> void:
 	if _restoring:
 		return
 	preferences.auto_speed = speed
+	_save_preferences()
+
+func _on_auto_ability_changed(enabled: bool) -> void:
+	if _restoring:
+		return
+	preferences.auto_ability = enabled
 	_save_preferences()
 
 func set_sound_enabled(enabled: bool) -> bool:

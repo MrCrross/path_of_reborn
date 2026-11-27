@@ -3,7 +3,12 @@ extends "res://tests/grove_acceptance_runner.gd"
 const HollowSuite = preload("res://tests/hollow_suite.gd")
 const HOLLOW_OUT := "res://../art_working/blue_hollow_qa/windows"
 
+var _hollow_out: String = HOLLOW_OUT
+
 func _run() -> void:
+	for argument: String in OS.get_cmdline_user_args():
+		if argument.begins_with("--hollow-out="):
+			_hollow_out = argument.trim_prefix("--hollow-out=")
 	for window_size: Vector2i in WINDOWS:
 		DisplayServer.window_set_size(window_size)
 		await _frames(10)
@@ -14,12 +19,10 @@ func _run() -> void:
 		_game.session.set_guild_visit_active(false)
 		_game.router.go_to("world")
 		await _frames(6)
-		await _click(_game.router.current_screen.guild_button)
-		await _read(_game.router.current_screen.dialogue)
+		await _map_visit("MapHollow")
 		await _capture("01_order")
-		await _click(_node("EnterHollow"))
 		await _read(_game.router.current_screen.dialogue)
-		if not _check(_game.session.location_id == GameSession.LOCATION_HOLLOW, "Guild departure opens Blue Hollow"):
+		if not _check(_game.session.location_id == GameSession.LOCATION_HOLLOW, "The map briefing opens Blue Hollow"):
 			break
 		await _read(_game.router.current_screen.hollow_route.dialogue)
 		await _click(_node("HollowFight"))
@@ -82,7 +85,7 @@ func _run() -> void:
 		await _frames(8)
 		_check(_game.session.checkpoints.manual_snapshots.size() == 1, "Safe ledge can be fixed")
 		await _click(seal.get_node("%BackButton"))
-		await _click(_node("DescendToElite"))
+		await _map_visit("MapBasin")
 		await _capture("06_risk")
 		if window_size.y == 800:
 			_game.notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
@@ -92,17 +95,21 @@ func _run() -> void:
 			cancel.pressed = true
 			root.push_input(cancel, true)
 		await _frames(2)
-		_check(_game.session.hollow_stage() == "ledge" and _node("DescendToElite").has_focus(), "Back cancels the warning and returns focus")
-		await _click(_node("DescendToElite"))
+		_check(_game.session.hollow_stage() == "ledge" and _node("MapBasin") == null and _node("FirstRoute").has_focus(), "Back cancels the warning, conceals the unvisited basin and returns focus")
+		await _map_visit("MapBasin")
 		var modal: Node = get_nodes_in_group(ConfirmDialog.MODAL_GROUP).back()
 		await _click(modal.get_node("%Confirm"))
 		await _read(_game.router.current_screen.hollow_route.dialogue)
 		if window_size.y == 800:
-			await _click(_node("RetreatFromBasin"))
+			await _click(_game.router.current_screen.map_button)
+			_check(_node("MapLioren").disabled, "The map leads back to the ledge before leaving the elite basin")
+			await _map_visit("MapLedge")
 			await _read(_game.router.current_screen.hollow_route.dialogue)
 			_check(not _game.session.quest_flags.has(GameSession.HOLLOW_ELITE_WON), "Retreat preserves the report without elite reward")
 		else:
 			_game.session.set_combat_format(GameSession.COMBAT_FORMAT_AUTO)
+			_game.session.choose_upgrade("strength")
+			_game.session.choose_upgrade("max_hp")
 			await _click(_node("HollowFight"))
 			combat = _game.router.current_screen
 			if not _check(combat.name == "Combat", "Elite encounter starts after confirmation"):
@@ -114,9 +121,10 @@ func _run() -> void:
 			await _open_claim(combat)
 			await _click(combat.result_panel.claim_button)
 			_check(_game.session.quest_flags.has(GameSession.HOLLOW_ELITE_WON), "Elite victory is recorded")
-		await _click(_node("ReturnToLioren"))
+		await _map_visit("MapLioren")
 		_check(_game.session.location_id == GameSession.LOCATION_LIOREN, "Route can leave for Lioren")
-		await _click(_game.router.current_screen.guild_button)
+		await _map_visit("MapGuild")
+		await _read(_game.router.current_screen.dialogue)
 		await _click(_node("ReportHollow"))
 		await _read(_game.router.current_screen.dialogue)
 		var rewards: CombatResultView = _node("GroveReportReward")
@@ -157,6 +165,6 @@ func _capture(label: String) -> void:
 	await _frames(4)
 	RenderingServer.force_draw()
 	var image: Image = root.get_texture().get_image()
-	var path: String = ProjectSettings.globalize_path(HOLLOW_OUT.path_join(_window_label).path_join(label + ".png"))
+	var path: String = ProjectSettings.globalize_path(_hollow_out.path_join(_window_label).path_join(label + ".png"))
 	DirAccess.make_dir_recursive_absolute(path.get_base_dir())
 	_check(image != null and image.save_png(path) == OK, "Capture %s" % label)

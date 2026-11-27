@@ -9,6 +9,12 @@ const SLOT_IDS: Array[String] = ["helmet", "armor", "weapon", "boots", "shoulder
 const SLOT_SIZE := Vector2(34, 24)
 const LEFT_SLOTS: Array[String] = ["helmet", "armor", "shoulders", "boots"]
 const RIGHT_SLOTS: Array[String] = ["weapon", "charm", "ring", "familiar"]
+const INVENTORY_TILE_BRIGHTNESS := {
+	&"normal": 1.0,
+	&"hover": 1.16,
+	&"pressed": 0.76,
+	&"disabled": 0.56,
+}
 
 var session: GameSession
 var display_mode: String = "inventory"
@@ -103,7 +109,8 @@ func _build_portrait_layout() -> void:
 		_add_slot(right, slot_id, Vector2(28, 27))
 
 func _add_slot(parent: Container, slot_id: String, extent: Vector2) -> void:
-	_empty_icons[slot_id] = ArtMap.texture(ArtMap.EMPTY_SLOT_ICONS[slot_id])
+	if display_mode != "inventory":
+		_empty_icons[slot_id] = ArtMap.texture(ArtMap.EMPTY_SLOT_ICONS[slot_id])
 	var button := Button.new()
 	button.name = "Slot_" + slot_id
 	button.custom_minimum_size = extent
@@ -111,6 +118,8 @@ func _add_slot(parent: Container, slot_id: String, extent: Vector2) -> void:
 	button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	button.expand_icon = true
 	button.add_theme_constant_override("icon_max_width", 20)
+	if display_mode == "inventory":
+		UiIcons.tint(button, Color.WHITE)
 	if display_mode == "combat":
 		button.focus_mode = Control.FOCUS_NONE
 		button.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -193,8 +202,28 @@ func _refresh_familiar(button: Button, badge: Label) -> void:
 	button.accessibility_name = button.tooltip_text
 
 func _set_slot_icon(button: Button, slot_id: String, item_icon: Texture2D = null) -> void:
+	if display_mode == "inventory":
+		var path: String = ArtMap.INVENTORY_SLOT_TILES[slot_id]
+		if item_icon != null:
+			path = ArtMap.INVENTORY_WEAPON_PLATE if slot_id == "weapon" else ArtMap.INVENTORY_SLOT_PLATE
+		_set_inventory_tile(button, path)
+		button.icon = item_icon
+		return
 	button.icon = item_icon if item_icon != null else _empty_icons[slot_id]
 	UiIcons.tint(button, Color.WHITE if item_icon != null else Color(1.0, 1.0, 1.0, 0.86))
+
+func _set_inventory_tile(button: Button, path: String) -> void:
+	var tile: Texture2D = ArtMap.texture(path)
+	var current := button.get_theme_stylebox("normal") as StyleBoxTexture
+	if current != null and current.texture == tile:
+		return
+	for state: StringName in INVENTORY_TILE_BRIGHTNESS:
+		var brightness: float = INVENTORY_TILE_BRIGHTNESS[state]
+		var style := StyleBoxTexture.new()
+		style.texture = tile
+		style.modulate_color = Color(brightness, brightness, brightness)
+		style.set_content_margin_all(2.0)
+		button.add_theme_stylebox_override(state, style)
 
 func _on_slot_pressed(slot_id: String) -> void:
 	if slot_id == "familiar":
